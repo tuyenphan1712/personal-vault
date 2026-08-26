@@ -25,6 +25,9 @@ target/
 # Local Claude settings (machine-specific)
 .claude/settings.local.json
 
+# Local private document storage (backend)
+backend-java-personal-vault/storage/
+
 # Logs
 *.log
 npm-debug.log*
