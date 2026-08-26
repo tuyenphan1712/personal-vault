@@ -4,6 +4,7 @@ import com.tuyen.personalvault.shared.security.JwtAuthenticationFilter;
 import com.tuyen.personalvault.shared.security.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE)
                 .body(ApiErrorResponse.of("DOCUMENT_003", "File is too large"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.of("ADMIN_001", "Admin permission required"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
