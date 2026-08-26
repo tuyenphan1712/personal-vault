@@ -37,8 +37,10 @@ The API uses **JWT access tokens** and **refresh tokens**:
 - **Access token**: short-lived, kept in Frontend memory, sent via the `Authorization` header.
 - **Web refresh token**: long-lived, stored in an HttpOnly, Secure cookie.
 - **Native mobile refresh token**: long-lived, returned only for a native-client auth flow and stored in iOS Keychain/Android Keystore through secure storage. Mobile does not depend on browser cookies.
-- Refresh tokens are stored and revocable in the `refresh_tokens` table.
+- Refresh tokens are stored and revocable in the `refresh_tokens` table, tagged with `client_type` (`web` or `mobile`).
 - Login and refresh must reject users whose `status` is `locked`.
+- **Brute-force protection**: after 5 consecutive failed login attempts for the same phone, `POST /auth/login` rejects further attempts with `429` / `AUTH_004` for 15 minutes, independent of the admin-controlled `status` lock. A successful login resets the counter. See `DATABASE.md` §2/§4 for the underlying `failed_login_attempts` / `lockout_until` fields.
+- **Accepted limitation**: `status` is only re-checked at login/refresh time, not on every authenticated request. If an admin locks a user mid-session, that user's still-unexpired access token continues to work until it naturally expires (15 minutes by default). This bounded window is an accepted MVP trade-off, not a bug — do not "fix" it by adding a per-request DB check without discussing the performance trade-off first.
 
 Request header:
 
@@ -171,6 +173,7 @@ docType: string, optional
 | 409 | Duplicate or conflicting resource |
 | 413 | File is too large |
 | 415 | File type is unsupported |
+| 429 | Too many failed login attempts — temporarily locked out |
 | 500 | Unexpected server error |
 
 **Error code prefixes by feature**:
@@ -180,13 +183,17 @@ COMMON_001       Invalid request
 AUTH_001         Invalid phone or password
 AUTH_002         Account is locked
 AUTH_003         Refresh token is invalid or revoked
+AUTH_004         Too many failed login attempts — temporarily locked out
 USER_001         User not found
+USER_002         Phone number already registered
 CREDENTIAL_001   Credential not found
 DOCUMENT_001     Document not found
 DOCUMENT_002     File type is unsupported
 DOCUMENT_003     File is too large
 ADMIN_001        Admin permission required
 ```
+
+> `USER_002` maps to HTTP `409` and is returned by `POST /auth/register` when the given `phone` already exists.
 
 ---
 
@@ -198,8 +205,8 @@ ADMIN_001        Admin permission required
 |---|---|---|---|
 | POST | `/auth/register` | Create a member account | No |
 | POST | `/auth/login` | Authenticate by phone and password | No |
-| POST | `/auth/refresh` | Issue a new access token | Refresh cookie |
-| POST | `/auth/logout` | Revoke current refresh token | Refresh cookie |
+| POST | `/auth/refresh` | Issue a new access token | Refresh cookie (web) or `refreshToken` body field (mobile) |
+| POST | `/auth/logout` | Revoke current refresh token | Refresh cookie (web) or `refreshToken` body field (mobile) |
 | GET | `/auth/me` | Get current user summary | User |
 
 ### Profile
@@ -207,7 +214,7 @@ ADMIN_001        Admin permission required
 | Method | Path | Description | Auth |
 |---|---|---|---|
 | GET | `/profile` | Get current user's profile | User |
-| PATCH | `/profile` | Update current user's profile | User |
+| PATCH | `/profile` | Update current user's profile (`fullName`, `birthday` only — `phone` is immutable via this endpoint) | User |
 
 ### Credentials
 
@@ -258,6 +265,48 @@ Request:
 
 For web clients, response data contains the current user and access token; the refresh token is set as an HttpOnly cookie and is **not** included in the JSON body. For native clients, include `clientType: "mobile"` (or use dedicated mobile auth endpoints) and return the refresh token in the response so the client can store it in Keychain/Keystore. Native refresh tokens must be hashed, rotated, and revoked exactly like web refresh tokens.
 
+On the 6th consecutive failed attempt within the lockout window, the response is `429` with `error.code = "AUTH_004"` and `error.details = { "retryAfterSeconds": <n> }` instead of the usual `401`/`AUTH_001`.
+
+Response `data` (both client types):
+
+```json
+{
+  "user": {
+    "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+    "phone": "0900000000",
+    "fullName": "Nguyen Van A",
+    "role": "member"
+  },
+  "accessToken": "eyJhbGciOi...",
+  "refreshToken": "only present for clientType=mobile",
+  "expiresIn": 900
+}
+```
+
+### `POST /auth/refresh`
+
+- **Web**: no request body — the refresh token is read from the HttpOnly cookie. Response sets a new rotated cookie and returns `{ accessToken, expiresIn }`.
+- **Mobile**: request body `{ "refreshToken": "..." }`. Response returns `{ accessToken, refreshToken, expiresIn }` with the refresh token **rotated** (the old `refresh_tokens` row is revoked, a new one issued) — the client must persist the new `refreshToken` and discard the old one.
+- Both variants reject with `AUTH_003` if the token is invalid, expired, or already revoked, and with `AUTH_002` if the owning user is `locked`.
+
+### `GET /auth/me`
+
+Response `data`:
+
+```json
+{
+  "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+  "phone": "0900000000",
+  "fullName": "Nguyen Van A",
+  "role": "member",
+  "status": "active"
+}
+```
+
+### `GET /profile` / `PATCH /profile`
+
+`GET` returns the same shape as `/auth/me` plus `birthday`. `PATCH` request body accepts only `fullName` and `birthday`; `phone`, `role`, and `status` are ignored if sent and can only change via `/auth/register` (phone, once) or admin endpoints (role/status).
+
 ### `POST /credentials`
 
 Request:
@@ -283,7 +332,22 @@ title      = Passport front page
 docType    = passport
 ```
 
-The backend validates file size and type, stores the file privately, and saves only metadata + storage path in MySQL.
+The backend validates file size and type, stores the file privately, and saves metadata (including the validated `mimeType` and `fileSize`) + storage path in MySQL.
+
+Response `data`:
+
+```json
+{
+  "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+  "title": "Passport front page",
+  "docType": "passport",
+  "mimeType": "image/png",
+  "fileSize": 482113,
+  "createdAt": "2026-08-22T10:30:00Z"
+}
+```
+
+`storage_path` is never returned to clients — files are only reachable via `GET /documents/{id}/download`, which streams the file with `Content-Type` set from the stored `mimeType` and `Content-Disposition: attachment`.
 
 ---
 

@@ -32,11 +32,15 @@
 | password_hash | VARCHAR(255) | NOT NULL | Bcrypt/argon2 hash |
 | birthday | DATE | NULL | Optional |
 | role | ENUM('admin','member') | NOT NULL, default `member` | Operational role only |
-| status | ENUM('active','locked') | NOT NULL, default `active` | Account lock status |
+| status | ENUM('active','locked') | NOT NULL, default `active` | **Admin-controlled** lock status — set only via `PATCH /admin/users/{id}/status`, stays locked until an admin reactivates it |
+| failed_login_attempts | INT | NOT NULL, default `0` | Consecutive failed login attempts; reset to `0` on successful login |
+| lockout_until | TIMESTAMP | NULL | **System-controlled**, temporary brute-force lockout — set automatically when `failed_login_attempts` hits the threshold, clears itself once the timestamp passes |
 | created_at | TIMESTAMP | NOT NULL, default now() | Audit field |
 | updated_at | TIMESTAMP | NOT NULL, default now() | Auto-updated |
 
 **Indexes**: `idx_users_phone` on `phone`
+
+> `status = locked` and `lockout_until` are two independent mechanisms — do not conflate them. `status` is a deliberate admin action with no expiry; `lockout_until` is an automatic, self-expiring brute-force cooldown that requires no admin action to clear. Both must be checked at login.
 
 ---
 
@@ -47,6 +51,7 @@
 | id | UUID | PK | Unique token record identifier |
 | user_id | UUID | FK → `users.id`, NOT NULL | Owner of the token |
 | token_hash | VARCHAR(255) | UNIQUE, NOT NULL | SHA-256 hash of the refresh token |
+| client_type | ENUM('web','mobile') | NOT NULL | Distinguishes browser-cookie sessions from native Keychain/Keystore sessions |
 | device_info | VARCHAR(255) | NULL | User agent / device name |
 | expires_at | TIMESTAMP | NOT NULL | Expiration time |
 | revoked_at | TIMESTAMP | NULL | Set on logout, rotation, or security event |
@@ -86,6 +91,8 @@
 | title | VARCHAR(255) | NOT NULL | e.g. "CCCD front side" |
 | doc_type | VARCHAR(100) | NULL | `cccd`, `diploma`, `passport` |
 | storage_path | TEXT | NOT NULL | File path or object storage URL |
+| mime_type | VARCHAR(100) | NOT NULL | Validated content type (`image/jpeg`, `image/png`, `application/pdf`); required to set the `Content-Type` header on download |
+| file_size | BIGINT | NOT NULL | File size in bytes at upload time; must be ≤ the configured max (10MB in MVP) |
 | created_at | TIMESTAMP | NOT NULL, default now() | Audit field |
 | updated_at | TIMESTAMP | NOT NULL, default now() | Auto-updated |
 
@@ -106,6 +113,9 @@ users (1) ──< owns >── (n) refresh_tokens
 - All relationships are **one-to-many**; no many-to-many in v1.
 - `credentials.user_id`, `documents.user_id`, `refresh_tokens.user_id` → FK to `users.id`.
 - **Cross-feature access rule**: every query on `credentials`, `documents`, or `refresh_tokens` must be scoped by `user_id` from the authenticated token — never trust a client-supplied `user_id`.
+- **Cascade on user deletion** (`DELETE /admin/users/{id}`):
+  - `credentials.user_id` and `refresh_tokens.user_id` use `ON DELETE CASCADE` — the database removes these rows automatically when the owning user is deleted.
+  - `documents.user_id` also uses `ON DELETE CASCADE` for the row, but the **file bytes are not touched by the database**. `AdminService`/`DocumentService` must delete the stored files from disk/object storage *before* (or in the same transaction as, with compensating cleanup on failure) removing the user, so cascade-deleted rows never leave orphaned files behind.
 
 ---
 
@@ -124,6 +134,7 @@ users (1) ──< owns >── (n) refresh_tokens
 - `refresh_tokens.token_hash` — stores a hash (SHA-256) of the token, never the raw value.
 - **Refresh token rotation**: on each use, the old record is revoked (`revoked_at` set) and a new record is issued. Expired/revoked tokens must be rejected at the **API layer**, not just filtered out of a query.
 - All sensitive endpoints must authorize via the authenticated user token and enforce `user_id` ownership checks.
+- **Brute-force protection**: `POST /auth/login` increments `users.failed_login_attempts` on each failed password check. After **5** consecutive failures, set `lockout_until = now() + 15 minutes` and reject further attempts with `AUTH_004` until that timestamp passes. A successful login resets `failed_login_attempts` to `0` and clears `lockout_until`. This check is separate from — and in addition to — the `status = locked` check.
 
 ---
 
@@ -147,22 +158,21 @@ users (1) ──< owns >── (n) refresh_tokens
 
 ### Example: Feature-based folder mapping
 
+> This mirrors the actual project package (`com.tuyen.personalvault`) and feature anatomy defined in `backend-java-personal-vault/docs/BE-ARCHITECTURE.md` — keep both in sync if either changes.
+
 ```text
-src/main/java/com/personalvault/
-├── user/
-│   ├── User.java                  # entity → users
-│   ├── UserRepository.java
-│   └── UserService.java
-├── auth/
-│   ├── RefreshToken.java          # entity → refresh_tokens
-│   └── RefreshTokenRepository.java
-├── credential/
-│   ├── Credential.java            # entity → credentials
-│   └── CredentialRepository.java
-├── document/
-│   ├── Document.java              # entity → documents
-│   └── DocumentRepository.java
+src/main/java/com/tuyen/personalvault/
+├── features/
+│   ├── users/
+│   │   └── entity/User.java               # entity → users
+│   ├── auth/
+│   │   └── entity/RefreshToken.java       # entity → refresh_tokens
+│   ├── credentials/
+│   │   └── entity/Credential.java         # entity → credentials
+│   └── documents/
+│       └── entity/Document.java           # entity → documents
 └── shared/
-    ├── BaseEntity.java            # common audit fields (created_at/updated_at)
-    └── exception/
+    ├── response/                          # ApiResponse, ApiErrorResponse, PageMeta
+    ├── exception/                         # AppException, GlobalExceptionHandler
+    └── security/                          # JwtProperties, CurrentUser
 ```
