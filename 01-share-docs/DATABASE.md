@@ -29,7 +29,7 @@
 | id | UUID | PK | Unique user identifier |
 | phone | VARCHAR(20) | UNIQUE, NOT NULL | Login identifier |
 | full_name | VARCHAR(255) | NOT NULL | User full name |
-| password_hash | VARCHAR(255) | NOT NULL | Bcrypt/argon2 hash |
+| password_hash | VARCHAR(255) | NOT NULL | BCrypt hash (Spring Security `BCryptPasswordEncoder`) |
 | birthday | DATE | NULL | Optional |
 | role | ENUM('admin','member') | NOT NULL, default `member` | Operational role only |
 | status | ENUM('active','locked') | NOT NULL, default `active` | **Admin-controlled** lock status — set only via `PATCH /admin/users/{id}/status`, stays locked until an admin reactivates it |
@@ -71,7 +71,8 @@
 | user_id | UUID | FK → `users.id`, NOT NULL | Owner of the record |
 | platform_name | VARCHAR(255) | NOT NULL | e.g. Gmail, Facebook |
 | account | VARCHAR(255) | NOT NULL | Username/email on that platform |
-| encrypted_password | TEXT | NOT NULL | Client-side encrypted password |
+| encrypted_password | TEXT | NOT NULL | Client-side encrypted password: `base64(iv):base64(ciphertext+authTag)` (AES-GCM). Opaque to the backend — never decrypted or validated. |
+| ciphertext_version | INT | NOT NULL, default `1` | Identifies the client-side encryption format/version. Backend stores it as-is; only the client uses it to pick the decryption path. See `API_SPEC.md` §7 `POST /credentials`. |
 | note | TEXT | NULL | Extra notes or reminders |
 | created_at | TIMESTAMP | NOT NULL, default now() | Audit field |
 | updated_at | TIMESTAMP | NOT NULL, default now() | Auto-updated |
@@ -89,7 +90,7 @@
 | id | UUID | PK | Unique document identifier |
 | user_id | UUID | FK → `users.id`, NOT NULL | Owner of the record |
 | title | VARCHAR(255) | NOT NULL | e.g. "CCCD front side" |
-| doc_type | VARCHAR(100) | NULL | `cccd`, `diploma`, `passport` |
+| doc_type | VARCHAR(100) | NULL | Free-text; MVP supported values: `cccd`, `diploma`, `passport` (validated at service layer, not a DB constraint — extendable later) |
 | storage_path | TEXT | NOT NULL | File path or object storage URL |
 | mime_type | VARCHAR(100) | NOT NULL | Validated content type (`image/jpeg`, `image/png`, `application/pdf`); required to set the `Content-Type` header on download |
 | file_size | BIGINT | NOT NULL | File size in bytes at upload time; must be ≤ the configured max (10MB in MVP) |
@@ -129,7 +130,7 @@ users (1) ──< owns >── (n) refresh_tokens
   - `users.status`: `active`, `locked`
 
 ### Security Conventions
-- `users.password_hash` — one-way hashed (bcrypt/argon2). Never store or log plaintext.
+- `users.password_hash` — one-way hashed with BCrypt. Never store or log plaintext.
 - `credentials.encrypted_password` — encrypted **client-side** before upload; server never sees plaintext.
 - `refresh_tokens.token_hash` — stores a hash (SHA-256) of the token, never the raw value.
 - **Refresh token rotation**: on each use, the old record is revoked (`revoked_at` set) and a new record is issued. Expired/revoked tokens must be rejected at the **API layer**, not just filtered out of a query.

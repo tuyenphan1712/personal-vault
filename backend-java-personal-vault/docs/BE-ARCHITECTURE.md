@@ -154,7 +154,7 @@ Configuration values such as database credentials, JWT secrets, and storage path
 ## 8. Security Architecture
 
 - Spring Security protects authenticated endpoints.
-- Login passwords are hashed with BCrypt or Argon2.
+- Login passwords are hashed with BCrypt (Spring Security `BCryptPasswordEncoder`).
 - JWT authentication populates the current user in the security context.
 - `credentials` and `documents` queries always filter by the **authenticated user ID**.
 - Admin role controls account administration, not access to another user's private content.

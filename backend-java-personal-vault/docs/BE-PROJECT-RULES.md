@@ -122,7 +122,7 @@ features/credentials/
 
 ## 5. Security and File Rules
 
-- Hash login passwords with BCrypt or Argon2 — never store plaintext passwords.
+- Hash login passwords with BCrypt (Spring Security `BCryptPasswordEncoder`) — never store plaintext passwords.
 - Use Spring Security for authentication and role checks.
 - Access/refresh tokens must support logout/revocation per the auth design.
 - `password_hash` and credential ciphertext must never appear in API responses or logs.

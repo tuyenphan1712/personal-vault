@@ -102,6 +102,8 @@ title: string
 docType: string, optional
 ```
 
+`docType` is free-text (not a DB enum); MVP-supported values are `cccd`, `diploma`, `passport`. The Frontend/Mobile document-type picker should offer these three; the backend validates at the service layer, not via a DB constraint, so the set can grow later without a migration.
+
 **MVP file rules**:
 
 - Max file size: **10MB** per file.
@@ -195,6 +197,26 @@ ADMIN_001        Admin permission required
 
 > `USER_002` maps to HTTP `409` and is returned by `POST /auth/register` when the given `phone` already exists.
 
+### `COMMON_001` validation error details
+
+When `COMMON_001` (`400`) is returned for request body validation failures (Jakarta Bean Validation on the backend, React Hook Form + Zod on Frontend/Mobile), `error.details` is an array of field-level errors instead of `null`:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "COMMON_001",
+    "message": "Validation failed",
+    "details": [
+      { "field": "phone", "message": "Phone number is required" },
+      { "field": "password", "message": "Password must be at least 8 characters" }
+    ]
+  }
+}
+```
+
+`field` uses the same `camelCase` request field name so Frontend/Mobile can map errors directly onto form fields. For non-field errors (e.g. malformed JSON body), `details` is `null` and `message` carries the description.
+
 ---
 
 ## 6. Endpoints by Feature
@@ -251,6 +273,24 @@ ADMIN_001        Admin permission required
 ---
 
 ## 7. Endpoint Details
+
+### `POST /auth/register`
+
+Request:
+
+```json
+{
+  "phone": "0900000000",
+  "password": "user-password",
+  "fullName": "Nguyen Van A"
+}
+```
+
+- `phone`, `password`, and `fullName` are required. `birthday` and `role`/`status` are **not** accepted here — `birthday` is set later via `PATCH /profile`; `role` always defaults to `member` and `status` always defaults to `active`.
+- Rejects with `409` / `USER_002` if `phone` already exists.
+- Password complexity rules are enforced by shared Zod schema on Frontend/Mobile and Jakarta Bean Validation on the backend; both must stay in sync if rules change.
+
+Response `data` is the same shape as `GET /auth/me` (no tokens — the client must call `POST /auth/login` after registering).
 
 ### `POST /auth/login`
 
@@ -315,12 +355,18 @@ Request:
 {
   "platformName": "Gmail",
   "account": "user@gmail.com",
-  "encryptedPassword": "base64-ciphertext-and-iv",
+  "encryptedPassword": "base64(iv):base64(ciphertext+authTag)",
+  "ciphertextVersion": 1,
   "note": null
 }
 ```
 
-The backend validates ownership from JWT, stores the ciphertext, and never decrypts it.
+**Client-side encryption contract** (must be identical on Frontend and Mobile, per `MOBILE-ARCHITECTURE.md` §7):
+
+- Algorithm: AES-GCM, 256-bit key, 12-byte random IV/nonce generated fresh per value.
+- Encoding: `encryptedPassword` is `base64(iv)` and `base64(ciphertext + authTag)` joined with a single `:` separator — never concatenate without a separator, since IV length must stay decodable independent of ciphertext length.
+- `ciphertextVersion` (integer, defaults to `1` if omitted) identifies the algorithm/encoding version. A future crypto change increments this — the backend stores it as-is and never validates its contents; only the client uses it to pick the right decryption path. Never reinterpret an existing version's stored ciphertext under a new format.
+- The backend validates ownership from JWT, stores `encryptedPassword` and `ciphertextVersion` as opaque values, and never decrypts them.
 
 ### `POST /documents`
 
@@ -348,6 +394,41 @@ Response `data`:
 ```
 
 `storage_path` is never returned to clients — files are only reachable via `GET /documents/{id}/download`, which streams the file with `Content-Type` set from the stored `mimeType` and `Content-Disposition: attachment`.
+
+### `GET /admin/users`
+
+Supports the standard `page`/`limit`/`search`/`sortBy`/`sortDirection` params from §3. Response `data` is a list of:
+
+```json
+{
+  "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+  "phone": "0900000000",
+  "fullName": "Nguyen Van A",
+  "role": "member",
+  "status": "active",
+  "createdAt": "2026-08-22T10:30:00Z"
+}
+```
+
+`failed_login_attempts` and `lockout_until` are **not** included — they are an internal brute-force mechanism, not account-administration data, and admins do not need them to lock/unlock an account.
+
+### `PATCH /admin/users/{id}/status`
+
+Request:
+
+```json
+{ "status": "locked" }
+```
+
+- `status` must be `"active"` or `"locked"` — any other value is `400`/`COMMON_001`.
+- Locking a user does **not** revoke their existing refresh tokens or invalidate an unexpired access token — see the `status` re-check caveat in §2. If immediate session termination is later required, that is a separate, explicitly-scoped change (e.g. revoking all `refresh_tokens` rows for the user), not part of this endpoint today.
+- Response `data` is the updated user, same shape as a `GET /admin/users` row.
+- Returns `404`/`USER_001` if the target user does not exist.
+
+### `DELETE /admin/users/{id}`
+
+- Deletes the user; `credentials` and `refresh_tokens` rows cascade at the DB level (see `DATABASE.md` §3). The backend must delete the user's document files from storage **before** removing the user row so no orphaned files remain.
+- Returns `204` with no body on success, `404`/`USER_001` if the user does not exist.
 
 ---
 
