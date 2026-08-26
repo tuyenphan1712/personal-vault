@@ -110,9 +110,9 @@ User action → Component → Feature hook → Feature service → Axios → Spr
 **Examples**:
 
 ```text
-LoginForm → useLogin() → auth.service.ts → POST /api/auth/login
-CredentialForm → encrypt locally → useCreateCredential() → POST /api/credentials
-DocumentList → useDocuments() → document.service.ts → GET /api/documents
+LoginForm → useLogin() → auth.service.ts → POST /api/v1/auth/login
+CredentialForm → encrypt locally → useCreateCredential() → POST /api/v1/credentials
+DocumentList → useDocuments() → document.service.ts → GET /api/v1/documents
 ```
 
 > Components must not call Axios directly. Services must not contain UI logic.
