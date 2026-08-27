@@ -28,7 +28,7 @@ Feature-based organization keeps related code together and makes it easier to ad
 
 | Concern | Choice |
 |---|---|
-| Language | Java 17+ LTS |
+| Language | Java 21 (LTS) |
 | Framework | Spring Boot |
 | Security | Spring Security with JWT access/refresh tokens |
 | Persistence | Spring Data JPA + Hibernate |
@@ -65,8 +65,9 @@ src/main/java/com/tuyen/personalvault/
 ```text
 src/main/resources/db/migration/
 ├── V1__create_users_table.sql
-├── V2__create_credentials_table.sql
-└── V3__create_documents_table.sql
+├── V2__create_refresh_tokens_table.sql
+├── V3__create_credentials_table.sql
+└── V4__create_documents_table.sql
 ```
 
 ---
@@ -127,6 +128,7 @@ GET /api/v1/credentials
 ## 6. Feature Communication
 
 - ❌ Features must not import another feature's repositories, entities, or internal implementation directly.
+- **Exception**: `admin` has no entity/repository of its own and is allowed to import `UserRepository`, `DocumentRepository`, and `DocumentStorageService` directly — see `AdminContext.md` and `BE-PROJECT-RULES.md` §3.
 - ✅ Allowed communication:
   - Public service interfaces
   - Dependency injection

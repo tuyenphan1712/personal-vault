@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -70,12 +71,26 @@ class DocumentControllerTest {
     void listReturns200WithItemsAndMeta() throws Exception {
         DocumentService.DocumentListResult result = new DocumentService.DocumentListResult(
                 List.of(sampleResponse()), new PageMeta(1, 20, 1, 1));
-        when(documentService.list(any())).thenReturn(result);
+        when(documentService.list(anyInt(), anyInt(), any(), any(), any(), any())).thenReturn(result);
 
         mockMvc.perform(get("/api/v1/documents"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value("Passport front"))
                 .andExpect(jsonPath("$.meta.total").value(1));
+    }
+
+    @Test
+    void listPassesSearchDocTypeAndSortParamsToService() throws Exception {
+        DocumentService.DocumentListResult result = new DocumentService.DocumentListResult(
+                List.of(), new PageMeta(1, 20, 0, 0));
+        when(documentService.list(1, 20, "front", "passport", "title", "asc")).thenReturn(result);
+
+        mockMvc.perform(get("/api/v1/documents")
+                        .param("search", "front")
+                        .param("docType", "passport")
+                        .param("sortBy", "title")
+                        .param("sortDirection", "asc"))
+                .andExpect(status().isOk());
     }
 
     @Test

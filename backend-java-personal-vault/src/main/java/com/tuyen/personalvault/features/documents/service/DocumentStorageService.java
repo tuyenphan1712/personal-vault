@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,12 @@ public class DocumentStorageService {
 
     private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
             "image/jpeg", "image/png", "application/pdf"
+    );
+
+    private static final Map<String, byte[]> MAGIC_BYTES = Map.of(
+            "image/jpeg", new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF},
+            "image/png", new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A},
+            "application/pdf", new byte[]{0x25, 0x50, 0x44, 0x46}
     );
 
     private final Path storageRoot;
@@ -44,6 +51,9 @@ public class DocumentStorageService {
         if (file.getSize() > maxFileSizeBytes) {
             throw new FileTooLargeException();
         }
+        if (!matchesMagicBytes(file, mimeType)) {
+            throw new UnsupportedFileTypeException();
+        }
 
         String fileName = UUID.randomUUID().toString();
         Path target = storageRoot.resolve(fileName).normalize();
@@ -54,6 +64,16 @@ public class DocumentStorageService {
         }
 
         return new StoredFile(target.toString(), mimeType, file.getSize());
+    }
+
+    private boolean matchesMagicBytes(MultipartFile file, String mimeType) {
+        byte[] signature = MAGIC_BYTES.get(mimeType);
+        try {
+            byte[] header = file.getInputStream().readNBytes(signature.length);
+            return java.util.Arrays.equals(header, signature);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to inspect document file content", e);
+        }
     }
 
     public Resource load(String storagePath) {

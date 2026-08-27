@@ -6,8 +6,6 @@ import com.tuyen.personalvault.features.credentials.dto.UpdateCredentialRequest;
 import com.tuyen.personalvault.features.credentials.service.CredentialService;
 import com.tuyen.personalvault.shared.response.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,9 +34,11 @@ public class CredentialController {
     @GetMapping
     public ApiResponse<List<CredentialResponse>> list(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int limit) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(limit, 100));
-        CredentialService.CredentialListResult result = credentialService.list(pageable);
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+        CredentialService.CredentialListResult result = credentialService.list(page, limit, search, sortBy, sortDirection);
         return ApiResponse.of(result.items(), result.meta());
     }
 

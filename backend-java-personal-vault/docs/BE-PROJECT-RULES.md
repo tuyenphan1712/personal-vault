@@ -10,7 +10,7 @@
 
 | Concern | Choice |
 |---|---|
-| Language | Java 17+ (LTS) |
+| Language | Java 21 (LTS) |
 | Framework | Spring Boot |
 | Security | Spring Security + JWT access/refresh token flow |
 | ORM | Spring Data JPA with Hibernate |
@@ -88,6 +88,7 @@ features/credentials/
 - A feature must be self-contained around one business capability.
 - ❌ Do not import another feature's internal classes directly.
 - ✅ Cross-feature communication uses a public service interface, shared service, or event.
+- **Exception**: `admin` has no table/entity of its own (see `AdminContext.md`) and is allowed to import `UserRepository` directly and `DocumentRepository`/`DocumentStorageService` for delete-cascade file cleanup. This is the only sanctioned direct cross-feature repository import in the codebase — do not extend it to other features without updating this rule.
 - Keep shared code in `shared/` — do not use it as a general dumping ground.
 - Required features: `auth`, `users`, `credentials`, `documents`, `admin`.
 - Ownership of credentials/documents is always determined from the **authenticated JWT user**.

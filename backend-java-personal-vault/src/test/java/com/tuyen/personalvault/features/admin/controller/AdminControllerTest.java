@@ -99,6 +99,18 @@ class AdminControllerTest {
     }
 
     @Test
+    void updateStatusReturns400WhenStatusMissing() throws Exception {
+        mockMvc.perform(patch("/api/v1/admin/users/{id}/status", UUID.randomUUID())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("COMMON_001"));
+    }
+
+    @Test
     void updateStatusReturns404WhenUserMissing() throws Exception {
         when(adminService.updateStatus(any(), any())).thenThrow(new UserNotFoundException());
 

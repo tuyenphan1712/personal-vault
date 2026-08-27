@@ -37,9 +37,19 @@ class DocumentStorageServiceTest {
     @Nested
     class Store {
 
+        private static final byte[] PNG_SIGNATURE = {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+
+        private byte[] validPngBytes(String... extra) {
+            byte[] tail = "fake-image-bytes".getBytes();
+            byte[] content = new byte[PNG_SIGNATURE.length + tail.length];
+            System.arraycopy(PNG_SIGNATURE, 0, content, 0, PNG_SIGNATURE.length);
+            System.arraycopy(tail, 0, content, PNG_SIGNATURE.length, tail.length);
+            return content;
+        }
+
         @Test
         void writesFileAndReturnsMetadataForAllowedType() throws IOException {
-            byte[] content = "fake-image-bytes".getBytes();
+            byte[] content = validPngBytes();
             MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", content);
 
             DocumentStorageService.StoredFile stored = storageService.store(file);
@@ -52,7 +62,7 @@ class DocumentStorageServiceTest {
 
         @Test
         void usesRandomFileNameNotOriginalFileName() {
-            MockMultipartFile file = new MockMultipartFile("file", "my-passport.png", "image/png", "x".getBytes());
+            MockMultipartFile file = new MockMultipartFile("file", "my-passport.png", "image/png", validPngBytes());
 
             DocumentStorageService.StoredFile stored = storageService.store(file);
 
@@ -66,6 +76,26 @@ class DocumentStorageServiceTest {
             assertThatThrownBy(() -> storageService.store(file))
                     .isInstanceOf(UnsupportedFileTypeException.class);
             assertThat(fileCount()).isZero();
+        }
+
+        @Test
+        void rejectsContentWhoseMagicBytesDontMatchDeclaredMimeType() throws IOException {
+            byte[] notActuallyPng = "this-is-plain-text-not-a-png".getBytes();
+            MockMultipartFile file = new MockMultipartFile("file", "fake.png", "image/png", notActuallyPng);
+
+            assertThatThrownBy(() -> storageService.store(file))
+                    .isInstanceOf(UnsupportedFileTypeException.class);
+            assertThat(fileCount()).isZero();
+        }
+
+        @Test
+        void acceptsContentWhoseMagicBytesMatchDeclaredPngMimeType() {
+            byte[] pngSignature = {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3};
+            MockMultipartFile file = new MockMultipartFile("file", "real.png", "image/png", pngSignature);
+
+            DocumentStorageService.StoredFile stored = storageService.store(file);
+
+            assertThat(stored.mimeType()).isEqualTo("image/png");
         }
 
         @Test

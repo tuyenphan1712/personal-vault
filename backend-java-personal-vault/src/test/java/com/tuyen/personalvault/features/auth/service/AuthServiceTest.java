@@ -230,7 +230,7 @@ class AuthServiceTest {
         void rotatesTokenAndKeepsClientTypeFromStoredToken() {
             User user = activeUser();
             RefreshToken current = usableToken(user, ClientType.web);
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(current));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
             when(jwtService.generateAccessToken(user.getId(), "member")).thenReturn("new-access-token");
             when(jwtService.getAccessTokenExpirationSeconds()).thenReturn(900L);
 
@@ -247,7 +247,7 @@ class AuthServiceTest {
         void mobileRefreshReturnsRawTokenInResponse() {
             User user = activeUser();
             RefreshToken current = usableToken(user, ClientType.mobile);
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(current));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
             when(jwtService.generateAccessToken(user.getId(), "member")).thenReturn("new-access-token");
             when(jwtService.getAccessTokenExpirationSeconds()).thenReturn(900L);
 
@@ -258,7 +258,7 @@ class AuthServiceTest {
 
         @Test
         void throwsInvalidRefreshTokenWhenNotFound() {
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.empty());
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> authService.refresh("unknown-token"))
                     .isInstanceOf(InvalidRefreshTokenException.class);
@@ -269,7 +269,7 @@ class AuthServiceTest {
             User user = activeUser();
             RefreshToken revoked = usableToken(user, ClientType.web);
             revoked.setRevokedAt(LocalDateTime.now());
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(revoked));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(revoked));
 
             assertThatThrownBy(() -> authService.refresh("raw-refresh-token"))
                     .isInstanceOf(InvalidRefreshTokenException.class);
@@ -280,7 +280,7 @@ class AuthServiceTest {
             User user = activeUser();
             RefreshToken expired = new RefreshToken(UUID.randomUUID(), user, "hash", ClientType.web,
                     "test-agent", LocalDateTime.now().minusMinutes(1));
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(expired));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(expired));
 
             assertThatThrownBy(() -> authService.refresh("raw-refresh-token"))
                     .isInstanceOf(InvalidRefreshTokenException.class);
@@ -291,7 +291,7 @@ class AuthServiceTest {
             User user = activeUser();
             user.setStatus(UserStatus.locked);
             RefreshToken current = usableToken(user, ClientType.web);
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(current));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
 
             assertThatThrownBy(() -> authService.refresh("raw-refresh-token"))
                     .isInstanceOf(AccountLockedException.class);
@@ -307,7 +307,7 @@ class AuthServiceTest {
             User user = activeUser();
             RefreshToken current = new RefreshToken(UUID.randomUUID(), user, "hash", ClientType.web,
                     "test-agent", LocalDateTime.now().plusDays(1));
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(current));
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
 
             authService.logout("raw-refresh-token");
 
@@ -316,7 +316,7 @@ class AuthServiceTest {
 
         @Test
         void doesNothingWhenTokenUnknown() {
-            when(refreshTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.empty());
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.empty());
 
             authService.logout("unknown-token");
 
@@ -327,7 +327,7 @@ class AuthServiceTest {
         void doesNothingWhenTokenBlank() {
             authService.logout(" ");
 
-            verify(refreshTokenRepository, never()).findByTokenHash(anyString());
+            verify(refreshTokenRepository, never()).findByTokenHashForUpdate(anyString());
         }
     }
 

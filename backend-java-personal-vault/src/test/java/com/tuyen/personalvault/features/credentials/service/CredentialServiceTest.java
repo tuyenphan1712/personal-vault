@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,17 +79,50 @@ class CredentialServiceTest {
 
         @Test
         void returnsItemsAndMetaScopedToCurrentUser() {
-            Pageable pageable = PageRequest.of(0, 20);
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<Credential> page = new PageImpl<>(List.of(credential()), pageable, 1);
-            when(credentialRepository.findAllByUserId(CURRENT_USER_ID, pageable)).thenReturn(page);
+            when(credentialRepository.search(CURRENT_USER_ID, null, pageable)).thenReturn(page);
 
-            CredentialService.CredentialListResult result = credentialService.list(pageable);
+            CredentialService.CredentialListResult result = credentialService.list(1, 20, null, "createdAt", "desc");
 
             assertThat(result.items()).hasSize(1);
             assertThat(result.meta().page()).isEqualTo(1);
             assertThat(result.meta().limit()).isEqualTo(20);
             assertThat(result.meta().total()).isEqualTo(1);
             assertThat(result.meta().totalPages()).isEqualTo(1);
+        }
+
+        @Test
+        void passesSearchTermThroughToRepository() {
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Page<Credential> page = new PageImpl<>(List.of(credential()), pageable, 1);
+            when(credentialRepository.search(CURRENT_USER_ID, "gmail", pageable)).thenReturn(page);
+
+            credentialService.list(1, 20, "gmail", "createdAt", "desc");
+
+            verify(credentialRepository).search(CURRENT_USER_ID, "gmail", pageable);
+        }
+
+        @Test
+        void sortsAscendingByPlatformNameWhenRequested() {
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, "platformName"));
+            Page<Credential> page = new PageImpl<>(List.of(credential()), pageable, 1);
+            when(credentialRepository.search(CURRENT_USER_ID, null, pageable)).thenReturn(page);
+
+            credentialService.list(1, 20, null, "platformName", "asc");
+
+            verify(credentialRepository).search(CURRENT_USER_ID, null, pageable);
+        }
+
+        @Test
+        void fallsBackToCreatedAtForUnknownSortField() {
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Page<Credential> page = new PageImpl<>(List.of(credential()), pageable, 1);
+            when(credentialRepository.search(CURRENT_USER_ID, null, pageable)).thenReturn(page);
+
+            credentialService.list(1, 20, null, "somethingUnsortable", "desc");
+
+            verify(credentialRepository).search(CURRENT_USER_ID, null, pageable);
         }
     }
 

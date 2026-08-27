@@ -156,7 +156,7 @@ public class AuthService {
         if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
             return Optional.empty();
         }
-        return refreshTokenRepository.findByTokenHash(hash(rawRefreshToken))
+        return refreshTokenRepository.findByTokenHashForUpdate(hash(rawRefreshToken))
                 .filter(token -> token.isUsable(LocalDateTime.now()));
     }
 

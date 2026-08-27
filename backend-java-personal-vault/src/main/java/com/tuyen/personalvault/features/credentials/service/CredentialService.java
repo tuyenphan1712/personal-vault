@@ -12,15 +12,20 @@ import com.tuyen.personalvault.features.users.repository.UserRepository;
 import com.tuyen.personalvault.shared.response.PageMeta;
 import com.tuyen.personalvault.shared.security.CurrentUser;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class CredentialService {
+
+    private static final Set<String> SORTABLE_FIELDS = Set.of("createdAt", "updatedAt", "platformName", "account");
 
     private final CredentialRepository credentialRepository;
     private final UserRepository userRepository;
@@ -34,12 +39,16 @@ public class CredentialService {
         this.credentialMapper = credentialMapper;
     }
 
-    public CredentialListResult list(Pageable pageable) {
-        Page<Credential> page = credentialRepository.findAllByUserId(CurrentUser.id(), pageable);
+    public CredentialListResult list(int page, int limit, String search, String sortBy, String sortDirection) {
+        String sortField = SORTABLE_FIELDS.contains(sortBy) ? sortBy : "createdAt";
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(limit, 100), Sort.by(direction, sortField));
+
+        Page<Credential> resultPage = credentialRepository.search(CurrentUser.id(), search, pageable);
         return new CredentialListResult(
-                page.map(credentialMapper::toResponse).getContent(),
+                resultPage.map(credentialMapper::toResponse).getContent(),
                 new PageMeta(pageable.getPageNumber() + 1, pageable.getPageSize(),
-                        page.getTotalElements(), page.getTotalPages())
+                        resultPage.getTotalElements(), resultPage.getTotalPages())
         );
     }
 

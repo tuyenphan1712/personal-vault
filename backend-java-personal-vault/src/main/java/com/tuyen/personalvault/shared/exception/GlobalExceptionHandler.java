@@ -6,10 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,8 +40,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(this::toFieldError)
+                .toList();
         return ResponseEntity.badRequest()
-                .body(ApiErrorResponse.of("COMMON_001", "Invalid request"));
+                .body(ApiErrorResponse.of("COMMON_001", "Validation failed", details));
+    }
+
+    private Map<String, String> toFieldError(FieldError fieldError) {
+        return Map.of("field", fieldError.getField(), "message", fieldError.getDefaultMessage());
     }
 
     @ExceptionHandler(Exception.class)

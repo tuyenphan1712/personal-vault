@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -62,13 +63,26 @@ class CredentialControllerTest {
     void listReturns200WithItemsAndMeta() throws Exception {
         CredentialService.CredentialListResult result = new CredentialService.CredentialListResult(
                 List.of(sampleResponse()), new PageMeta(1, 20, 1, 1));
-        when(credentialService.list(any())).thenReturn(result);
+        when(credentialService.list(anyInt(), anyInt(), any(), any(), any())).thenReturn(result);
 
         mockMvc.perform(get("/api/v1/credentials"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].platformName").value("Gmail"))
                 .andExpect(jsonPath("$.meta.total").value(1));
+    }
+
+    @Test
+    void listPassesSearchAndSortParamsToService() throws Exception {
+        CredentialService.CredentialListResult result = new CredentialService.CredentialListResult(
+                List.of(), new PageMeta(1, 20, 0, 0));
+        when(credentialService.list(1, 20, "gmail", "platformName", "asc")).thenReturn(result);
+
+        mockMvc.perform(get("/api/v1/credentials")
+                        .param("search", "gmail")
+                        .param("sortBy", "platformName")
+                        .param("sortDirection", "asc"))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -95,7 +109,9 @@ class CredentialControllerTest {
                                 {"platformName":"","account":"user@gmail.com","encryptedPassword":"base64(iv):base64(cipher)"}
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error.code").value("COMMON_001"));
+                .andExpect(jsonPath("$.error.code").value("COMMON_001"))
+                .andExpect(jsonPath("$.error.details[0].field").value("platformName"))
+                .andExpect(jsonPath("$.error.details[0].message").isNotEmpty());
     }
 
     @Test

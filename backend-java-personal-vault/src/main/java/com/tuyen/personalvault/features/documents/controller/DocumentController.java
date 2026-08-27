@@ -4,8 +4,6 @@ import com.tuyen.personalvault.features.documents.dto.DocumentResponse;
 import com.tuyen.personalvault.features.documents.service.DocumentService;
 import com.tuyen.personalvault.shared.response.ApiResponse;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,9 +35,12 @@ public class DocumentController {
     @GetMapping
     public ApiResponse<List<DocumentResponse>> list(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int limit) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(limit, 100));
-        DocumentService.DocumentListResult result = documentService.list(pageable);
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String docType,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+        DocumentService.DocumentListResult result = documentService.list(page, limit, search, docType, sortBy, sortDirection);
         return ApiResponse.of(result.items(), result.meta());
     }
 

@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
@@ -86,14 +87,36 @@ class DocumentServiceTest {
 
         @Test
         void returnsItemsAndMetaScopedToCurrentUser() {
-            Pageable pageable = PageRequest.of(0, 20);
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<Document> page = new PageImpl<>(List.of(document()), pageable, 1);
-            when(documentRepository.findAllByUserId(CURRENT_USER_ID, pageable)).thenReturn(page);
+            when(documentRepository.search(CURRENT_USER_ID, null, null, pageable)).thenReturn(page);
 
-            DocumentService.DocumentListResult result = documentService.list(pageable);
+            DocumentService.DocumentListResult result = documentService.list(1, 20, null, null, "createdAt", "desc");
 
             assertThat(result.items()).hasSize(1);
             assertThat(result.meta().total()).isEqualTo(1);
+        }
+
+        @Test
+        void passesSearchAndDocTypeThroughToRepository() {
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Page<Document> page = new PageImpl<>(List.of(document()), pageable, 1);
+            when(documentRepository.search(CURRENT_USER_ID, "passport", "passport", pageable)).thenReturn(page);
+
+            documentService.list(1, 20, "passport", "passport", "createdAt", "desc");
+
+            verify(documentRepository).search(CURRENT_USER_ID, "passport", "passport", pageable);
+        }
+
+        @Test
+        void sortsAscendingByTitleWhenRequested() {
+            Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, "title"));
+            Page<Document> page = new PageImpl<>(List.of(document()), pageable, 1);
+            when(documentRepository.search(CURRENT_USER_ID, null, null, pageable)).thenReturn(page);
+
+            documentService.list(1, 20, null, null, "title", "asc");
+
+            verify(documentRepository).search(CURRENT_USER_ID, null, null, pageable);
         }
     }
 
@@ -162,6 +185,35 @@ class DocumentServiceTest {
             @SuppressWarnings("unchecked")
             List<Map<String, String>> details = (List<Map<String, String>>) ex.getDetails();
             assertThat(details.get(0).get("field")).isEqualTo("docType");
+            verify(storageService, never()).store(any());
+        }
+
+        @Test
+        void deletesStoredFileWhenSavingMetadataFails() {
+            when(userRepository.getReferenceById(CURRENT_USER_ID)).thenReturn(owner());
+            when(storageService.store(any())).thenReturn(
+                    new DocumentStorageService.StoredFile("/storage/documents/xyz", "image/png", 2048L));
+            when(documentRepository.save(any())).thenThrow(new RuntimeException("db unavailable"));
+            MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", "x".getBytes());
+
+            assertThatThrownBy(() -> documentService.upload(file, "Passport front", "passport"))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("db unavailable");
+
+            verify(storageService).delete("/storage/documents/xyz");
+        }
+
+        @Test
+        void rejectsBlankTitleWithoutTouchingStorage() {
+            MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", "x".getBytes());
+
+            AppException ex = catchThrowableOfType(AppException.class,
+                    () -> documentService.upload(file, "  ", "passport"));
+
+            assertThat(ex.getCode()).isEqualTo("COMMON_001");
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> details = (List<Map<String, String>>) ex.getDetails();
+            assertThat(details.get(0).get("field")).isEqualTo("title");
             verify(storageService, never()).store(any());
         }
     }
