@@ -23,7 +23,10 @@ Only a SHA-256 hex hash of the raw token is stored (`token_hash`). The raw token
 
 `AuthService.login` checks `lockout_until` before checking the password. On the 5th consecutive failed attempt it sets `lockout_until = now + 15m` (still returns `AUTH_001` for that failing attempt itself); every login request while `lockout_until` is still in the future returns `429`/`AUTH_004` with `retryAfterSeconds` in `error.details`, independent of the admin-controlled `status` lock (`AUTH_002`).
 
-## Known gaps (flagged, not fixed here)
+## Unauthenticated requests
 
-- No `AuthenticationEntryPoint` is configured, so a missing/invalid access token currently gets Spring Security's default response rather than the project's `{ success: false, error: {...} }` envelope. Revisit when unauthenticated-request behavior needs to match the documented error format exactly.
-- The refresh cookie is always marked `Secure`, so it will not be sent by browsers over plain HTTP in local dev — needs local HTTPS (or a temporary dev-only override) to exercise the web login/refresh flow end-to-end.
+`SecurityConfig` registers a custom `AuthenticationEntryPoint` so a missing/invalid/expired access token on a protected endpoint returns `401`/`AUTH_005` in the project's standard `{ success: false, error: {...} }` envelope (see `API_SPEC.md` §2/§5), not Spring Security's default response.
+
+## Cookie `Secure` flag
+
+The refresh cookie's `Secure` attribute is controlled by `app.cookie.secure` (env `COOKIE_SECURE`, default `true`). Keep it `true` in every real deployment — browsers require `Secure` cookies to travel over HTTPS. Only local HTTP-only frontend dev should set `COOKIE_SECURE=false`, otherwise the browser silently drops the refresh cookie and the web login/refresh flow can't be exercised end-to-end.

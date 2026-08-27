@@ -13,6 +13,7 @@ import com.tuyen.personalvault.shared.response.ApiResponse;
 import com.tuyen.personalvault.shared.security.JwtProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -33,10 +34,13 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtProperties jwtProperties;
+    private final boolean cookieSecure;
 
-    public AuthController(AuthService authService, JwtProperties jwtProperties) {
+    public AuthController(AuthService authService, JwtProperties jwtProperties,
+                           @Value("${app.cookie.secure}") boolean cookieSecure) {
         this.authService = authService;
         this.jwtProperties = jwtProperties;
+        this.cookieSecure = cookieSecure;
     }
 
     @PostMapping("/register")
@@ -94,7 +98,7 @@ public class AuthController {
     private ResponseCookie buildRefreshCookie(String rawToken) {
         return ResponseCookie.from(REFRESH_COOKIE_NAME, rawToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(jwtProperties.getRefreshTokenExpirationMs() / 1000)
@@ -104,7 +108,7 @@ public class AuthController {
     private ResponseCookie buildExpiredRefreshCookie() {
         return ResponseCookie.from(REFRESH_COOKIE_NAME, "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(0)

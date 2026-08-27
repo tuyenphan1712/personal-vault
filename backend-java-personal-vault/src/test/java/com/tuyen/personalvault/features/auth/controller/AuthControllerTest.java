@@ -127,7 +127,8 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.data.accessToken").value("access-token"))
                 .andExpect(jsonPath("$.data.refreshToken").doesNotExist())
                 .andExpect(cookie().value("refreshToken", "raw-refresh-token"))
-                .andExpect(cookie().httpOnly("refreshToken", true));
+                .andExpect(cookie().httpOnly("refreshToken", true))
+                .andExpect(cookie().secure("refreshToken", true));
     }
 
     @Test

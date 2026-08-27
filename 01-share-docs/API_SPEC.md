@@ -48,6 +48,8 @@ Request header:
 Authorization: Bearer <access-token>
 ```
 
+A request to a protected endpoint with a missing or invalid/expired access token is rejected with `401`/`AUTH_005` in the standard error envelope, before it reaches any controller.
+
 **Authentication endpoints**:
 
 ```text
@@ -186,6 +188,7 @@ AUTH_001         Invalid phone or password
 AUTH_002         Account is locked
 AUTH_003         Refresh token is invalid or revoked
 AUTH_004         Too many failed login attempts — temporarily locked out
+AUTH_005         Missing or invalid access token
 USER_001         User not found
 USER_002         Phone number already registered
 CREDENTIAL_001   Credential not found
