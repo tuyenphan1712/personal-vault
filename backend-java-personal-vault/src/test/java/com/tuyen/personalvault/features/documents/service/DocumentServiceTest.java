@@ -148,7 +148,7 @@ class DocumentServiceTest {
     class Upload {
 
         @Test
-        void storesFileAndSavesMetadataForSupportedDocType() {
+        void storesFileAndSavesMetadataWithDocType() {
             when(userRepository.getReferenceById(CURRENT_USER_ID)).thenReturn(owner());
             when(storageService.store(any())).thenReturn(
                     new DocumentStorageService.StoredFile("/storage/documents/xyz", "image/png", 2048L));
@@ -160,6 +160,18 @@ class DocumentServiceTest {
             assertThat(response.docType()).isEqualTo("passport");
             assertThat(response.mimeType()).isEqualTo("image/png");
             assertThat(response.fileSize()).isEqualTo(2048L);
+        }
+
+        @Test
+        void acceptsFreeTextDocTypeOutsideSuggestedList() {
+            when(userRepository.getReferenceById(CURRENT_USER_ID)).thenReturn(owner());
+            when(storageService.store(any())).thenReturn(
+                    new DocumentStorageService.StoredFile("/storage/documents/xyz", "image/png", 512L));
+            MockMultipartFile file = new MockMultipartFile("file", "note.png", "image/png", "x".getBytes());
+
+            DocumentResponse response = documentService.upload(file, "Birth certificate", "birth_certificate");
+
+            assertThat(response.docType()).isEqualTo("birth_certificate");
         }
 
         @Test
@@ -175,11 +187,26 @@ class DocumentServiceTest {
         }
 
         @Test
-        void rejectsUnsupportedDocTypeWithoutTouchingStorage() {
+        void rejectsBlankDocTypeWithoutTouchingStorage() {
             MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", "x".getBytes());
 
             AppException ex = catchThrowableOfType(AppException.class,
-                    () -> documentService.upload(file, "Passport front", "not-a-real-type"));
+                    () -> documentService.upload(file, "Passport front", "   "));
+
+            assertThat(ex.getCode()).isEqualTo("COMMON_001");
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> details = (List<Map<String, String>>) ex.getDetails();
+            assertThat(details.get(0).get("field")).isEqualTo("docType");
+            verify(storageService, never()).store(any());
+        }
+
+        @Test
+        void rejectsOverlongDocTypeWithoutTouchingStorage() {
+            MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", "x".getBytes());
+            String overlongDocType = "a".repeat(101);
+
+            AppException ex = catchThrowableOfType(AppException.class,
+                    () -> documentService.upload(file, "Passport front", overlongDocType));
 
             assertThat(ex.getCode()).isEqualTo("COMMON_001");
             @SuppressWarnings("unchecked")

@@ -143,10 +143,10 @@ class DocumentControllerTest {
     void uploadReturns400OnInvalidDocType() throws Exception {
         when(documentService.upload(any(), any(), any())).thenThrow(new AppException(
                 "COMMON_001", "Validation failed", HttpStatus.BAD_REQUEST,
-                List.of(Map.of("field", "docType", "message", "docType must be one of: cccd, diploma, passport"))));
+                List.of(Map.of("field", "docType", "message", "docType must not be blank and at most 100 characters"))));
         MockMultipartFile file = new MockMultipartFile("file", "passport.png", "image/png", "x".getBytes());
         MockMultipartFile title = new MockMultipartFile("title", "", "text/plain", "Passport front".getBytes());
-        MockMultipartFile docType = new MockMultipartFile("docType", "", "text/plain", "not-a-real-type".getBytes());
+        MockMultipartFile docType = new MockMultipartFile("docType", "", "text/plain", "   ".getBytes());
 
         mockMvc.perform(multipart("/api/v1/documents")
                         .file(file)

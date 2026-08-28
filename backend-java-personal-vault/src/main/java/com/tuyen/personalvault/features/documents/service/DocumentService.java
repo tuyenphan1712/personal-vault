@@ -28,7 +28,7 @@ import java.util.UUID;
 @Service
 public class DocumentService {
 
-    private static final Set<String> SUPPORTED_DOC_TYPES = Set.of("cccd", "diploma", "passport");
+    private static final int MAX_DOC_TYPE_LENGTH = 100;
     private static final Set<String> SORTABLE_FIELDS = Set.of("createdAt", "updatedAt", "title", "docType");
 
     private final DocumentRepository documentRepository;
@@ -109,10 +109,13 @@ public class DocumentService {
     }
 
     private void validateDocType(String docType) {
-        if (docType != null && !SUPPORTED_DOC_TYPES.contains(docType)) {
+        if (docType == null) {
+            return;
+        }
+        if (docType.isBlank() || docType.length() > MAX_DOC_TYPE_LENGTH) {
             throw new AppException("COMMON_001", "Validation failed", HttpStatus.BAD_REQUEST,
                     List.of(Map.of("field", "docType",
-                            "message", "docType must be one of: cccd, diploma, passport")));
+                            "message", "docType must not be blank and at most " + MAX_DOC_TYPE_LENGTH + " characters")));
         }
     }
 

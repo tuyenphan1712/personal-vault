@@ -3,7 +3,7 @@ import { ROUTES } from '@/routes/routes'
 import { Button } from '@/shared/components/Button'
 import { useDeleteDocument } from '../hooks/useDeleteDocument'
 import { useDownloadDocument } from '../hooks/useDownloadDocument'
-import type { Document } from '../types/document.types'
+import { getDocumentTypeLabel, type Document } from '../types/document.types'
 
 interface DocumentCardProps {
   document: Document
@@ -35,7 +35,7 @@ export function DocumentCard({ document: doc, onNotify }: DocumentCardProps) {
           {doc.title}
         </Link>
         <div className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs text-muted">
-          {doc.docType ? <span className="uppercase">{doc.docType}</span> : null}
+          {doc.docType ? <span>{getDocumentTypeLabel(doc.docType)}</span> : null}
           <span>{formatFileSize(doc.fileSize)}</span>
           <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
         </div>

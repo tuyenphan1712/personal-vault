@@ -1,6 +1,6 @@
 import { Button } from '@/shared/components/Button'
 import { useDownloadDocument } from '../hooks/useDownloadDocument'
-import type { Document } from '../types/document.types'
+import { getDocumentTypeLabel, type Document } from '../types/document.types'
 
 interface DocumentDetailProps {
   document: Document
@@ -28,7 +28,7 @@ export function DocumentDetail({ document: doc }: DocumentDetailProps) {
         </span>
         <div>
           <h1 className="font-serif text-xl font-normal text-ink">{doc.title}</h1>
-          {doc.docType ? <p className="font-mono text-sm uppercase text-muted">{doc.docType}</p> : null}
+          {doc.docType ? <p className="font-mono text-sm text-muted">{getDocumentTypeLabel(doc.docType)}</p> : null}
         </div>
       </div>
       <dl className="grid grid-cols-2 gap-3 font-mono text-sm text-muted">

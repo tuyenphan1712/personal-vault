@@ -90,7 +90,7 @@
 | id | UUID | PK | Unique document identifier |
 | user_id | UUID | FK → `users.id`, NOT NULL | Owner of the record |
 | title | VARCHAR(255) | NOT NULL | e.g. "CCCD front side" |
-| doc_type | VARCHAR(100) | NULL | Free-text; MVP supported values: `cccd`, `diploma`, `passport` (validated at service layer, not a DB constraint — extendable later) |
+| doc_type | VARCHAR(100) | NULL | Free-text, no whitelist; service layer only rejects blank or >100-char values (not a DB constraint). See `API_SPEC.md` §7 for the Frontend/Mobile picker's suggested categories. |
 | storage_path | TEXT | NOT NULL | File path or object storage URL |
 | mime_type | VARCHAR(100) | NOT NULL | Validated content type (`image/jpeg`, `image/png`, `application/pdf`); required to set the `Content-Type` header on download |
 | file_size | BIGINT | NOT NULL | File size in bytes at upload time; must be ≤ the configured max (10MB in MVP) |

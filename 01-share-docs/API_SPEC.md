@@ -104,7 +104,20 @@ title: string
 docType: string, optional
 ```
 
-`docType` is free-text (not a DB enum); MVP-supported values are `cccd`, `diploma`, `passport`. The Frontend/Mobile document-type picker should offer these three; the backend validates at the service layer, not via a DB constraint, so the set can grow later without a migration.
+`docType` is free-text (not a DB enum, no whitelist): the backend only requires it to be non-blank and at most 100 characters when provided (`null`/omitted is allowed). The Frontend/Mobile document-type picker offers one broad category per option — see `docType` picker categories below — plus a free-typed "Other" option; any value the picker sends is accepted as-is, so new categories or values never require a backend change or migration.
+
+**`docType` picker categories** (Frontend/Mobile UI options only — not enforced by the API):
+
+| Category | Value |
+|---|---|
+| Identity & Civil Status | `identity_civil_status` |
+| Education & Qualifications | `education_qualifications` |
+| Employment & Contracts | `employment_contracts` |
+| Medical & Health | `medical_health` |
+| Finance & Tax | `finance_tax` |
+| Property & Vehicles | `property_vehicles` |
+| Legal & Miscellaneous | `legal_misc` |
+| Other | any free-typed value the user enters |
 
 **MVP file rules**:
 

@@ -12,7 +12,7 @@ Owns `GET/POST /api/v1/documents`, `GET /api/v1/documents/{id}`, `GET /api/v1/do
 
 ## `docType` validation
 
-Per `DATABASE.md`, `doc_type` is free-text at the DB level (extendable later without a migration) but validated at the service layer against the MVP set (`cccd`, `diploma`, `passport`). An unsupported value is rejected as `COMMON_001` with a field-level `details` entry (same shape as Jakarta Bean Validation errors), not a dedicated `DOCUMENT_*` code, since it's a request-validation failure rather than a storage/lookup error.
+`doc_type` is free-text with no whitelist — `DocumentService.validateDocType()` only rejects a blank or >100-char value (matching the `VARCHAR(100)` column); `null`/omitted is allowed. There used to be a fixed MVP set (`cccd`, `diploma`, `passport`) enforced here, but the Frontend/Mobile picker grew into several categories of suggested values (see `API_SPEC.md` §7) plus a free-typed "Other" option, so the whitelist was dropped rather than kept growing in lockstep with the UI. A rejected value is still `COMMON_001` with a field-level `details` entry (same shape as Jakarta Bean Validation errors), not a dedicated `DOCUMENT_*` code, since it's a request-validation failure rather than a storage/lookup error.
 
 ## Ownership and cleanup
 
