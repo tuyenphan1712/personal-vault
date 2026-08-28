@@ -21,6 +21,36 @@
   color-scheme: light;
 }
 
+/*
+ * Scoped theme for the Credentials feature only (per the approved Claude Design
+ * mockup). Overrides the same CSS custom properties the global theme above
+ * publishes, so every existing color and font utility class picks it up
+ * automatically inside this scope, with no component changes needed elsewhere.
+ */
+.vault-scope {
+  --color-bg: #f6f4f0;
+  --color-surface: #ffffff;
+  --color-surface-hover: #efebe5;
+  --color-primary: #4e8071;
+  --color-primary-dark: #2c5545;
+  --color-primary-soft: #d6e3dd;
+  --color-mist: #635d57;
+  --color-mist-soft: #efebe5;
+  --color-ink: #1e1c1a;
+  --color-muted: #837c74;
+  --color-line: #e2ddd5;
+  --color-danger: #9e4b39;
+  --color-danger-dark: #7a3728;
+  --color-danger-soft: #f5e1dc;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
 body {
   margin: 0;
   background: var(--color-bg);
