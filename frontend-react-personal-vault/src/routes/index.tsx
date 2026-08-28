@@ -3,6 +3,7 @@ import App from '../app/App'
 import { DashboardPage } from '../app/pages/DashboardPage'
 import { LoginPage, RegisterPage } from '../features/auth'
 import { CredentialDetailPage, CredentialListPage } from '../features/credentials'
+import { ProfilePage } from '../features/profile'
 import { AdminRoute } from './AdminRoute'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from './routes'
@@ -24,6 +25,7 @@ export function AppRouter() {
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
           <Route path={ROUTES.CREDENTIALS} element={<CredentialListPage />} />
           <Route path={ROUTES.CREDENTIAL_DETAIL(':id')} element={<CredentialDetailPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

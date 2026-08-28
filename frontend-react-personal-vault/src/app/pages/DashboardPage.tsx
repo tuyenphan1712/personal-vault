@@ -24,6 +24,9 @@ export function DashboardPage() {
         <Link to={ROUTES.CREDENTIALS} className="text-slate-900 underline">
           Credentials
         </Link>
+        <Link to={ROUTES.PROFILE} className="text-slate-900 underline">
+          Profile
+        </Link>
       </nav>
     </div>
   )
