@@ -36,7 +36,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       <Input label="Phone number" type="tel" {...register('phone')} error={errors.phone?.message} />
       <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
       {registerUser.isError ? (
-        <p className="text-sm text-red-600">This phone number is already registered.</p>
+        <p className="text-sm text-danger">This phone number is already registered.</p>
       ) : null}
       <Button type="submit" isLoading={registerUser.isPending}>
         Create account

@@ -33,7 +33,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       <Input label="Phone number" type="tel" {...register('phone')} error={errors.phone?.message} />
       <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
       {login.isError ? (
-        <p className="text-sm text-red-600">Invalid phone number or password.</p>
+        <p className="text-sm text-danger">Invalid phone number or password.</p>
       ) : null}
       <Button type="submit" isLoading={login.isPending}>
         Log in
