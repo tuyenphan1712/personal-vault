@@ -1,64 +1,31 @@
-import { useState } from 'react'
-import { Button } from '@/shared/components/Button'
-import { decryptValue } from '@/shared/lib/crypto'
-import { getEncryptionKey } from '@/shared/lib/keyStore'
 import type { Credential } from '../types/credential.types'
+import { PasswordReveal } from './PasswordReveal'
 
 interface CredentialDetailProps {
   credential: Credential
   onUnlockNeeded: () => void
+  onNotify: (message: string) => void
 }
 
-export function CredentialDetail({ credential, onUnlockNeeded }: CredentialDetailProps) {
-  const [revealed, setRevealed] = useState<string | null>(null)
-  const [revealError, setRevealError] = useState<string | null>(null)
-  const [lastSeenCiphertext, setLastSeenCiphertext] = useState(credential.encryptedPassword)
-
-  if (lastSeenCiphertext !== credential.encryptedPassword) {
-    setLastSeenCiphertext(credential.encryptedPassword)
-    setRevealed(null)
-    setRevealError(null)
-  }
-
-  const handleReveal = async () => {
-    setRevealError(null)
-    const key = getEncryptionKey()
-    if (!key) {
-      setRevealError('Vault is locked.')
-      return
-    }
-    try {
-      setRevealed(await decryptValue(credential.encryptedPassword, key))
-    } catch {
-      setRevealError('Could not decrypt — try unlocking the vault again.')
-    }
-  }
-
+export function CredentialDetail({ credential, onUnlockNeeded, onNotify }: CredentialDetailProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-xl font-semibold text-ink">{credential.platformName}</h1>
-        <p className="text-sm text-muted">{credential.account}</p>
+    <div className="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-primary-soft font-serif text-lg text-primary-dark">
+          {credential.platformName.charAt(0).toUpperCase()}
+        </span>
+        <div>
+          <h1 className="font-serif text-xl font-normal text-ink">{credential.platformName}</h1>
+          <p className="font-mono text-sm text-muted">{credential.account}</p>
+        </div>
       </div>
       {credential.note ? <p className="text-sm text-muted">{credential.note}</p> : null}
-      <div className="flex items-center gap-2">
-        {revealed ? (
-          <code className="rounded bg-mist-soft px-2 py-1 text-sm text-mist">{revealed}</code>
-        ) : (
-          <Button variant="secondary" onClick={handleReveal}>
-            Show password
-          </Button>
-        )}
-        {revealError ? (
-          <>
-            <p className="text-sm text-danger">{revealError}</p>
-            <Button variant="secondary" onClick={onUnlockNeeded}>
-              Unlock again
-            </Button>
-          </>
-        ) : null}
-      </div>
-      <p className="text-xs text-muted">
+      <PasswordReveal
+        encryptedPassword={credential.encryptedPassword}
+        onUnlockNeeded={onUnlockNeeded}
+        onNotify={onNotify}
+      />
+      <p className="font-mono text-xs text-muted">
         Last updated {new Date(credential.updatedAt).toLocaleString()}
       </p>
     </div>

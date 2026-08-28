@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { ROUTES } from '@/routes/routes'
+import { BackLink } from '@/shared/components/BackLink'
+import { Toast } from '@/shared/components/Toast'
 import { getEncryptionKey, setEncryptionKey } from '@/shared/lib/keyStore'
 import { CredentialDetail } from '../components/CredentialDetail'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredential } from '../hooks/useCredential'
+import { useToast } from '../hooks/useToast'
 
 export function CredentialDetailPage() {
   const { id } = useParams<{ id: string }>()
   const [isUnlocked, setIsUnlocked] = useState(() => getEncryptionKey() !== null)
   const { data: credential, isLoading, isError } = useCredential(id ?? '')
+  const { message: toastMessage, notify } = useToast()
 
   const handleUnlockNeeded = () => {
     setEncryptionKey(null)
@@ -17,10 +21,8 @@ export function CredentialDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <Link to={ROUTES.CREDENTIALS} className="text-sm text-muted underline">
-        ← Back to credentials
-      </Link>
+    <div className="vault-scope mx-auto max-w-2xl px-4 py-10">
+      <BackLink to={ROUTES.CREDENTIALS}>Back to credentials</BackLink>
       <div className="mt-6">
         {!isUnlocked ? (
           <UnlockVaultPrompt onUnlocked={() => setIsUnlocked(true)} />
@@ -29,9 +31,10 @@ export function CredentialDetailPage() {
         ) : isError || !credential ? (
           <p className="text-sm text-danger">Credential not found.</p>
         ) : (
-          <CredentialDetail credential={credential} onUnlockNeeded={handleUnlockNeeded} />
+          <CredentialDetail credential={credential} onUnlockNeeded={handleUnlockNeeded} onNotify={notify} />
         )}
       </div>
+      <Toast message={toastMessage} />
     </div>
   )
 }

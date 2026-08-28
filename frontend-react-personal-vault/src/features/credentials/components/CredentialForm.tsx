@@ -20,7 +20,7 @@ type CredentialFormValues = z.infer<typeof credentialSchema>
 
 interface CredentialFormProps {
   credential?: Credential
-  onSuccess: () => void
+  onSuccess: (message: string) => void
 }
 
 export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
@@ -53,6 +53,7 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
         id: credential.id,
         payload: { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
       })
+      onSuccess('Changes sealed.')
     } else {
       await createCredential.mutateAsync({
         platformName: values.platformName,
@@ -60,9 +61,8 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
         encryptedPassword,
         note: values.note ?? null,
       })
+      onSuccess('Sealed and saved.')
     }
-
-    onSuccess()
   })
 
   return (
