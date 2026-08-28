@@ -1,33 +1,6 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-bg: #f7f5ef;
-  --color-surface: #fcfbf7;
-  --color-surface-hover: #f3f0e7;
-  --color-primary: #4f8767;
-  --color-primary-dark: #386249;
-  --color-primary-soft: #e1efe6;
-  --color-mist: #5c7a8a;
-  --color-mist-soft: #e8eef0;
-  --color-ink: #2b2a26;
-  --color-muted: #6e695d;
-  --color-line: #e3decf;
-  --color-danger: #b65b45;
-  --color-danger-dark: #9c4a38;
-  --color-danger-soft: #f5e7e2;
-}
-
-:root {
-  color-scheme: light;
-}
-
-/*
- * Scoped theme for the Credentials feature only (per the approved Claude Design
- * mockup). Overrides the same CSS custom properties the global theme above
- * publishes, so every existing color and font utility class picks it up
- * automatically inside this scope, with no component changes needed elsewhere.
- */
-.vault-scope {
   --color-bg: #f6f4f0;
   --color-surface: #ffffff;
   --color-surface-hover: #efebe5;
@@ -42,18 +15,22 @@
   --color-danger: #9e4b39;
   --color-danger-dark: #7a3728;
   --color-danger-soft: #f5e1dc;
+}
+
+:root {
+  color-scheme: light;
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
   --font-serif: 'Newsreader', ui-serif, Georgia, serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  min-height: 100vh;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
 }

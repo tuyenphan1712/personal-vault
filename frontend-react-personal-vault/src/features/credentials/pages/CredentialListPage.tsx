@@ -24,7 +24,7 @@ export function CredentialListPage() {
 
   if (!isUnlocked) {
     return (
-      <div className="vault-scope mx-auto max-w-2xl px-4 py-10">
+      <div className="mx-auto max-w-2xl px-4 py-10">
         <BackLink to={ROUTES.DASHBOARD}>Back to dashboard</BackLink>
         <div className="mt-6">
           <UnlockVaultPrompt onUnlocked={() => setIsUnlocked(true)} />
@@ -40,7 +40,7 @@ export function CredentialListPage() {
   }
 
   return (
-    <div className="vault-scope mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
       <BackLink to={ROUTES.DASHBOARD}>Back to dashboard</BackLink>
       <div className="flex items-start justify-between gap-4 border-b border-line pb-6">
         <div>
