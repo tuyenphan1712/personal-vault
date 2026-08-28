@@ -13,7 +13,16 @@ interface CredentialCardProps {
 export function CredentialCard({ credential, onEdit }: CredentialCardProps) {
   const [revealed, setRevealed] = useState<string | null>(null)
   const [revealError, setRevealError] = useState<string | null>(null)
+  const [lastSeenCiphertext, setLastSeenCiphertext] = useState(credential.encryptedPassword)
   const deleteCredential = useDeleteCredential()
+
+  // The encrypted value changes after an edit — any previously revealed plaintext is now stale
+  // (and wouldn't even decrypt against the new ciphertext), so hide it again.
+  if (lastSeenCiphertext !== credential.encryptedPassword) {
+    setLastSeenCiphertext(credential.encryptedPassword)
+    setRevealed(null)
+    setRevealError(null)
+  }
 
   const handleReveal = async () => {
     setRevealError(null)

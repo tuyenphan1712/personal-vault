@@ -11,6 +11,13 @@ interface CredentialDetailProps {
 export function CredentialDetail({ credential }: CredentialDetailProps) {
   const [revealed, setRevealed] = useState<string | null>(null)
   const [revealError, setRevealError] = useState<string | null>(null)
+  const [lastSeenCiphertext, setLastSeenCiphertext] = useState(credential.encryptedPassword)
+
+  if (lastSeenCiphertext !== credential.encryptedPassword) {
+    setLastSeenCiphertext(credential.encryptedPassword)
+    setRevealed(null)
+    setRevealError(null)
+  }
 
   const handleReveal = async () => {
     setRevealError(null)
