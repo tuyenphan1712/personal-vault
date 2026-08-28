@@ -4,9 +4,10 @@ import { CredentialCard } from './CredentialCard'
 
 interface CredentialListProps {
   onEdit: (credential: Credential) => void
+  onUnlockNeeded: () => void
 }
 
-export function CredentialList({ onEdit }: CredentialListProps) {
+export function CredentialList({ onEdit, onUnlockNeeded }: CredentialListProps) {
   const { data, isLoading, isError } = useCredentials()
 
   if (isLoading) {
@@ -24,7 +25,12 @@ export function CredentialList({ onEdit }: CredentialListProps) {
   return (
     <ul className="flex flex-col gap-3">
       {data.data.map((credential) => (
-        <CredentialCard key={credential.id} credential={credential} onEdit={onEdit} />
+        <CredentialCard
+          key={credential.id}
+          credential={credential}
+          onEdit={onEdit}
+          onUnlockNeeded={onUnlockNeeded}
+        />
       ))}
     </ul>
   )

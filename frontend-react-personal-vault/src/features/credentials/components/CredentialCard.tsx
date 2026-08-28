@@ -8,9 +8,10 @@ import type { Credential } from '../types/credential.types'
 interface CredentialCardProps {
   credential: Credential
   onEdit: (credential: Credential) => void
+  onUnlockNeeded: () => void
 }
 
-export function CredentialCard({ credential, onEdit }: CredentialCardProps) {
+export function CredentialCard({ credential, onEdit, onUnlockNeeded }: CredentialCardProps) {
   const [revealed, setRevealed] = useState<string | null>(null)
   const [revealError, setRevealError] = useState<string | null>(null)
   const [lastSeenCiphertext, setLastSeenCiphertext] = useState(credential.encryptedPassword)
@@ -68,7 +69,14 @@ export function CredentialCard({ credential, onEdit }: CredentialCardProps) {
             Show password
           </Button>
         )}
-        {revealError ? <p className="text-sm text-red-600">{revealError}</p> : null}
+        {revealError ? (
+          <>
+            <p className="text-sm text-red-600">{revealError}</p>
+            <Button variant="secondary" onClick={onUnlockNeeded}>
+              Unlock again
+            </Button>
+          </>
+        ) : null}
       </div>
     </li>
   )

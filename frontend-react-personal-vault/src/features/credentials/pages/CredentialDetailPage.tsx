@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ROUTES } from '@/routes/routes'
-import { getEncryptionKey } from '@/shared/lib/keyStore'
+import { getEncryptionKey, setEncryptionKey } from '@/shared/lib/keyStore'
 import { CredentialDetail } from '../components/CredentialDetail'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredential } from '../hooks/useCredential'
@@ -10,6 +10,11 @@ export function CredentialDetailPage() {
   const { id } = useParams<{ id: string }>()
   const [isUnlocked, setIsUnlocked] = useState(() => getEncryptionKey() !== null)
   const { data: credential, isLoading, isError } = useCredential(id ?? '')
+
+  const handleUnlockNeeded = () => {
+    setEncryptionKey(null)
+    setIsUnlocked(false)
+  }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
@@ -24,7 +29,7 @@ export function CredentialDetailPage() {
         ) : isError || !credential ? (
           <p className="text-sm text-red-600">Credential not found.</p>
         ) : (
-          <CredentialDetail credential={credential} />
+          <CredentialDetail credential={credential} onUnlockNeeded={handleUnlockNeeded} />
         )}
       </div>
     </div>

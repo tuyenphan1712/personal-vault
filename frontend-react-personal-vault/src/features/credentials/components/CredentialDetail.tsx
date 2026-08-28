@@ -6,9 +6,10 @@ import type { Credential } from '../types/credential.types'
 
 interface CredentialDetailProps {
   credential: Credential
+  onUnlockNeeded: () => void
 }
 
-export function CredentialDetail({ credential }: CredentialDetailProps) {
+export function CredentialDetail({ credential, onUnlockNeeded }: CredentialDetailProps) {
   const [revealed, setRevealed] = useState<string | null>(null)
   const [revealError, setRevealError] = useState<string | null>(null)
   const [lastSeenCiphertext, setLastSeenCiphertext] = useState(credential.encryptedPassword)
@@ -48,7 +49,14 @@ export function CredentialDetail({ credential }: CredentialDetailProps) {
             Show password
           </Button>
         )}
-        {revealError ? <p className="text-sm text-red-600">{revealError}</p> : null}
+        {revealError ? (
+          <>
+            <p className="text-sm text-red-600">{revealError}</p>
+            <Button variant="secondary" onClick={onUnlockNeeded}>
+              Unlock again
+            </Button>
+          </>
+        ) : null}
       </div>
       <p className="text-xs text-slate-400">
         Last updated {new Date(credential.updatedAt).toLocaleString()}

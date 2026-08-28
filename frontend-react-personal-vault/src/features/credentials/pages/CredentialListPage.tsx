@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/shared/components/Button'
 import { Modal } from '@/shared/components/Modal'
-import { getEncryptionKey } from '@/shared/lib/keyStore'
+import { getEncryptionKey, setEncryptionKey } from '@/shared/lib/keyStore'
 import { CredentialForm } from '../components/CredentialForm'
 import { CredentialList } from '../components/CredentialList'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
@@ -26,13 +26,18 @@ export function CredentialListPage() {
     setEditingCredential(null)
   }
 
+  const handleUnlockNeeded = () => {
+    setEncryptionKey(null)
+    setIsUnlocked(false)
+  }
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-900">Credentials</h1>
         <Button onClick={() => setIsCreating(true)}>Add credential</Button>
       </div>
-      <CredentialList onEdit={setEditingCredential} />
+      <CredentialList onEdit={setEditingCredential} onUnlockNeeded={handleUnlockNeeded} />
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingCredential ? 'Edit credential' : 'Add credential'}>
         <CredentialForm credential={editingCredential ?? undefined} onSuccess={closeModal} />
       </Modal>
