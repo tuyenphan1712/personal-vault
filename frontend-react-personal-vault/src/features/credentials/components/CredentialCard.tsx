@@ -41,11 +41,11 @@ export function CredentialCard({ credential, onEdit, onUnlockNeeded }: Credentia
   }
 
   return (
-    <li className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4">
+    <li className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-medium text-slate-900">{credential.platformName}</p>
-          <p className="text-sm text-slate-600">{credential.account}</p>
+          <p className="font-medium text-ink">{credential.platformName}</p>
+          <p className="text-sm text-muted">{credential.account}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => onEdit(credential)}>
@@ -60,10 +60,10 @@ export function CredentialCard({ credential, onEdit, onUnlockNeeded }: Credentia
           </Button>
         </div>
       </div>
-      {credential.note ? <p className="text-sm text-slate-500">{credential.note}</p> : null}
+      {credential.note ? <p className="text-sm text-muted">{credential.note}</p> : null}
       <div className="flex items-center gap-2">
         {revealed ? (
-          <code className="rounded bg-slate-100 px-2 py-1 text-sm">{revealed}</code>
+          <code className="rounded bg-mist-soft px-2 py-1 text-sm text-mist">{revealed}</code>
         ) : (
           <Button variant="secondary" onClick={handleReveal}>
             Show password
@@ -71,7 +71,7 @@ export function CredentialCard({ credential, onEdit, onUnlockNeeded }: Credentia
         )}
         {revealError ? (
           <>
-            <p className="text-sm text-red-600">{revealError}</p>
+            <p className="text-sm text-danger">{revealError}</p>
             <Button variant="secondary" onClick={onUnlockNeeded}>
               Unlock again
             </Button>

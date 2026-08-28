@@ -18,16 +18,16 @@ export function CredentialDetailPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <Link to={ROUTES.CREDENTIALS} className="text-sm text-slate-600 underline">
+      <Link to={ROUTES.CREDENTIALS} className="text-sm text-muted underline">
         ← Back to credentials
       </Link>
       <div className="mt-6">
         {!isUnlocked ? (
           <UnlockVaultPrompt onUnlocked={() => setIsUnlocked(true)} />
         ) : isLoading ? (
-          <p className="text-sm text-slate-600">Loading…</p>
+          <p className="text-sm text-muted">Loading…</p>
         ) : isError || !credential ? (
-          <p className="text-sm text-red-600">Credential not found.</p>
+          <p className="text-sm text-danger">Credential not found.</p>
         ) : (
           <CredentialDetail credential={credential} onUnlockNeeded={handleUnlockNeeded} />
         )}

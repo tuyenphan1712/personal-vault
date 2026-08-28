@@ -11,15 +11,15 @@ export function CredentialList({ onEdit, onUnlockNeeded }: CredentialListProps) 
   const { data, isLoading, isError } = useCredentials()
 
   if (isLoading) {
-    return <p className="text-sm text-slate-600">Loading credentials…</p>
+    return <p className="text-sm text-muted">Loading credentials…</p>
   }
 
   if (isError) {
-    return <p className="text-sm text-red-600">Couldn't load your credentials. Try again.</p>
+    return <p className="text-sm text-danger">Couldn't load your credentials. Try again.</p>
   }
 
   if (!data || data.data.length === 0) {
-    return <p className="text-sm text-slate-600">No credentials yet — add your first one.</p>
+    return <p className="text-sm text-muted">No credentials yet — add your first one.</p>
   }
 
   return (

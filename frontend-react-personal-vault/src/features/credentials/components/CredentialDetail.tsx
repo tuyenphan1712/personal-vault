@@ -37,13 +37,13 @@ export function CredentialDetail({ credential, onUnlockNeeded }: CredentialDetai
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-xl font-semibold text-slate-900">{credential.platformName}</h1>
-        <p className="text-sm text-slate-600">{credential.account}</p>
+        <h1 className="text-xl font-semibold text-ink">{credential.platformName}</h1>
+        <p className="text-sm text-muted">{credential.account}</p>
       </div>
-      {credential.note ? <p className="text-sm text-slate-500">{credential.note}</p> : null}
+      {credential.note ? <p className="text-sm text-muted">{credential.note}</p> : null}
       <div className="flex items-center gap-2">
         {revealed ? (
-          <code className="rounded bg-slate-100 px-2 py-1 text-sm">{revealed}</code>
+          <code className="rounded bg-mist-soft px-2 py-1 text-sm text-mist">{revealed}</code>
         ) : (
           <Button variant="secondary" onClick={handleReveal}>
             Show password
@@ -51,14 +51,14 @@ export function CredentialDetail({ credential, onUnlockNeeded }: CredentialDetai
         )}
         {revealError ? (
           <>
-            <p className="text-sm text-red-600">{revealError}</p>
+            <p className="text-sm text-danger">{revealError}</p>
             <Button variant="secondary" onClick={onUnlockNeeded}>
               Unlock again
             </Button>
           </>
         ) : null}
       </div>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-muted">
         Last updated {new Date(credential.updatedAt).toLocaleString()}
       </p>
     </div>

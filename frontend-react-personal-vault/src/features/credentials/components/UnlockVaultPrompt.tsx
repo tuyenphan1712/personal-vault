@@ -29,9 +29,9 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
   })
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col gap-4 rounded-lg border border-slate-200 p-6">
-      <h2 className="text-lg font-semibold text-slate-900">Unlock your vault</h2>
-      <p className="text-sm text-slate-600">
+    <div className="mx-auto flex max-w-sm flex-col gap-4 rounded-lg border border-line bg-surface p-6">
+      <h2 className="text-lg font-semibold text-ink">Unlock your vault</h2>
+      <p className="text-sm text-muted">
         Enter your password again to decrypt your saved credentials on this device.
       </p>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
