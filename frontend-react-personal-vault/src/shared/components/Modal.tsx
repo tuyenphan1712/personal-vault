@@ -4,16 +4,17 @@ interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title: string
+  titleClassName?: string
   children: ReactNode
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, titleClassName = '', children }: ModalProps) {
   if (!isOpen) {
     return null
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm">
       <button
         type="button"
         aria-label="Close"
@@ -24,10 +25,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative z-10 w-full max-w-md rounded-lg bg-surface p-6 shadow-xl"
+        className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-ink">{title}</h2>
+          <h2 className={`text-lg font-semibold text-ink ${titleClassName}`}>{title}</h2>
           <button
             type="button"
             onClick={onClose}
