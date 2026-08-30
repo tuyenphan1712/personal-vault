@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
+import { PasswordInput } from '@/shared/components/PasswordInput'
 import { useRegister } from '../hooks/useRegister'
 
 // Kept in sync with backend RegisterRequest (Jakarta Bean Validation) per API_SPEC.md §7.
@@ -31,10 +32,10 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   })
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-4 text-left">
       <Input label="Full name" {...register('fullName')} error={errors.fullName?.message} />
       <Input label="Phone number" type="tel" {...register('phone')} error={errors.phone?.message} />
-      <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
+      <PasswordInput label="Password" {...register('password')} error={errors.password?.message} />
       {registerUser.isError ? (
         <p className="text-sm text-danger">This phone number is already registered.</p>
       ) : null}
