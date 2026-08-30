@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "読み込み中…",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "edit": "編集",
+    "delete": "削除",
+    "saveChanges": "変更を保存",
+    "showPassword": "パスワードを表示",
+    "hidePassword": "パスワードを隠す",
+    "backToDashboard": "ダッシュボードに戻る",
+    "logout": "ログアウト",
+    "switchToDarkMode": "ダークモードに切り替え",
+    "switchToLightMode": "ライトモードに切り替え",
+    "darkMode": "ダークモード",
+    "lightMode": "ライトモード",
+    "languageLabel": "言語"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "greeting": "こんにちは、{{name}}さん",
+    "navCredentialsLabel": "認証情報",
+    "navCredentialsDescription": "保存されたパスワードとアカウント。この端末上で暗号化されます。",
+    "navDocumentsLabel": "書類",
+    "navDocumentsDescription": "あなたの個人的な書類やドキュメント。",
+    "navProfileLabel": "プロフィール",
+    "navProfileDescription": "あなたのアカウント情報。"
+  },
+  "auth": {
+    "loginTitle": "おかえりなさい",
+    "loginSubtitle": "ログインしてパーソナルボールトにアクセスします。",
+    "loginButton": "ログイン",
+    "loginError": "電話番号またはパスワードが正しくありません。",
+    "noAccount": "アカウントをお持ちでないですか?",
+    "registerLink": "新規登録",
+    "registerTitle": "ボールトを作成",
+    "registerSubtitle": "認証情報や書類を安全に保管するためのパーソナルボールトを設定します。",
+    "registerButton": "アカウントを作成",
+    "registerError": "この電話番号はすでに登録されています。",
+    "hasAccount": "すでにアカウントをお持ちですか?",
+    "loginLink": "ログイン",
+    "encryptionFooter": "AES-GCM・クライアント側暗号化",
+    "fields": {
+      "phone": "電話番号",
+      "password": "パスワード",
+      "fullName": "氏名"
+    },
+    "errors": {
+      "phoneRequired": "電話番号を入力してください",
+      "passwordRequired": "パスワードを入力してください",
+      "phoneInvalid": "電話番号の形式が正しくありません",
+      "passwordMinLength": "パスワードは8文字以上で入力してください",
+      "fullNameRequired": "氏名を入力してください"
+    }
+  }
+}

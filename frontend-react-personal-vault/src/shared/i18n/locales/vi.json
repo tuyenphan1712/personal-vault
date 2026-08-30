@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Đang tải…",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "saveChanges": "Lưu thay đổi",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
+    "backToDashboard": "Về trang chính",
+    "logout": "Đăng xuất",
+    "switchToDarkMode": "Chuyển sang chế độ tối",
+    "switchToLightMode": "Chuyển sang chế độ sáng",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng",
+    "languageLabel": "Ngôn ngữ"
+  },
+  "dashboard": {
+    "title": "Trang chính",
+    "greeting": "Xin chào, {{name}}",
+    "navCredentialsLabel": "Thông tin đăng nhập",
+    "navCredentialsDescription": "Mật khẩu và tài khoản đã lưu, mã hoá trên thiết bị.",
+    "navDocumentsLabel": "Tài liệu",
+    "navDocumentsDescription": "Giấy tờ và tài liệu riêng tư của bạn.",
+    "navProfileLabel": "Hồ sơ",
+    "navProfileDescription": "Thông tin tài khoản của bạn."
+  },
+  "auth": {
+    "loginTitle": "Chào mừng trở lại",
+    "loginSubtitle": "Đăng nhập để truy cập vào kho lưu trữ cá nhân của bạn.",
+    "loginButton": "Đăng nhập",
+    "loginError": "Số điện thoại hoặc mật khẩu không đúng.",
+    "noAccount": "Chưa có tài khoản?",
+    "registerLink": "Đăng ký",
+    "registerTitle": "Tạo kho lưu trữ của bạn",
+    "registerSubtitle": "Thiết lập kho lưu trữ cá nhân để lưu thông tin đăng nhập và tài liệu một cách an toàn.",
+    "registerButton": "Tạo tài khoản",
+    "registerError": "Số điện thoại này đã được đăng ký.",
+    "hasAccount": "Đã có tài khoản?",
+    "loginLink": "Đăng nhập",
+    "encryptionFooter": "AES-GCM · mã hoá phía máy khách",
+    "fields": {
+      "phone": "Số điện thoại",
+      "password": "Mật khẩu",
+      "fullName": "Họ và tên"
+    },
+    "errors": {
+      "phoneRequired": "Vui lòng nhập số điện thoại",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+      "fullNameRequired": "Vui lòng nhập họ và tên"
+    }
+  }
+}

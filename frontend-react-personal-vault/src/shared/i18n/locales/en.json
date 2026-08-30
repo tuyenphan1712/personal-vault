@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "saveChanges": "Save changes",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "backToDashboard": "Back to dashboard",
+    "logout": "Log out",
+    "switchToDarkMode": "Switch to dark mode",
+    "switchToLightMode": "Switch to light mode",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "languageLabel": "Language"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": "Hello, {{name}}",
+    "navCredentialsLabel": "Credentials",
+    "navCredentialsDescription": "Passwords and saved accounts, encrypted on this device.",
+    "navDocumentsLabel": "Documents",
+    "navDocumentsDescription": "Your private papers and documents.",
+    "navProfileLabel": "Profile",
+    "navProfileDescription": "Your account information."
+  },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Log in to access your personal vault.",
+    "loginButton": "Log in",
+    "loginError": "Invalid phone number or password.",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register",
+    "registerTitle": "Create your vault",
+    "registerSubtitle": "Set up your personal vault to store credentials and documents securely.",
+    "registerButton": "Create account",
+    "registerError": "This phone number is already registered.",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log in",
+    "encryptionFooter": "AES-GCM · client-side encryption",
+    "fields": {
+      "phone": "Phone number",
+      "password": "Password",
+      "fullName": "Full name"
+    },
+    "errors": {
+      "phoneRequired": "Phone number is required",
+      "passwordRequired": "Password is required",
+      "phoneInvalid": "Phone number is invalid",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "fullNameRequired": "Full name is required"
+    }
+  }
+}
