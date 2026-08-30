@@ -1,6 +1,8 @@
 import { Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { ROUTES } from '@/routes/routes'
 import { Button } from '@/shared/components/Button'
+import { toIntlLocale } from '@/shared/i18n'
 import { useDeleteDocument } from '../hooks/useDeleteDocument'
 import { useDownloadDocument } from '../hooks/useDownloadDocument'
 import { getDocumentTypeLabel, type Document } from '../types/document.types'
@@ -22,6 +24,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function DocumentCard({ document: doc, onNotify }: DocumentCardProps) {
+  const { t, i18n } = useTranslation()
   const deleteDocument = useDeleteDocument()
   const { download, isDownloading } = useDownloadDocument()
 
@@ -35,29 +38,25 @@ export function DocumentCard({ document: doc, onNotify }: DocumentCardProps) {
           {doc.title}
         </Link>
         <div className="mt-0.5 flex flex-wrap items-center gap-2 font-mono text-xs text-muted">
-          {doc.docType ? <span>{getDocumentTypeLabel(doc.docType)}</span> : null}
+          {doc.docType ? <span>{getDocumentTypeLabel(doc.docType, t)}</span> : null}
           <span>{formatFileSize(doc.fileSize)}</span>
-          <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+          <span>{new Date(doc.createdAt).toLocaleDateString(toIntlLocale(i18n.language))}</span>
         </div>
       </div>
       <div className="-ml-2 flex gap-1 md:ml-0">
-        <Button
-          variant="secondary"
-          isLoading={isDownloading}
-          onClick={() => download(doc.id, doc.title)}
-        >
-          Download
+        <Button variant="secondary" isLoading={isDownloading} onClick={() => download(doc.id, doc.title)}>
+          {t('documents.download')}
         </Button>
         <Button
           variant="danger"
           isLoading={deleteDocument.isPending}
           onClick={() =>
             deleteDocument.mutate(doc.id, {
-              onSuccess: () => onNotify(`${doc.title} deleted.`),
+              onSuccess: () => onNotify(t('documents.deletedToast', { name: doc.title })),
             })
           }
         >
-          Delete
+          {t('common.delete')}
         </Button>
       </div>
     </li>

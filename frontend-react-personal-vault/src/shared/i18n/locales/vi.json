@@ -97,5 +97,53 @@
     "savedToastCreate": "Đã niêm phong và lưu.",
     "notFound": "Không tìm thấy thông tin đăng nhập.",
     "backToCredentials": "Về danh sách thông tin đăng nhập"
+  },
+  "documents": {
+    "pageTitle": "Tài liệu",
+    "pageSubtitle": "Tài liệu riêng tư, được lưu trữ an toàn và chỉ bạn mới truy cập được.",
+    "uploadButton": "Tải lên tài liệu",
+    "modalTitle": "Tải lên tài liệu",
+    "loading": "Đang tải danh sách tài liệu…",
+    "loadError": "Không thể tải tài liệu. Vui lòng thử lại.",
+    "emptyTitle": "Chưa có tài liệu nào",
+    "emptyBody": "Tải lên tài liệu riêng tư đầu tiên để bắt đầu.",
+    "countSingular": "{{count}} tài liệu",
+    "countPlural": "{{count}} tài liệu",
+    "download": "Tải xuống",
+    "deletedToast": "Đã xoá {{name}}.",
+    "uploadedToast": "Đã tải lên tài liệu.",
+    "fields": {
+      "title": "Tiêu đề",
+      "docType": "Loại giấy tờ (không bắt buộc)",
+      "selectType": "Chọn loại giấy tờ",
+      "otherType": "Khác (tự nhập)",
+      "customTypeLabel": "Loại giấy tờ khác",
+      "customTypePlaceholder": "VD: Giấy khai sinh",
+      "file": "Tệp",
+      "fileHint": "Tối đa 10MB. Chỉ nhận JPEG, PNG, hoặc PDF."
+    },
+    "errors": {
+      "titleRequired": "Vui lòng nhập tiêu đề",
+      "fileRequired": "Vui lòng chọn một tệp",
+      "fileTooLarge": "Tệp phải nhỏ hơn hoặc bằng 10MB",
+      "fileTypeInvalid": "Chỉ chấp nhận tệp JPEG, PNG, hoặc PDF",
+      "customTypeRequired": "Vui lòng nhập loại giấy tờ"
+    },
+    "notFound": "Không tìm thấy tài liệu.",
+    "backToDocuments": "Về danh sách tài liệu",
+    "detail": {
+      "fileSize": "Dung lượng",
+      "type": "Định dạng",
+      "uploaded": "Ngày tải lên"
+    },
+    "types": {
+      "identity_civil_status": "Giấy tờ định danh & Hộ tịch",
+      "education_qualifications": "Bằng cấp & Chứng chỉ",
+      "employment_contracts": "Hồ sơ Lao động & Hợp đồng",
+      "medical_health": "Y tế & Sức khỏe",
+      "finance_tax": "Tài chính & Thuế",
+      "property_vehicles": "Tài sản & Phương tiện",
+      "legal_misc": "Giấy tờ Pháp lý & Ủy quyền khác"
+    }
   }
 }

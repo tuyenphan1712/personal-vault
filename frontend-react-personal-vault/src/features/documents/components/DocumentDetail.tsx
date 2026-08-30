@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/Button'
+import { toIntlLocale } from '@/shared/i18n'
 import { useDownloadDocument } from '../hooks/useDownloadDocument'
 import { getDocumentTypeLabel, type Document } from '../types/document.types'
 
@@ -18,6 +20,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function DocumentDetail({ document: doc }: DocumentDetailProps) {
+  const { t, i18n } = useTranslation()
   const { download, isDownloading } = useDownloadDocument()
 
   return (
@@ -28,19 +31,19 @@ export function DocumentDetail({ document: doc }: DocumentDetailProps) {
         </span>
         <div>
           <h1 className="font-serif text-xl font-normal text-ink">{doc.title}</h1>
-          {doc.docType ? <p className="font-mono text-sm text-muted">{getDocumentTypeLabel(doc.docType)}</p> : null}
+          {doc.docType ? <p className="font-mono text-sm text-muted">{getDocumentTypeLabel(doc.docType, t)}</p> : null}
         </div>
       </div>
       <dl className="grid grid-cols-2 gap-3 font-mono text-sm text-muted">
-        <dt>File size</dt>
+        <dt>{t('documents.detail.fileSize')}</dt>
         <dd>{formatFileSize(doc.fileSize)}</dd>
-        <dt>Type</dt>
+        <dt>{t('documents.detail.type')}</dt>
         <dd>{doc.mimeType}</dd>
-        <dt>Uploaded</dt>
-        <dd>{new Date(doc.createdAt).toLocaleString()}</dd>
+        <dt>{t('documents.detail.uploaded')}</dt>
+        <dd>{new Date(doc.createdAt).toLocaleString(toIntlLocale(i18n.language))}</dd>
       </dl>
       <Button isLoading={isDownloading} onClick={() => download(doc.id, doc.title)}>
-        Download
+        {t('documents.download')}
       </Button>
     </div>
   )

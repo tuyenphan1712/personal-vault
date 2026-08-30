@@ -97,5 +97,53 @@
     "savedToastCreate": "Sealed and saved.",
     "notFound": "Credential not found.",
     "backToCredentials": "Back to credentials"
+  },
+  "documents": {
+    "pageTitle": "Documents",
+    "pageSubtitle": "Private documents, stored securely and only reachable by you.",
+    "uploadButton": "Upload document",
+    "modalTitle": "Upload document",
+    "loading": "Loading documents…",
+    "loadError": "Couldn't load your documents. Try again.",
+    "emptyTitle": "No documents yet",
+    "emptyBody": "Upload your first private document to get started.",
+    "countSingular": "{{count}} document",
+    "countPlural": "{{count}} documents",
+    "download": "Download",
+    "deletedToast": "{{name}} deleted.",
+    "uploadedToast": "Document uploaded.",
+    "fields": {
+      "title": "Title",
+      "docType": "Document type (optional)",
+      "selectType": "Select a type",
+      "otherType": "Other (custom)",
+      "customTypeLabel": "Other document type",
+      "customTypePlaceholder": "e.g. Birth certificate",
+      "file": "File",
+      "fileHint": "Max 10MB. JPEG, PNG, or PDF only."
+    },
+    "errors": {
+      "titleRequired": "Title is required",
+      "fileRequired": "A file is required",
+      "fileTooLarge": "File must be 10MB or smaller",
+      "fileTypeInvalid": "Only JPEG, PNG, or PDF files are allowed",
+      "customTypeRequired": "Please enter a document type"
+    },
+    "notFound": "Document not found.",
+    "backToDocuments": "Back to documents",
+    "detail": {
+      "fileSize": "File size",
+      "type": "Type",
+      "uploaded": "Uploaded"
+    },
+    "types": {
+      "identity_civil_status": "Identity & Civil Status",
+      "education_qualifications": "Education & Qualifications",
+      "employment_contracts": "Employment & Contracts",
+      "medical_health": "Medical & Health",
+      "finance_tax": "Finance & Tax",
+      "property_vehicles": "Property & Vehicles",
+      "legal_misc": "Legal & Miscellaneous"
+    }
   }
 }

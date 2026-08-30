@@ -97,5 +97,53 @@
     "savedToastCreate": "封印して保存しました。",
     "notFound": "認証情報が見つかりません。",
     "backToCredentials": "認証情報一覧に戻る"
+  },
+  "documents": {
+    "pageTitle": "書類",
+    "pageSubtitle": "個人の書類を安全に保管し、本人だけがアクセスできます。",
+    "uploadButton": "書類をアップロード",
+    "modalTitle": "書類をアップロード",
+    "loading": "書類を読み込み中…",
+    "loadError": "書類を読み込めませんでした。もう一度お試しください。",
+    "emptyTitle": "書類はまだありません",
+    "emptyBody": "最初の書類をアップロードして始めましょう。",
+    "countSingular": "{{count}}件の書類",
+    "countPlural": "{{count}}件の書類",
+    "download": "ダウンロード",
+    "deletedToast": "{{name}}を削除しました。",
+    "uploadedToast": "書類をアップロードしました。",
+    "fields": {
+      "title": "タイトル",
+      "docType": "書類の種類(任意)",
+      "selectType": "種類を選択",
+      "otherType": "その他(自由入力)",
+      "customTypeLabel": "その他の書類の種類",
+      "customTypePlaceholder": "例: 出生証明書",
+      "file": "ファイル",
+      "fileHint": "最大10MB。JPEG、PNG、PDFのみ対応。"
+    },
+    "errors": {
+      "titleRequired": "タイトルを入力してください",
+      "fileRequired": "ファイルを選択してください",
+      "fileTooLarge": "ファイルは10MB以下にしてください",
+      "fileTypeInvalid": "JPEG、PNG、PDF形式のみ対応しています",
+      "customTypeRequired": "書類の種類を入力してください"
+    },
+    "notFound": "書類が見つかりません。",
+    "backToDocuments": "書類一覧に戻る",
+    "detail": {
+      "fileSize": "ファイルサイズ",
+      "type": "種類",
+      "uploaded": "アップロード日"
+    },
+    "types": {
+      "identity_civil_status": "本人確認・戸籍関連",
+      "education_qualifications": "学歴・資格",
+      "employment_contracts": "雇用・契約書類",
+      "medical_health": "医療・健康",
+      "finance_tax": "金融・税務",
+      "property_vehicles": "資産・車両",
+      "legal_misc": "法的書類・その他"
+    }
   }
 }
