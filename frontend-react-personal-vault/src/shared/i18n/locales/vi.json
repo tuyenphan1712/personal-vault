@@ -145,5 +145,22 @@
       "property_vehicles": "Tài sản & Phương tiện",
       "legal_misc": "Giấy tờ Pháp lý & Ủy quyền khác"
     }
+  },
+  "profile": {
+    "pageTitle": "Hồ sơ",
+    "pageSubtitle": "Thông tin tài khoản của bạn.",
+    "loadError": "Không thể tải hồ sơ.",
+    "phone": "Số điện thoại",
+    "fullName": "Họ và tên",
+    "birthday": "Ngày sinh",
+    "editButton": "Sửa hồ sơ",
+    "phoneImmutable": "Không thể thay đổi ở đây",
+    "fields": {
+      "fullName": "Họ và tên",
+      "birthday": "Ngày sinh"
+    },
+    "errors": {
+      "fullNameRequired": "Vui lòng nhập họ và tên"
+    }
   }
 }
