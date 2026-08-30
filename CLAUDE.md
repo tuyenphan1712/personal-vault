@@ -60,3 +60,12 @@ When user asks to:
 - Follow existing patterns in the codebase — read at least one existing feature in the same app first.
 - Do NOT create feature code when running `/init-base`.
 - Any endpoint, DB field, or error code introduced while running a `*-crud` skill must also update `01-share-docs/API_SPEC.md` / `DATABASE.md` — these are the source of truth shared by all three apps.
+
+## Brainstorming / Planning Doc Location
+When using the `superpowers:brainstorming` or `superpowers:writing-plans` skills, save the spec/plan inside the docs of the app the work belongs to, not at the repo root:
+- Frontend work → `frontend-react-personal-vault/docs/superpowers/specs/` and `frontend-react-personal-vault/docs/superpowers/plans/`
+- Backend work → `backend-java-personal-vault/docs/superpowers/specs/` and `backend-java-personal-vault/docs/superpowers/plans/`
+- Mobile work → `mobile-expo-personal-vault/docs/superpowers/specs/` and `mobile-expo-personal-vault/docs/superpowers/plans/`
+- Work spanning multiple apps (rare) → keep at repo root `docs/superpowers/specs/` / `docs/superpowers/plans/`
+
+This overrides the skills' own default (`docs/superpowers/...` at repo root) whenever the work is scoped to one app.
