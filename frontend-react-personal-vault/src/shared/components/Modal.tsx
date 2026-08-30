@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ModalProps {
   isOpen: boolean
@@ -9,30 +10,22 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, titleClassName = '', children }: ModalProps) {
+  const { t } = useTranslation()
+
   if (!isOpen) {
     return null
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm">
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onClose}
-        className="absolute inset-0 cursor-default"
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
-      >
+      <button type="button" aria-label={t('common.close')} onClick={onClose} className="absolute inset-0 cursor-default" />
+      <div role="dialog" aria-modal="true" aria-label={title} className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className={`text-lg font-semibold text-ink ${titleClassName}`}>{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="rounded-md p-1 text-muted hover:bg-surface-hover hover:text-ink"
           >
             ✕

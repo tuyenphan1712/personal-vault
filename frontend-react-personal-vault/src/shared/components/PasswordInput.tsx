@@ -1,4 +1,5 @@
 import { forwardRef, useState, type InputHTMLAttributes } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: string
@@ -9,6 +10,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(fu
   { label, error, id, className = '', ...rest },
   ref,
 ) {
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
   const inputId = id ?? rest.name
   const errorId = error ? `${inputId}-error` : undefined
@@ -33,7 +35,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(fu
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
-          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-label={visible ? t('common.hidePassword') : t('common.showPassword')}
           aria-pressed={visible}
           className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted hover:text-ink"
         >

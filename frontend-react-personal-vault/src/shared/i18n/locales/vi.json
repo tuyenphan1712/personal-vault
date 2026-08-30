@@ -52,5 +52,50 @@
       "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
       "fullNameRequired": "Vui lòng nhập họ và tên"
     }
+  },
+  "credentials": {
+    "unlock": {
+      "title": "Kho lưu trữ đang được niêm phong",
+      "subtitle": "Nhập mật khẩu mã hoá để mở khoá. Khoá được tạo ngay tại đây, trên thiết bị này — không gửi đi đâu cả.",
+      "button": "Mở khoá kho lưu trữ",
+      "footer": "AES-GCM · mã hoá phía máy khách",
+      "forgotten": "Quên mật khẩu? Không thể khôi phục — chỉ bạn mới giữ chìa khoá.",
+      "passwordRequired": "Vui lòng nhập mật khẩu"
+    },
+    "pageTitle": "Thông tin đăng nhập",
+    "pageSubtitle": "Thông tin đăng nhập đã lưu, được mã hoá trên thiết bị này trước khi lưu trữ.",
+    "addButton": "Thêm thông tin đăng nhập",
+    "modalEditTitle": "Sửa thông tin đăng nhập",
+    "modalAddTitle": "Thêm thông tin đăng nhập",
+    "loading": "Đang tải thông tin đăng nhập…",
+    "loadError": "Không thể tải thông tin đăng nhập. Vui lòng thử lại.",
+    "emptyTitle": "Chưa có thông tin đăng nhập nào",
+    "emptyBody": "Thêm mục đầu tiên để bắt đầu xây dựng kho lưu trữ của bạn.",
+    "countSingular": "{{count}} thông tin đăng nhập",
+    "countPlural": "{{count}} thông tin đăng nhập",
+    "encryptedBadge": "Đã mã hoá",
+    "deletedToast": "Đã xoá {{name}}.",
+    "copyPasswordAria": "Sao chép mật khẩu",
+    "vaultLocked": "Kho lưu trữ đang bị khoá.",
+    "decryptError": "Không thể giải mã — hãy thử mở khoá kho lưu trữ lại.",
+    "copiedToast": "Đã sao chép mật khẩu. Clipboard sẽ tự xoá sau 20 giây.",
+    "unlockAgain": "Mở khoá lại",
+    "lastUpdated": "Cập nhật lần cuối {{date}}",
+    "passwordLabel": "Mật khẩu",
+    "fields": {
+      "platform": "Nền tảng",
+      "account": "Tài khoản",
+      "password": "Mật khẩu",
+      "note": "Ghi chú (không bắt buộc)"
+    },
+    "errors": {
+      "platformRequired": "Vui lòng nhập tên nền tảng",
+      "accountRequired": "Vui lòng nhập tài khoản",
+      "passwordRequired": "Vui lòng nhập mật khẩu"
+    },
+    "savedToastEdit": "Đã niêm phong thay đổi.",
+    "savedToastCreate": "Đã niêm phong và lưu.",
+    "notFound": "Không tìm thấy thông tin đăng nhập.",
+    "backToCredentials": "Về danh sách thông tin đăng nhập"
   }
 }

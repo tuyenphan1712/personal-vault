@@ -52,5 +52,50 @@
       "passwordMinLength": "Password must be at least 8 characters",
       "fullNameRequired": "Full name is required"
     }
+  },
+  "credentials": {
+    "unlock": {
+      "title": "Your vault is sealed",
+      "subtitle": "Enter your encryption password to open it. The key is derived here, on this device — nothing is sent.",
+      "button": "Unlock vault",
+      "footer": "AES-GCM · client-side encryption",
+      "forgotten": "Forgotten it? There's no reset — only you hold the key.",
+      "passwordRequired": "Password is required"
+    },
+    "pageTitle": "Credentials",
+    "pageSubtitle": "Saved logins, encrypted on this device before they're stored.",
+    "addButton": "Add credential",
+    "modalEditTitle": "Edit credential",
+    "modalAddTitle": "Add credential",
+    "loading": "Loading credentials…",
+    "loadError": "Couldn't load your credentials. Try again.",
+    "emptyTitle": "No credentials yet",
+    "emptyBody": "Add your first one to start building your vault.",
+    "countSingular": "{{count}} credential",
+    "countPlural": "{{count}} credentials",
+    "encryptedBadge": "Encrypted",
+    "deletedToast": "{{name}} deleted.",
+    "copyPasswordAria": "Copy password",
+    "vaultLocked": "Vault is locked.",
+    "decryptError": "Could not decrypt — try unlocking the vault again.",
+    "copiedToast": "Password copied. Clipboard clears in 20s.",
+    "unlockAgain": "Unlock again",
+    "lastUpdated": "Last updated {{date}}",
+    "passwordLabel": "Password",
+    "fields": {
+      "platform": "Platform",
+      "account": "Account",
+      "password": "Password",
+      "note": "Note (optional)"
+    },
+    "errors": {
+      "platformRequired": "Platform name is required",
+      "accountRequired": "Account is required",
+      "passwordRequired": "Password is required"
+    },
+    "savedToastEdit": "Changes sealed.",
+    "savedToastCreate": "Sealed and saved.",
+    "notFound": "Credential not found.",
+    "backToCredentials": "Back to credentials"
   }
 }

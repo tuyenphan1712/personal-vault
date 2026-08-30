@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/Button'
 import { decryptValue } from '@/shared/lib/crypto'
 import { getEncryptionKey } from '@/shared/lib/keyStore'
@@ -10,6 +11,7 @@ interface PasswordRevealProps {
 }
 
 export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: PasswordRevealProps) {
+  const { t } = useTranslation()
   const [revealed, setRevealed] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -31,13 +33,13 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
     setError(null)
     const key = getEncryptionKey()
     if (!key) {
-      setError('Vault is locked.')
+      setError(t('credentials.vaultLocked'))
       return
     }
     try {
       setRevealed(await decryptValue(encryptedPassword, key))
     } catch {
-      setError('Could not decrypt — try unlocking the vault again.')
+      setError(t('credentials.decryptError'))
     }
   }
 
@@ -47,13 +49,13 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
     }
     await navigator.clipboard.writeText(revealed)
     setCopied(true)
-    onNotify('Password copied. Clipboard clears in 20s.')
+    onNotify(t('credentials.copiedToast'))
     window.setTimeout(() => setCopied(false), 2000)
   }
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-muted">Password</span>
+      <span className="text-xs font-medium uppercase tracking-wide text-muted">{t('credentials.passwordLabel')}</span>
       <div className="flex items-center gap-2">
         <code className="flex-1 truncate rounded-md bg-mist-soft px-3 py-1.5 font-mono text-sm tracking-wide text-mist">
           {revealed ?? '••••••••••••'}
@@ -62,7 +64,7 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
           <button
             type="button"
             onClick={handleCopy}
-            aria-label="Copy password"
+            aria-label={t('credentials.copyPasswordAria')}
             className="flex-shrink-0 rounded-md border border-line p-2 text-muted transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {copied ? <CheckIcon /> : <CopyIcon />}
@@ -71,7 +73,7 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
         <button
           type="button"
           onClick={handleToggle}
-          aria-label={revealed ? 'Hide password' : 'Show password'}
+          aria-label={revealed ? t('common.hidePassword') : t('common.showPassword')}
           aria-pressed={revealed !== null}
           className="flex-shrink-0 rounded-md border border-line p-2 text-muted transition-colors hover:bg-surface-hover hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
@@ -82,7 +84,7 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
         <div className="flex items-center gap-2">
           <p className="text-sm text-danger">{error}</p>
           <Button variant="secondary" onClick={onUnlockNeeded}>
-            Unlock again
+            {t('credentials.unlockAgain')}
           </Button>
         </div>
       ) : null}

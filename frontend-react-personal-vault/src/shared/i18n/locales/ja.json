@@ -52,5 +52,50 @@
       "passwordMinLength": "パスワードは8文字以上で入力してください",
       "fullNameRequired": "氏名を入力してください"
     }
+  },
+  "credentials": {
+    "unlock": {
+      "title": "ボールトは封印されています",
+      "subtitle": "暗号化パスワードを入力して開いてください。鍵はこの端末上で生成され、どこにも送信されません。",
+      "button": "ボールトを開く",
+      "footer": "AES-GCM・クライアント側暗号化",
+      "forgotten": "忘れてしまった場合、リセットする方法はありません — 鍵を持っているのはあなただけです。",
+      "passwordRequired": "パスワードを入力してください"
+    },
+    "pageTitle": "認証情報",
+    "pageSubtitle": "保存されたログイン情報。保存前にこの端末上で暗号化されます。",
+    "addButton": "認証情報を追加",
+    "modalEditTitle": "認証情報を編集",
+    "modalAddTitle": "認証情報を追加",
+    "loading": "認証情報を読み込み中…",
+    "loadError": "認証情報を読み込めませんでした。もう一度お試しください。",
+    "emptyTitle": "認証情報はまだありません",
+    "emptyBody": "最初の1件を追加してボールトを作り始めましょう。",
+    "countSingular": "{{count}}件の認証情報",
+    "countPlural": "{{count}}件の認証情報",
+    "encryptedBadge": "暗号化済み",
+    "deletedToast": "{{name}}を削除しました。",
+    "copyPasswordAria": "パスワードをコピー",
+    "vaultLocked": "ボールトはロックされています。",
+    "decryptError": "復号できませんでした — もう一度ボールトを開いてみてください。",
+    "copiedToast": "パスワードをコピーしました。クリップボードは20秒後に消去されます。",
+    "unlockAgain": "もう一度開く",
+    "lastUpdated": "最終更新: {{date}}",
+    "passwordLabel": "パスワード",
+    "fields": {
+      "platform": "サービス名",
+      "account": "アカウント",
+      "password": "パスワード",
+      "note": "メモ(任意)"
+    },
+    "errors": {
+      "platformRequired": "サービス名を入力してください",
+      "accountRequired": "アカウントを入力してください",
+      "passwordRequired": "パスワードを入力してください"
+    },
+    "savedToastEdit": "変更を封印しました。",
+    "savedToastCreate": "封印して保存しました。",
+    "notFound": "認証情報が見つかりません。",
+    "backToCredentials": "認証情報一覧に戻る"
   }
 }

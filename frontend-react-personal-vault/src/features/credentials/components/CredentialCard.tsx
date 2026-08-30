@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/Button'
+import { toIntlLocale } from '@/shared/i18n'
 import { useDeleteCredential } from '../hooks/useDeleteCredential'
 import type { Credential } from '../types/credential.types'
 import { PasswordReveal } from './PasswordReveal'
@@ -11,6 +13,7 @@ interface CredentialCardProps {
 }
 
 export function CredentialCard({ credential, onEdit, onUnlockNeeded, onNotify }: CredentialCardProps) {
+  const { t, i18n } = useTranslation()
   const deleteCredential = useDeleteCredential()
 
   return (
@@ -21,24 +24,26 @@ export function CredentialCard({ credential, onEdit, onUnlockNeeded, onNotify }:
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
           <p className="font-medium text-ink">{credential.platformName}</p>
-          <span className="font-mono text-xs text-muted">{new Date(credential.updatedAt).toLocaleDateString()}</span>
+          <span className="font-mono text-xs text-muted">
+            {new Date(credential.updatedAt).toLocaleDateString(toIntlLocale(i18n.language))}
+          </span>
         </div>
         <p className="mt-0.5 truncate font-mono text-sm text-muted">{credential.account}</p>
         {credential.note ? <p className="mt-2 text-sm text-muted">{credential.note}</p> : null}
         <div className="-ml-2 mt-3 flex gap-1">
           <Button variant="secondary" onClick={() => onEdit(credential)}>
-            Edit
+            {t('common.edit')}
           </Button>
           <Button
             variant="danger"
             isLoading={deleteCredential.isPending}
             onClick={() =>
               deleteCredential.mutate(credential.id, {
-                onSuccess: () => onNotify(`${credential.platformName} deleted.`),
+                onSuccess: () => onNotify(t('credentials.deletedToast', { name: credential.platformName })),
               })
             }
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </div>
       </div>
