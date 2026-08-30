@@ -42,10 +42,17 @@ export function ProfileForm({ profile, onSuccess, onCancel }: ProfileFormProps) 
   })
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <Input label="Full name" {...register('fullName')} error={errors.fullName?.message} />
       <Input label="Birthday" type="date" {...register('birthday')} error={errors.birthday?.message} />
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-1.5">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted">Phone</span>
+        <div className="flex items-center justify-between gap-2 rounded-md border border-line bg-bg px-3 py-2.5">
+          <span className="font-mono text-sm text-muted">{profile.phone}</span>
+          <span className="font-mono text-[11px] uppercase tracking-wide text-muted">Can't be changed here</span>
+        </div>
+      </div>
+      <div className="mt-1 flex gap-2">
         <Button type="submit" isLoading={updateProfile.isPending}>
           Save changes
         </Button>
