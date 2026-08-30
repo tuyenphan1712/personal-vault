@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { ROUTES } from '@/routes/routes'
 import { VaultBadge } from '@/shared/components/VaultBadge'
 import { LoginForm } from '../components/LoginForm'
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
@@ -14,18 +16,18 @@ export function LoginPage() {
           <span className="block h-3.5 w-3.5 rounded-full bg-[#B08442]" />
         </span>
         <div>
-          <h1 className="font-serif text-3xl font-light tracking-tight text-ink">Welcome back</h1>
-          <p className="mt-1 text-sm text-muted">Log in to access your personal vault.</p>
+          <h1 className="font-serif text-3xl font-light tracking-tight text-ink">{t('auth.loginTitle')}</h1>
+          <p className="mt-1 text-sm text-muted">{t('auth.loginSubtitle')}</p>
         </div>
         <LoginForm onSuccess={() => navigate(ROUTES.DASHBOARD)} />
         <div className="w-full border-t border-line pt-4 font-mono text-xs uppercase tracking-wide text-muted">
-          AES-GCM · client-side encryption
+          {t('auth.encryptionFooter')}
         </div>
       </div>
       <p className="text-center text-xs text-muted">
-        Don't have an account?{' '}
+        {t('auth.noAccount')}{' '}
         <Link to={ROUTES.REGISTER} className="font-medium text-ink underline">
-          Register
+          {t('auth.registerLink')}
         </Link>
       </p>
     </div>

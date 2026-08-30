@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from './LanguageSwitcher'
 import { VaultMark } from './VaultMark'
 
 export function VaultBadge() {
@@ -7,6 +8,7 @@ export function VaultBadge() {
         <VaultMark size={26} />
       </span>
       <span className="font-serif text-base font-medium tracking-tight text-ink">Personal Vault</span>
+      <LanguageSwitcher />
     </div>
   )
 }

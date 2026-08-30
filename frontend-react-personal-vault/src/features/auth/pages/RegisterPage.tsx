@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { ROUTES } from '@/routes/routes'
 import { VaultBadge } from '@/shared/components/VaultBadge'
 import { RegisterForm } from '../components/RegisterForm'
 
 export function RegisterPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
@@ -14,20 +16,18 @@ export function RegisterPage() {
           <span className="block h-3.5 w-3.5 rounded-full bg-[#B08442]" />
         </span>
         <div>
-          <h1 className="font-serif text-3xl font-light tracking-tight text-ink">Create your vault</h1>
-          <p className="mt-1 text-sm text-muted">
-            Set up your personal vault to store credentials and documents securely.
-          </p>
+          <h1 className="font-serif text-3xl font-light tracking-tight text-ink">{t('auth.registerTitle')}</h1>
+          <p className="mt-1 text-sm text-muted">{t('auth.registerSubtitle')}</p>
         </div>
         <RegisterForm onSuccess={() => navigate(ROUTES.LOGIN)} />
         <div className="w-full border-t border-line pt-4 font-mono text-xs uppercase tracking-wide text-muted">
-          AES-GCM · client-side encryption
+          {t('auth.encryptionFooter')}
         </div>
       </div>
       <p className="text-center text-xs text-muted">
-        Already have an account?{' '}
+        {t('auth.hasAccount')}{' '}
         <Link to={ROUTES.LOGIN} className="font-medium text-ink underline">
-          Log in
+          {t('auth.loginLink')}
         </Link>
       </p>
     </div>
