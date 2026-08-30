@@ -1,7 +1,7 @@
 # i18n (vi / en / ja) — Design Spec
 
 Date: 2026-08-30
-Status: Approved by user, pending implementation
+Status: Implemented
 
 ## Problem
 
