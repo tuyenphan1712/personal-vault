@@ -5,7 +5,6 @@ import { useTranslation, type TFunction } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/shared/components/Button'
 import { PasswordInput } from '@/shared/components/PasswordInput'
-import { VaultBadge } from '@/shared/components/VaultBadge'
 import { useUnlockVault } from '../hooks/useUnlockVault'
 
 function createUnlockSchema(t: TFunction) {
@@ -37,7 +36,6 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
 
   return (
     <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
-      <VaultBadge />
       <div className="flex w-full flex-col items-center gap-4 rounded-xl border border-line bg-surface p-8 text-center shadow-sm">
         <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#B08442]/35 bg-[#EFE3CE]">
           <span className="block h-3.5 w-3.5 rounded-full bg-[#B08442]" />
