@@ -95,6 +95,7 @@
     },
     "savedToastEdit": "Đã niêm phong thay đổi.",
     "savedToastCreate": "Đã niêm phong và lưu.",
+    "saveError": "Không thể lưu thông tin đăng nhập. Vui lòng thử lại.",
     "notFound": "Không tìm thấy thông tin đăng nhập.",
     "backToCredentials": "Về danh sách thông tin đăng nhập"
   },

@@ -148,6 +148,25 @@ describe('CredentialForm', () => {
     expect(called).toBe(false)
   })
 
+  it('shows an error message and does not call onSuccess when saving fails', async () => {
+    setEncryptionKey(await deriveEncryptionKey('unlock-pass', 'user-1'))
+    server.use(
+      http.post(`${API_BASE_URL}/credentials`, () =>
+        HttpResponse.json({ success: false, error: { code: 'COMMON_001', message: 'Validation failed', details: null } }, { status: 400 }),
+      ),
+    )
+    const onSuccess = vi.fn()
+    renderForm({ onSuccess })
+
+    await userEvent.type(screen.getByLabelText('Platform'), 'Gmail')
+    await userEvent.type(screen.getByLabelText('Account'), 'user@example.com')
+    await userEvent.type(screen.getByLabelText('Password'), PLAINTEXT_PASSWORD)
+    await userEvent.click(screen.getByRole('button', { name: 'Add credential' }))
+
+    expect(await screen.findByText("Couldn't save this credential. Try again.")).toBeInTheDocument()
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it('never logs the plaintext password anywhere during submit', async () => {
     const key = await deriveEncryptionKey('unlock-pass', 'user-1')
     setEncryptionKey(key)

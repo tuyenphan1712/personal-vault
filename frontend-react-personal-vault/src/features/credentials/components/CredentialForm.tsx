@@ -55,19 +55,18 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
     const encryptedPassword = await encryptValue(values.password, key)
 
     if (credential) {
-      await updateCredential.mutateAsync({
-        id: credential.id,
-        payload: { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
-      })
-      onSuccess(t('credentials.savedToastEdit'))
+      updateCredential.mutate(
+        {
+          id: credential.id,
+          payload: { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
+        },
+        { onSuccess: () => onSuccess(t('credentials.savedToastEdit')) },
+      )
     } else {
-      await createCredential.mutateAsync({
-        platformName: values.platformName,
-        account: values.account,
-        encryptedPassword,
-        note: values.note ?? null,
-      })
-      onSuccess(t('credentials.savedToastCreate'))
+      createCredential.mutate(
+        { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
+        { onSuccess: () => onSuccess(t('credentials.savedToastCreate')) },
+      )
     }
   })
 
@@ -77,6 +76,9 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
       <Input label={t('credentials.fields.account')} {...register('account')} error={errors.account?.message} />
       <Input label={t('credentials.fields.password')} type="password" {...register('password')} error={errors.password?.message} />
       <Input label={t('credentials.fields.note')} {...register('note')} error={errors.note?.message} />
+      {createCredential.isError || updateCredential.isError ? (
+        <p className="text-sm text-danger">{t('credentials.saveError')}</p>
+      ) : null}
       <Button type="submit" isLoading={isPending}>
         {credential ? t('common.saveChanges') : t('credentials.addButton')}
       </Button>

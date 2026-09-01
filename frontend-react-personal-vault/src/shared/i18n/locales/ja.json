@@ -95,6 +95,7 @@
     },
     "savedToastEdit": "変更を封印しました。",
     "savedToastCreate": "封印して保存しました。",
+    "saveError": "認証情報を保存できませんでした。もう一度お試しください。",
     "notFound": "認証情報が見つかりません。",
     "backToCredentials": "認証情報一覧に戻る"
   },

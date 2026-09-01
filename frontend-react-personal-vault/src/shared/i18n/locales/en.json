@@ -95,6 +95,7 @@
     },
     "savedToastEdit": "Changes sealed.",
     "savedToastCreate": "Sealed and saved.",
+    "saveError": "Couldn't save this credential. Try again.",
     "notFound": "Credential not found.",
     "backToCredentials": "Back to credentials"
   },
