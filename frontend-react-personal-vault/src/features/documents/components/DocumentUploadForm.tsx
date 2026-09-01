@@ -18,9 +18,9 @@ function createUploadSchema(t: TFunction) {
       file: z
         .instanceof(FileList)
         .refine((files) => files.length === 1, t('documents.errors.fileRequired'))
-        .refine((files) => files[0].size <= MAX_FILE_SIZE_BYTES, t('documents.errors.fileTooLarge'))
+        .refine((files) => !files[0] || files[0].size <= MAX_FILE_SIZE_BYTES, t('documents.errors.fileTooLarge'))
         .refine(
-          (files) => (ALLOWED_DOCUMENT_TYPES as readonly string[]).includes(files[0].type),
+          (files) => !files[0] || (ALLOWED_DOCUMENT_TYPES as readonly string[]).includes(files[0].type),
           t('documents.errors.fileTypeInvalid'),
         ),
     })
