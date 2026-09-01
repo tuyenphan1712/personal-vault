@@ -1,2 +1,8 @@
 export { useAuthStore } from './stores/auth.store'
 export type { CurrentUser } from './types/Session.types'
+export { useLogin } from './hooks/useLogin'
+export { useRegister } from './hooks/useRegister'
+export { useLogout } from './hooks/useLogout'
+export { useSessionBootstrap } from './hooks/useSessionBootstrap'
+export { LoginScreen } from './screens/LoginScreen'
+export { RegisterScreen } from './screens/RegisterScreen'

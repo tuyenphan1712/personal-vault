@@ -29,12 +29,24 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 // Coordinates concurrent 401s onto a single in-flight refresh call.
 let refreshPromise: Promise<string | null> | null = null
 
+// A 401 from one of these endpoints is a login/refresh failure, not an expired session —
+// retrying it through the refresh flow would recurse into itself (e.g. an invalid refresh
+// token causes /auth/refresh to 401, which would otherwise try to refresh again).
+const AUTH_ENDPOINTS_EXEMPT_FROM_REFRESH = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout']
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined
+    const isExemptFromRefresh = AUTH_ENDPOINTS_EXEMPT_FROM_REFRESH.some((path) => originalRequest?.url?.includes(path))
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retried && refreshAccessToken) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retried &&
+      !isExemptFromRefresh &&
+      refreshAccessToken
+    ) {
       originalRequest._retried = true
 
       if (!refreshPromise) {
