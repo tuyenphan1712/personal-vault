@@ -150,6 +150,7 @@
     "pageTitle": "Hồ sơ",
     "pageSubtitle": "Thông tin tài khoản của bạn.",
     "loadError": "Không thể tải hồ sơ.",
+    "updateError": "Không thể cập nhật hồ sơ. Vui lòng thử lại.",
     "phone": "Số điện thoại",
     "fullName": "Họ và tên",
     "birthday": "Ngày sinh",

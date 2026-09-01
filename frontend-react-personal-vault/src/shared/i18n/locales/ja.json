@@ -150,6 +150,7 @@
     "pageTitle": "プロフィール",
     "pageSubtitle": "アカウント情報。",
     "loadError": "プロフィールを読み込めませんでした。",
+    "updateError": "プロフィールを更新できませんでした。もう一度お試しください。",
     "phone": "電話番号",
     "fullName": "氏名",
     "birthday": "生年月日",

@@ -39,12 +39,14 @@ export function ProfileForm({ profile, onSuccess, onCancel }: ProfileFormProps) 
   })
   const updateProfile = useUpdateProfile()
 
-  const onSubmit = handleSubmit(async (values) => {
-    await updateProfile.mutateAsync({
-      fullName: values.fullName,
-      birthday: values.birthday ? values.birthday : null,
-    })
-    onSuccess()
+  const onSubmit = handleSubmit((values) => {
+    updateProfile.mutate(
+      {
+        fullName: values.fullName,
+        birthday: values.birthday ? values.birthday : null,
+      },
+      { onSuccess },
+    )
   })
 
   return (
@@ -58,6 +60,7 @@ export function ProfileForm({ profile, onSuccess, onCancel }: ProfileFormProps) 
           <span className="font-mono text-[11px] uppercase tracking-wide text-muted">{t('profile.phoneImmutable')}</span>
         </div>
       </div>
+      {updateProfile.isError ? <p className="text-sm text-danger">{t('profile.updateError')}</p> : null}
       <div className="mt-1 flex gap-2">
         <Button type="submit" isLoading={updateProfile.isPending}>
           {t('common.saveChanges')}

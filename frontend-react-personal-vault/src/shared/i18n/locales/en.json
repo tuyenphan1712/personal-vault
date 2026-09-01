@@ -150,6 +150,7 @@
     "pageTitle": "Profile",
     "pageSubtitle": "Your account details.",
     "loadError": "Could not load profile.",
+    "updateError": "Could not update profile. Try again.",
     "phone": "Phone",
     "fullName": "Full name",
     "birthday": "Birthday",

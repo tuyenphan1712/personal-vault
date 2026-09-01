@@ -106,13 +106,7 @@ describe('ProfileForm', () => {
     expect(screen.getByRole('button', { name: 'Loading…' })).toBeDisabled()
   })
 
-  it('does not call onSuccess when the update fails', async () => {
-    // ProfileForm's onSubmit awaits mutateAsync without a try/catch, so a rejected mutation
-    // surfaces as an unhandled promise rejection in the test process. That is the component's
-    // real (untouched) behavior; swallow it here so it doesn't fail the test run.
-    const onUnhandledRejection = () => {}
-    process.on('unhandledRejection', onUnhandledRejection)
-
+  it('shows an error message and does not call onSuccess when the update fails', async () => {
     server.use(
       http.patch(`${API_BASE_URL}/profile`, () =>
         HttpResponse.json({ success: false, error: { code: 'COMMON_001', message: 'Validation failed', details: null } }, { status: 400 }),
@@ -122,9 +116,8 @@ describe('ProfileForm', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
+    expect(await screen.findByText('Could not update profile. Try again.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
     expect(onSuccess).not.toHaveBeenCalled()
-
-    process.off('unhandledRejection', onUnhandledRejection)
   })
 })
