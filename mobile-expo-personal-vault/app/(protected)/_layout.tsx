@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/src/features/auth'
 import { Redirect, Stack } from 'expo-router'
+import { colors } from '@/src/shared/theme/tokens'
 
 export default function ProtectedLayout() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -14,9 +15,9 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="credentials" />
     </Stack>
   )
 }

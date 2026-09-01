@@ -10,7 +10,7 @@ export default function PublicLayout() {
   }
 
   if (isAuthenticated) {
-    return <Redirect href="/(protected)/(tabs)" />
+    return <Redirect href="/(protected)" />
   }
 
   return (

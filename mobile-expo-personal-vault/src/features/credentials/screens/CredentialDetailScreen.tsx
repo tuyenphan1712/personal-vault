@@ -1,8 +1,11 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { BackButton } from '@/src/shared/components/BackButton'
+import { Button } from '@/src/shared/components/Button'
+import { colors, fonts, radii, spacing } from '@/src/shared/theme/tokens'
 import { PasswordReveal } from '../components/PasswordReveal'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredential } from '../hooks/useCredential'
@@ -37,7 +40,7 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator />
+        <ActivityIndicator color={colors.primary} />
       </SafeAreaView>
     )
   }
@@ -61,31 +64,49 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
     ])
   }
 
+  const initial = credential.platformName.trim().charAt(0).toUpperCase() || '?'
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>{credential.platformName}</Text>
-        <Text style={styles.account}>{credential.account}</Text>
+      <View style={styles.header}>
+        <BackButton />
+        <View style={styles.titleRow}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initial}</Text>
+          </View>
+          <View style={styles.titleCopy}>
+            <Text style={styles.title} numberOfLines={1}>
+              {credential.platformName}
+            </Text>
+            <Text style={styles.account} numberOfLines={1}>
+              {credential.account}
+            </Text>
+          </View>
+        </View>
+      </View>
 
+      <View style={styles.body}>
         <PasswordReveal
           encryptedPassword={credential.encryptedPassword}
           onUnlockNeeded={() => setIsUnlocked(false)}
           onCopied={() => Alert.alert('Copied', 'Password copied to clipboard.')}
         />
 
-        {credential.note ? <Text style={styles.note}>{credential.note}</Text> : null}
+        {credential.note ? (
+          <View style={styles.kvBlock}>
+            <Text style={styles.kvLabel}>Note</Text>
+            <Text style={styles.kvValue}>{credential.note}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.actions}>
-          <Pressable
-            accessibilityRole="button"
-            style={styles.editButton}
+          <Button
+            label="Edit"
+            variant="outline"
+            style={styles.actionButton}
             onPress={() => router.push({ pathname: '/(protected)/credentials/new', params: { id: credential.id } })}
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </Pressable>
-          <Pressable accessibilityRole="button" style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </Pressable>
+          />
+          <Button label="Delete" variant="outlineDanger" style={styles.actionButton} onPress={handleDelete} />
         </View>
       </View>
     </SafeAreaView>
@@ -95,60 +116,85 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.xxl,
   },
-  content: {
-    padding: 24,
-    gap: 16,
+  header: {
+    gap: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: radii.md,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  avatarText: {
+    fontFamily: fonts.serifSemiBold,
+    fontSize: 19,
+    color: colors.primaryDark,
+  },
+  titleCopy: {
+    flex: 1,
+    minWidth: 0,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontFamily: fonts.serif,
+    fontSize: 21,
+    color: colors.ink,
   },
   account: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: fonts.sans,
+    fontSize: 12.5,
+    color: colors.muted,
   },
-  note: {
-    fontSize: 14,
-    color: '#444',
+  body: {
+    padding: spacing.xl,
+    gap: spacing.xl,
+  },
+  kvBlock: {
+    gap: 6,
+  },
+  kvLabel: {
+    fontFamily: fonts.mono,
+    fontSize: 10.5,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: colors.mist,
+  },
+  kvValue: {
+    fontFamily: fonts.sans,
+    fontSize: 14.5,
+    color: colors.ink,
   },
   errorText: {
-    color: '#dc2626',
+    fontFamily: fonts.sans,
+    color: colors.danger,
     fontSize: 14,
   },
   actions: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
+    gap: spacing.md,
+    marginTop: 'auto',
   },
-  editButton: {
+  actionButton: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#2563eb',
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  editButtonText: {
-    color: '#2563eb',
-    fontWeight: '600',
-  },
-  deleteButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#dc2626',
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  deleteButtonText: {
-    color: '#dc2626',
-    fontWeight: '600',
   },
 })

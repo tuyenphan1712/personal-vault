@@ -1,7 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { z } from 'zod'
+import { Button } from '@/src/shared/components/Button'
+import { Logo } from '@/src/shared/components/Logo'
+import { TextField } from '@/src/shared/components/TextField'
+import { colors, fonts, radii } from '@/src/shared/theme/tokens'
 import { useUnlockVault } from '../hooks/useUnlockVault'
 
 const unlockSchema = z.object({
@@ -28,72 +32,62 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vault locked</Text>
-      <Text style={styles.subtitle}>Enter your password to view and edit your saved credentials.</Text>
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            accessibilityLabel="Password"
-            placeholder="Password"
-            style={styles.input}
-            secureTextEntry
-            autoCapitalize="none"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-          />
-        )}
-      />
-      {errors.password ? <Text style={styles.errorText}>{errors.password.message}</Text> : null}
-      <Pressable accessibilityRole="button" style={styles.button} onPress={onSubmit} disabled={isUnlocking}>
-        {isUnlocking ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Unlock</Text>}
-      </Pressable>
+      <View style={styles.card}>
+        <Logo showWordmark={false} height={44} />
+        <Text style={styles.title}>Vault locked</Text>
+        <Text style={styles.subtitle}>Enter your password to view and edit your saved credentials.</Text>
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextField
+              label="Password"
+              placeholder="••••••••••"
+              secureTextEntry
+              autoCapitalize="none"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              error={errors.password?.message}
+            />
+          )}
+        />
+        <Button label="Unlock" onPress={onSubmit} isLoading={isUnlocking} style={styles.button} />
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12,
     padding: 24,
     alignItems: 'center',
   },
+  card: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radii.lg,
+    padding: 24,
+    gap: 12,
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontFamily: fonts.serifLight,
+    fontSize: 24,
+    color: colors.ink,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: fonts.sans,
+    fontSize: 13.5,
+    color: colors.muted,
     textAlign: 'center',
-  },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  errorText: {
-    color: '#dc2626',
-    fontSize: 13,
-    alignSelf: 'flex-start',
+    marginBottom: 4,
   },
   button: {
     width: '100%',
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
     marginTop: 4,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 })

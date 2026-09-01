@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { z } from 'zod'
+import { Button } from '@/src/shared/components/Button'
+import { TextField } from '@/src/shared/components/TextField'
+import { colors, fonts } from '@/src/shared/theme/tokens'
 
 const credentialSchema = z.object({
   platformName: z.string().min(1, 'Platform is required'),
@@ -37,61 +40,57 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
         control={control}
         name="platformName"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            accessibilityLabel="Platform"
-            placeholder="Platform (e.g. Gmail)"
-            style={styles.input}
+          <TextField
+            label="Platform"
+            placeholder="Gmail"
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            error={errors.platformName?.message}
           />
         )}
       />
-      {errors.platformName ? <Text style={styles.errorText}>{errors.platformName.message}</Text> : null}
 
       <Controller
         control={control}
         name="account"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            accessibilityLabel="Account"
-            placeholder="Account (e.g. user@gmail.com)"
-            style={styles.input}
+          <TextField
+            label="Account"
+            placeholder="user@gmail.com"
             autoCapitalize="none"
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            error={errors.account?.message}
           />
         )}
       />
-      {errors.account ? <Text style={styles.errorText}>{errors.account.message}</Text> : null}
 
       <Controller
         control={control}
         name="password"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            accessibilityLabel="Password"
-            placeholder="Password"
-            style={styles.input}
+          <TextField
+            label="Password"
+            placeholder="••••••••••"
             secureTextEntry
             autoCapitalize="none"
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            error={errors.password?.message}
           />
         )}
       />
-      {errors.password ? <Text style={styles.errorText}>{errors.password.message}</Text> : null}
 
       <Controller
         control={control}
         name="note"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            accessibilityLabel="Note"
-            placeholder="Note (optional)"
-            style={styles.input}
+          <TextField
+            label="Note (optional)"
+            placeholder="Personal account"
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
@@ -101,44 +100,21 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <Pressable
-        accessibilityRole="button"
-        style={styles.button}
-        onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{submitLabel}</Text>}
-      </Pressable>
+      <Button label={submitLabel} onPress={handleSubmit(onSubmit)} isLoading={isSubmitting} style={styles.button} />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
+    gap: 14,
   },
   errorText: {
-    color: '#dc2626',
+    fontFamily: fonts.sans,
+    color: colors.danger,
     fontSize: 13,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: 4,
   },
 })

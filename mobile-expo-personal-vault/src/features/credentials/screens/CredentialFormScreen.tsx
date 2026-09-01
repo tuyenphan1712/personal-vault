@@ -3,6 +3,8 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { BackButton } from '@/src/shared/components/BackButton'
+import { colors, fonts, spacing } from '@/src/shared/theme/tokens'
 import { CredentialForm, type CredentialFormValues } from '../components/CredentialForm'
 import { useCredential } from '../hooks/useCredential'
 import { useCreateCredential } from '../hooks/useCreateCredential'
@@ -48,13 +50,16 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
   if (isEditing && isLoading) {
     return (
       <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator />
+        <ActivityIndicator color={colors.primary} />
       </SafeAreaView>
     )
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <BackButton />
+      </View>
       <View style={styles.content}>
         <Text style={styles.title}>{isEditing ? 'Edit credential' : 'Add credential'}</Text>
         <CredentialForm
@@ -76,18 +81,24 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+  },
   content: {
-    padding: 24,
-    gap: 20,
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontFamily: fonts.serif,
+    fontSize: 21,
+    color: colors.ink,
   },
 })

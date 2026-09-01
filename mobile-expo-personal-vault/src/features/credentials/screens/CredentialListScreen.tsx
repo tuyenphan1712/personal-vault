@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { BackButton } from '@/src/shared/components/BackButton'
+import { Button } from '@/src/shared/components/Button'
+import { colors, fonts, radii, spacing } from '@/src/shared/theme/tokens'
 import { CredentialCard } from '../components/CredentialCard'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredentials } from '../hooks/useCredentials'
@@ -21,54 +24,49 @@ export function CredentialListScreen() {
     )
   }
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator />
-      </SafeAreaView>
-    )
-  }
-
-  if (isError) {
-    const isOffline = isAxiosError(error) && !error.response
-    return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>
-          {isOffline ? "You're offline. Check your connection and try again." : 'Could not load credentials.'}
-        </Text>
-        <Pressable accessibilityRole="button" style={styles.retryButton} onPress={() => refetch()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
-        </Pressable>
-      </SafeAreaView>
-    )
-  }
-
-  const credentials = data?.data ?? []
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <BackButton />
+          <Pressable accessibilityRole="button" style={styles.addPill} onPress={() => router.push('/(protected)/credentials/new')}>
+            <Text style={styles.addPillText}>+ Add</Text>
+          </Pressable>
+        </View>
         <Text style={styles.title}>Credentials</Text>
-        <Pressable accessibilityRole="button" onPress={() => router.push('/(protected)/credentials/new')}>
-          <Text style={styles.addButton}>Add</Text>
-        </Pressable>
       </View>
-      <FlatList
-        data={credentials}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        refreshing={isRefetching}
-        onRefresh={refetch}
-        ListEmptyComponent={
-          <View style={styles.centered}>
-            <Text style={styles.emptyText}>No credentials saved yet.</Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <CredentialCard credential={item} onPress={(id) => router.push(`/(protected)/credentials/${id}`)} />
-        )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+
+      {isLoading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator color={colors.primary} />
+        </View>
+      ) : isError ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>
+            {isAxiosError(error) && !error.response
+              ? "You're offline. Check your connection and try again."
+              : 'Could not load credentials.'}
+          </Text>
+          <Button label="Retry" variant="outline" onPress={() => refetch()} />
+        </View>
+      ) : (
+        <FlatList
+          data={data?.data ?? []}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          refreshing={isRefetching}
+          onRefresh={refetch}
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={styles.emptyText}>No credentials saved yet.</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <CredentialCard credential={item} onPress={(id) => router.push(`/(protected)/credentials/${id}`)} />
+          )}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </SafeAreaView>
   )
 }
@@ -76,56 +74,64 @@ export function CredentialListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    padding: 24,
+    gap: spacing.md,
+    padding: spacing.xxl,
   },
   header: {
+    gap: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  },
+  addPill: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+    borderRadius: radii.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  addPillText: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 11.5,
+    color: colors.primaryDark,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  addButton: {
-    color: '#2563eb',
-    fontSize: 16,
-    fontWeight: '600',
+    fontFamily: fonts.serif,
+    fontSize: 22,
+    color: colors.ink,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
     flexGrow: 1,
   },
   separator: {
     height: 10,
   },
   emptyText: {
-    color: '#666',
+    fontFamily: fonts.sans,
+    color: colors.muted,
     fontSize: 14,
   },
   errorText: {
-    color: '#dc2626',
+    fontFamily: fonts.sans,
+    color: colors.danger,
     fontSize: 14,
     textAlign: 'center',
-  },
-  retryButton: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  retryButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
 })

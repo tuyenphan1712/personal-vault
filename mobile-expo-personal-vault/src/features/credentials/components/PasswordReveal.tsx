@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { decryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { Button } from '@/src/shared/components/Button'
+import { colors, fonts, radii } from '@/src/shared/theme/tokens'
 
 interface PasswordRevealProps {
   encryptedPassword: string
@@ -43,28 +45,30 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Password</Text>
-      <View style={styles.row}>
-        <Text style={styles.value}>{revealed ?? '••••••••••••'}</Text>
-        {revealed ? (
-          <Pressable accessibilityRole="button" onPress={handleCopy} style={styles.button}>
-            <Text>Copy</Text>
+      <View style={styles.card}>
+        <Text style={styles.value} numberOfLines={1}>
+          {revealed ?? '••••••••••••'}
+        </Text>
+        <View style={styles.actions}>
+          {revealed ? (
+            <Pressable accessibilityRole="button" onPress={handleCopy} style={styles.pill}>
+              <Text style={styles.pillText}>Copy</Text>
+            </Pressable>
+          ) : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: revealed !== null }}
+            onPress={handleToggle}
+            style={styles.pill}
+          >
+            <Text style={styles.pillText}>{revealed ? 'Hide' : 'Show'}</Text>
           </Pressable>
-        ) : null}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ expanded: revealed !== null }}
-          onPress={handleToggle}
-          style={styles.button}
-        >
-          <Text>{revealed ? 'Hide' : 'Show'}</Text>
-        </Pressable>
+        </View>
       </View>
       {error ? (
         <View style={styles.errorRow}>
           <Text style={styles.errorText}>{error}</Text>
-          <Pressable accessibilityRole="button" onPress={onUnlockNeeded}>
-            <Text style={styles.unlockLink}>Unlock vault again</Text>
-          </Pressable>
+          <Button label="Unlock vault again" variant="outline" onPress={onUnlockNeeded} style={styles.unlockButton} />
         </View>
       ) : null}
     </View>
@@ -76,40 +80,60 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.mono,
+    fontSize: 10.5,
+    letterSpacing: 0.6,
     textTransform: 'uppercase',
-    color: '#666',
+    color: colors.mist,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  card: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radii.md,
+    padding: 14,
+    gap: 10,
   },
   value: {
-    flex: 1,
-    fontFamily: 'monospace',
-    fontSize: 16,
+    fontFamily: fonts.mono,
+    fontSize: 15,
+    letterSpacing: 1,
+    color: colors.ink,
   },
-  button: {
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  pill: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+    borderRadius: radii.pill,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+  },
+  pillText: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 10.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    color: colors.primaryDark,
   },
   errorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 2,
   },
   errorText: {
-    color: '#dc2626',
+    fontFamily: fonts.sans,
+    color: colors.danger,
     fontSize: 13,
+    flexShrink: 1,
   },
-  unlockLink: {
-    color: '#2563eb',
-    fontSize: 13,
-    fontWeight: '600',
+  unlockButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
 })

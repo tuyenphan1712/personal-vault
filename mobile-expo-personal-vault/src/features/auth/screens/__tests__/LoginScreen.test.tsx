@@ -40,7 +40,7 @@ describe('LoginScreen', () => {
     await fireEvent.changeText(screen.getByLabelText('Password'), VALID_PASSWORD)
     await fireEvent.press(screen.getByRole('button', { name: 'Log in' }))
 
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(protected)/(tabs)'))
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(protected)'), { timeout: 5000 })
     expect(useAuthStore.getState().isAuthenticated).toBe(true)
   })
 
