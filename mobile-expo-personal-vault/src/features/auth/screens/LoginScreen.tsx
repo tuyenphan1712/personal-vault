@@ -12,9 +12,11 @@ export function LoginScreen() {
   const { mutate, isPending, error } = useLogin()
 
   function handleSubmit(values: LoginFormValues) {
-    mutate(values, {
-      onSuccess: () => router.replace('/(protected)'),
-    })
+    // No explicit navigation on success: setting the session (inside useLogin's mutationFn)
+    // flips useAuthStore.isAuthenticated, and app/(public)/_layout.tsx reactively redirects to
+    // /(protected) as soon as that happens. Navigating here too raced that redirect and could
+    // leave the router stuck mid-transition after this screen had already been unmounted.
+    mutate(values)
   }
 
   return (

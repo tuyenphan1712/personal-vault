@@ -8,7 +8,8 @@ import { LoginScreen } from '../LoginScreen'
 import { loginSuccessHandler, VALID_PASSWORD, VALID_PHONE } from '../../hooks/__tests__/mocks/authHandlers'
 
 const mockReplace = jest.fn()
-jest.mock('expo-router', () => ({ useRouter: () => ({ replace: mockReplace }) }))
+const mockPush = jest.fn()
+jest.mock('expo-router', () => ({ useRouter: () => ({ replace: mockReplace, push: mockPush }) }))
 
 jest.mock('@/src/shared/lib/storage/secureStorage', () => ({
   setRefreshToken: jest.fn().mockResolvedValue(undefined),
@@ -32,7 +33,9 @@ beforeEach(() => {
 })
 
 describe('LoginScreen', () => {
-  it('logs in and navigates to the protected area on success', async () => {
+  it('logs in and sets the session on success, without navigating imperatively', async () => {
+    // Navigation to /(protected) is left entirely to app/(public)/_layout.tsx reacting to
+    // isAuthenticated — an imperative router.replace() here previously raced that redirect.
     server.use(loginSuccessHandler)
     await renderScreen()
 
@@ -40,11 +43,11 @@ describe('LoginScreen', () => {
     await fireEvent.changeText(screen.getByLabelText('Password'), VALID_PASSWORD)
     await fireEvent.press(screen.getByRole('button', { name: 'Log in' }))
 
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(protected)'), { timeout: 5000 })
-    expect(useAuthStore.getState().isAuthenticated).toBe(true)
+    await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true), { timeout: 5000 })
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 
-  it('shows an error message and does not navigate on invalid credentials', async () => {
+  it('shows an error message and does not change the session on invalid credentials', async () => {
     server.use(loginSuccessHandler)
     await renderScreen()
 
@@ -53,6 +56,7 @@ describe('LoginScreen', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Log in' }))
 
     expect(await screen.findByText('Invalid phone or password')).toBeTruthy()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(mockReplace).not.toHaveBeenCalled()
   })
 })
