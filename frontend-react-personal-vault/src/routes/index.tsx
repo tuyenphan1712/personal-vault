@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import App from '../app/App'
 import { DashboardPage } from '../app/pages/DashboardPage'
+import { AdminUsersPage } from '../features/admin'
 import { LoginPage, RegisterPage } from '../features/auth'
 import { CredentialDetailPage, CredentialListPage } from '../features/credentials'
 import { DocumentDetailPage, DocumentListPage } from '../features/documents'
@@ -8,12 +9,6 @@ import { ProfilePage } from '../features/profile'
 import { AdminRoute } from './AdminRoute'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from './routes'
-
-// Feature pages are added under features/[feature]/pages and wired here as they are built.
-// Example once available:
-//   <Route element={<AdminRoute />}>
-//     <Route path={ROUTES.ADMIN_USERS} element={<AdminUsersPage />} />
-//   </Route>
 
 export function AppRouter() {
   return (
@@ -29,6 +24,9 @@ export function AppRouter() {
           <Route path={ROUTES.DOCUMENTS} element={<DocumentListPage />} />
           <Route path={ROUTES.DOCUMENT_DETAIL(':id')} element={<DocumentDetailPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        </Route>
+        <Route element={<AdminRoute />}>
+          <Route path={ROUTES.ADMIN_USERS} element={<AdminUsersPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

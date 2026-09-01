@@ -162,5 +162,37 @@
     "errors": {
       "fullNameRequired": "Full name is required"
     }
+  },
+  "admin": {
+    "pageTitle": "User management",
+    "pageSubtitle": "Lock, unlock, or delete user accounts.",
+    "searchPlaceholder": "Search by phone or full name…",
+    "loading": "Loading users…",
+    "loadError": "Couldn't load users. Try again.",
+    "emptyTitle": "No users found",
+    "columnPhone": "Phone",
+    "columnFullName": "Full name",
+    "columnRole": "Role",
+    "columnStatus": "Status",
+    "columnCreatedAt": "Created",
+    "roleAdmin": "Admin",
+    "roleMember": "Member",
+    "statusActive": "Active",
+    "statusLocked": "Locked",
+    "lockButton": "Lock",
+    "unlockButton": "Unlock",
+    "cannotActOnSelf": "Can't perform this on your own account",
+    "lockedToast": "{{name}}'s account is locked.",
+    "unlockedToast": "{{name}}'s account is unlocked.",
+    "deletedToast": "{{name}}'s account was deleted.",
+    "actionError": "Action failed. Try again.",
+    "pageIndicator": "Page {{page}} of {{totalPages}}",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "deleteDialog": {
+      "title": "Delete user account",
+      "body": "Are you sure you want to delete {{name}}'s account ({{phone}})? All of their credentials and documents will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete account"
+    }
   }
 }

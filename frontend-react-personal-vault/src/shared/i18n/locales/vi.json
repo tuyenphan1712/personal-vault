@@ -162,5 +162,37 @@
     "errors": {
       "fullNameRequired": "Vui lòng nhập họ và tên"
     }
+  },
+  "admin": {
+    "pageTitle": "Quản lý người dùng",
+    "pageSubtitle": "Khóa, mở khóa hoặc xóa tài khoản người dùng.",
+    "searchPlaceholder": "Tìm theo số điện thoại hoặc họ tên…",
+    "loading": "Đang tải danh sách người dùng…",
+    "loadError": "Không thể tải danh sách người dùng. Vui lòng thử lại.",
+    "emptyTitle": "Không tìm thấy người dùng nào",
+    "columnPhone": "Số điện thoại",
+    "columnFullName": "Họ và tên",
+    "columnRole": "Vai trò",
+    "columnStatus": "Trạng thái",
+    "columnCreatedAt": "Ngày tạo",
+    "roleAdmin": "Quản trị viên",
+    "roleMember": "Thành viên",
+    "statusActive": "Hoạt động",
+    "statusLocked": "Đã khóa",
+    "lockButton": "Khóa",
+    "unlockButton": "Mở khóa",
+    "cannotActOnSelf": "Không thể thực hiện trên chính tài khoản của bạn",
+    "lockedToast": "Đã khóa tài khoản {{name}}.",
+    "unlockedToast": "Đã mở khóa tài khoản {{name}}.",
+    "deletedToast": "Đã xóa tài khoản {{name}}.",
+    "actionError": "Thao tác thất bại. Vui lòng thử lại.",
+    "pageIndicator": "Trang {{page}}/{{totalPages}}",
+    "prevPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "deleteDialog": {
+      "title": "Xóa tài khoản người dùng",
+      "body": "Bạn có chắc muốn xóa tài khoản của {{name}} ({{phone}})? Toàn bộ thông tin đăng nhập và tài liệu của họ sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+      "confirm": "Xóa tài khoản"
+    }
   }
 }
