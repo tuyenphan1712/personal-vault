@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { registerAuthHandlers } from '@/shared/lib/axios'
 import { setAccessToken } from '@/shared/lib/tokenStore'
 import { authService } from '../services/auth.service'
@@ -17,6 +17,7 @@ export function useSessionBootstrap() {
   const setSession = useAuthStore((state) => state.setSession)
   const clearSession = useAuthStore((state) => state.clearSession)
   const setSessionLoading = useAuthStore((state) => state.setSessionLoading)
+  const hasBootstrapped = useRef(false)
 
   useEffect(() => {
     registerAuthHandlers({
@@ -35,32 +36,29 @@ export function useSessionBootstrap() {
       },
     })
 
-    let cancelled = false
+    // This provider lives for the whole app session, so the only remount to guard against is
+    // React StrictMode's dev-only double-invoke — without this guard it fires two concurrent
+    // /auth/refresh calls that race the single-use refresh token, and the loser's 401 was
+    // wiping out the winner's already-restored session.
+    if (hasBootstrapped.current) {
+      return
+    }
+    hasBootstrapped.current = true
 
     async function bootstrap() {
       try {
         const result = await authService.refresh()
         setAccessToken(result.accessToken)
         const user = await authService.me()
-        if (!cancelled) {
-          setSession(user)
-        }
+        setSession(user)
       } catch {
-        if (!cancelled) {
-          clearSession()
-        }
+        clearSession()
       } finally {
-        if (!cancelled) {
-          setSessionLoading(false)
-        }
+        setSessionLoading(false)
       }
     }
 
     void bootstrap()
-
-    return () => {
-      cancelled = true
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
