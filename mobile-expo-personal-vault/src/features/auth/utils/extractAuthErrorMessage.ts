@@ -10,5 +10,8 @@ export function extractAuthErrorMessage(error: unknown): string {
     }
     return message
   }
+  if (isAxiosError(error) && (error.code === 'ECONNABORTED' || !error.response)) {
+    return "Could not reach the server. Check your connection and try again."
+  }
   return 'Something went wrong. Please try again.'
 }

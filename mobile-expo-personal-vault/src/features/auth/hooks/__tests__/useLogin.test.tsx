@@ -4,7 +4,8 @@ import type { ReactNode } from 'react'
 import { server } from '@/src/shared/testing/msw/server'
 import { createTestQueryClient } from '@/src/shared/testing/queryClient'
 import { getAccessToken, setAccessToken } from '@/src/shared/lib/auth/tokenStore'
-import { getEncryptionKey, setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import * as cryptoAdapter from '@/src/shared/lib/crypto/cryptoAdapter'
+import { getEncryptionKey, setEncryptionKey, useIsDerivingKey } from '@/src/shared/lib/crypto/keyStore'
 import { useAuthStore } from '../../stores/auth.store'
 import { useLogin } from '../useLogin'
 import { loginSuccessHandler, VALID_PASSWORD, VALID_PHONE, currentUserFixture } from './mocks/authHandlers'
@@ -62,6 +63,48 @@ describe('useLogin', () => {
     const secondKey = getEncryptionKey()
 
     expect(secondKey).toEqual(firstKey)
+  })
+
+  it('sets the session as soon as sign-in succeeds, without waiting for the slower key derivation', async () => {
+    server.use(loginSuccessHandler)
+    let resolveDerive!: (key: Uint8Array) => void
+    const deriveSpy = jest
+      .spyOn(cryptoAdapter, 'deriveEncryptionKey')
+      .mockImplementation(() => new Promise((resolve) => { resolveDerive = resolve }))
+
+    const { result } = await renderHook(() => useLogin(), { wrapper })
+    result.current.mutate({ phone: VALID_PHONE, password: VALID_PASSWORD })
+
+    await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true))
+    // Session is active but the key derivation (mocked to hang) hasn't resolved yet.
+    expect(getEncryptionKey()).toBeNull()
+    expect(result.current.isSuccess).toBe(false)
+
+    resolveDerive(new Uint8Array(32))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(getEncryptionKey()).not.toBeNull()
+
+    deriveSpy.mockRestore()
+  })
+
+  it('flags isDerivingKey while the key derivation is in flight and clears it once done', async () => {
+    server.use(loginSuccessHandler)
+    let resolveDerive!: (key: Uint8Array) => void
+    const deriveSpy = jest
+      .spyOn(cryptoAdapter, 'deriveEncryptionKey')
+      .mockImplementation(() => new Promise((resolve) => { resolveDerive = resolve }))
+
+    const { result: loginResult } = await renderHook(() => useLogin(), { wrapper })
+    const { result: derivingResult } = await renderHook(() => useIsDerivingKey())
+
+    loginResult.current.mutate({ phone: VALID_PHONE, password: VALID_PASSWORD })
+
+    await waitFor(() => expect(derivingResult.current).toBe(true))
+
+    resolveDerive(new Uint8Array(32))
+    await waitFor(() => expect(derivingResult.current).toBe(false))
+
+    deriveSpy.mockRestore()
   })
 
   it('surfaces an error and leaves the session and key cleared on invalid credentials', async () => {

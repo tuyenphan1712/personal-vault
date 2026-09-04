@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { useHasEncryptionKey, useIsDerivingKey } from '@/src/shared/lib/crypto/keyStore'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { Button } from '@/src/shared/components/Button'
 import { colors, fonts, radii, spacing } from '@/src/shared/theme/tokens'
+import { CopyableField } from '../components/CopyableField'
 import { PasswordReveal } from '../components/PasswordReveal'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredential } from '../hooks/useCredential'
@@ -19,7 +19,8 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
   const router = useRouter()
   const { data: credential, isLoading, isError } = useCredential(credentialId)
   const deleteCredential = useDeleteCredential()
-  const [isUnlocked, setIsUnlocked] = useState(() => getEncryptionKey() !== null)
+  const hasKey = useHasEncryptionKey()
+  const isDerivingKey = useIsDerivingKey()
 
   if (!credentialId) {
     return (
@@ -29,10 +30,19 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
     )
   }
 
-  if (!isUnlocked) {
+  if (!hasKey && isDerivingKey) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centered]}>
+        <ActivityIndicator color={colors.primary} />
+        <Text style={styles.errorText}>Preparing your vault…</Text>
+      </SafeAreaView>
+    )
+  }
+
+  if (!hasKey) {
     return (
       <SafeAreaView style={styles.container}>
-        <UnlockVaultPrompt onUnlocked={() => setIsUnlocked(true)} />
+        <UnlockVaultPrompt onUnlocked={() => {}} />
       </SafeAreaView>
     )
   }
@@ -78,17 +88,20 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
             <Text style={styles.title} numberOfLines={1}>
               {credential.platformName}
             </Text>
-            <Text style={styles.account} numberOfLines={1}>
-              {credential.account}
-            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.body}>
+        <CopyableField
+          label="Account"
+          value={credential.account}
+          onCopied={() => Alert.alert('Copied', 'Account copied to clipboard.')}
+        />
+
         <PasswordReveal
           encryptedPassword={credential.encryptedPassword}
-          onUnlockNeeded={() => setIsUnlocked(false)}
+          onUnlockNeeded={() => {}}
           onCopied={() => Alert.alert('Copied', 'Password copied to clipboard.')}
         />
 
@@ -159,11 +172,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.serif,
     fontSize: 21,
     color: colors.ink,
-  },
-  account: {
-    fontFamily: fonts.sans,
-    fontSize: 12.5,
-    color: colors.muted,
   },
   body: {
     padding: spacing.xl,

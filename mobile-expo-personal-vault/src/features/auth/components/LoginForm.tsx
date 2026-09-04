@@ -17,9 +17,10 @@ interface LoginFormProps {
   onSubmit: (values: LoginFormValues) => void
   isSubmitting: boolean
   errorMessage: string | null
+  statusLabel?: string | null
 }
 
-export function LoginForm({ onSubmit, isSubmitting, errorMessage }: LoginFormProps) {
+export function LoginForm({ onSubmit, isSubmitting, errorMessage, statusLabel }: LoginFormProps) {
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { phone: '', password: '' },
@@ -64,6 +65,7 @@ export function LoginForm({ onSubmit, isSubmitting, errorMessage }: LoginFormPro
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <Button label="Log in" onPress={handleSubmit(onSubmit)} isLoading={isSubmitting} style={styles.button} />
+      {isSubmitting && statusLabel ? <Text style={styles.statusText}>{statusLabel}</Text> : null}
     </View>
   )
 }
@@ -79,5 +81,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 4,
+  },
+  statusText: {
+    fontFamily: fonts.sans,
+    color: colors.muted,
+    fontSize: 12.5,
+    textAlign: 'center',
   },
 })

@@ -35,8 +35,13 @@ describe('extractAuthErrorMessage', () => {
     expect(extractAuthErrorMessage(new Error('network down'))).toBe('Something went wrong. Please try again.')
   })
 
-  it('falls back to a generic message when the axios error has no response body', () => {
+  it('shows a connectivity message when the axios error has no response (network error)', () => {
     const error = new AxiosError('Network Error')
-    expect(extractAuthErrorMessage(error)).toBe('Something went wrong. Please try again.')
+    expect(extractAuthErrorMessage(error)).toBe('Could not reach the server. Check your connection and try again.')
+  })
+
+  it('shows a connectivity message on a request timeout', () => {
+    const error = new AxiosError('timeout of 15000ms exceeded', 'ECONNABORTED')
+    expect(extractAuthErrorMessage(error)).toBe('Could not reach the server. Check your connection and try again.')
   })
 })

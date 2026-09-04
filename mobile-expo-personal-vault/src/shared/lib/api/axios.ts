@@ -16,6 +16,10 @@ export function registerAuthHandlers(handlers: {
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  // Axios has no timeout by default — an unreachable/stalled backend (wrong LAN IP, backend
+  // still starting up, dropped Wi-Fi) would otherwise hang every request forever instead of
+  // surfacing an error the UI can show and let the user retry.
+  timeout: 15000,
 })
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {

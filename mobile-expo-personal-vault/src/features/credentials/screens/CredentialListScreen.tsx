@@ -1,9 +1,8 @@
 import { isAxiosError } from 'axios'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { useHasEncryptionKey, useIsDerivingKey } from '@/src/shared/lib/crypto/keyStore'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { Button } from '@/src/shared/components/Button'
 import { colors, fonts, radii, spacing } from '@/src/shared/theme/tokens'
@@ -14,12 +13,22 @@ import { useCredentials } from '../hooks/useCredentials'
 export function CredentialListScreen() {
   const router = useRouter()
   const { data, isLoading, isError, error, refetch, isRefetching } = useCredentials()
-  const [isUnlocked, setIsUnlocked] = useState(() => getEncryptionKey() !== null)
+  const hasKey = useHasEncryptionKey()
+  const isDerivingKey = useIsDerivingKey()
 
-  if (!isUnlocked) {
+  if (!hasKey && isDerivingKey) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centered]}>
+        <ActivityIndicator color={colors.primary} />
+        <Text style={styles.emptyText}>Preparing your vault…</Text>
+      </SafeAreaView>
+    )
+  }
+
+  if (!hasKey) {
     return (
       <SafeAreaView style={styles.container}>
-        <UnlockVaultPrompt onUnlocked={() => setIsUnlocked(true)} />
+        <UnlockVaultPrompt onUnlocked={() => {}} />
       </SafeAreaView>
     )
   }

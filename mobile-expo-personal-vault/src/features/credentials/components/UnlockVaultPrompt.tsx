@@ -53,6 +53,7 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
           )}
         />
         <Button label="Unlock" onPress={onSubmit} isLoading={isUnlocking} style={styles.button} />
+        {isUnlocking ? <Text style={styles.statusText}>Deriving encryption key…</Text> : null}
       </View>
     </View>
   )
@@ -89,5 +90,11 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     marginTop: 4,
+  },
+  statusText: {
+    fontFamily: fonts.sans,
+    color: colors.muted,
+    fontSize: 12.5,
+    textAlign: 'center',
   },
 })

@@ -7,9 +7,14 @@ import { LoginForm, type LoginFormValues } from '../components/LoginForm'
 import { useLogin } from '../hooks/useLogin'
 import { extractAuthErrorMessage } from '../utils/extractAuthErrorMessage'
 
+const STAGE_LABELS: Record<string, string> = {
+  signingIn: 'Signing in…',
+  derivingKey: 'Deriving encryption key…',
+}
+
 export function LoginScreen() {
   const router = useRouter()
-  const { mutate, isPending, error } = useLogin()
+  const { mutate, isPending, error, stage } = useLogin()
 
   function handleSubmit(values: LoginFormValues) {
     // No explicit navigation on success: setting the session (inside useLogin's mutationFn)
@@ -32,6 +37,7 @@ export function LoginScreen() {
         onSubmit={handleSubmit}
         isSubmitting={isPending}
         errorMessage={error ? extractAuthErrorMessage(error) : null}
+        statusLabel={STAGE_LABELS[stage]}
       />
       <View style={styles.footer}>
         <Text style={styles.footerText}>No account yet? </Text>

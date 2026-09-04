@@ -1,7 +1,6 @@
 import { gcm } from '@noble/ciphers/aes.js'
-import { pbkdf2Async } from '@noble/hashes/pbkdf2.js'
-import { sha256 } from '@noble/hashes/sha2.js'
 import * as Crypto from 'expo-crypto'
+import { pbkdf2 } from 'react-native-quick-crypto'
 
 // AES-GCM encryption for credential passwords — contract defined in API_SPEC.md §7 and mirrored
 // from the web client's shared/lib/crypto.ts so a credential encrypted on one platform decrypts
@@ -51,9 +50,23 @@ function base64ToBytes(base64: string): Uint8Array {
 
 /** Derives an AES-256-GCM key from the login password. Same password + userId always yields the
  *  same key, so nothing needs to be persisted for the key to be recoverable across sessions —
- *  matches the web client's deriveEncryptionKey exactly. */
+ *  matches the web client's deriveEncryptionKey exactly.
+ *
+ *  Runs PBKDF2-HMAC-SHA256 through react-native-quick-crypto's native (OpenSSL/JSI) binding
+ *  instead of a pure-JS implementation — pure JS on Hermes (no JIT, unlike the web client's
+ *  hardware-accelerated Web Crypto API) took 10s+ for 100k rounds on real devices; the native
+ *  binding brings this back down to native-crypto speed (milliseconds). Requires a Dev
+ *  Client/production build — this native module has no native code to link in Expo Go. */
 export async function deriveEncryptionKey(password: string, userId: string): Promise<CredentialKey> {
-  return pbkdf2Async(sha256, password, userId, { c: PBKDF2_ITERATIONS, dkLen: KEY_LENGTH_BYTES })
+  return new Promise((resolve, reject) => {
+    pbkdf2(password, userId, PBKDF2_ITERATIONS, KEY_LENGTH_BYTES, 'sha256', (err, derivedKey) => {
+      if (err || !derivedKey) {
+        reject(err ?? new Error('PBKDF2 key derivation failed'))
+        return
+      }
+      resolve(new Uint8Array(derivedKey))
+    })
+  })
 }
 
 export async function encryptCredential(plaintext: string, key: CredentialKey): Promise<string> {
