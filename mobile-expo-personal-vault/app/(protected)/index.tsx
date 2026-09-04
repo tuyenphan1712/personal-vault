@@ -63,7 +63,7 @@ export default function Home() {
           subtitle="Personal files & scans"
           onPress={() => router.push('/(protected)/documents')}
         />
-        <NavCard title="Profile" subtitle="Account & settings" comingSoon />
+        <NavCard title="Profile" subtitle="Account & settings" onPress={() => router.push('/(protected)/profile')} />
         <Pressable
           accessibilityRole="button"
           style={styles.logoutButton}

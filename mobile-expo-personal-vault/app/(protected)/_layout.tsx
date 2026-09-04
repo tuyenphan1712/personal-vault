@@ -19,6 +19,7 @@ export default function ProtectedLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="credentials" />
       <Stack.Screen name="documents" />
+      <Stack.Screen name="profile" />
     </Stack>
   )
 }
