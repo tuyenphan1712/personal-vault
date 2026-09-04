@@ -18,3 +18,11 @@ export interface AdminUserListParams {
 export interface UpdateUserStatusRequest {
   status: 'active' | 'locked'
 }
+
+export interface AdminOverviewStats {
+  total: number
+  active: number
+  locked: number
+  admins: number
+  recentSignups: AdminUser[]
+}

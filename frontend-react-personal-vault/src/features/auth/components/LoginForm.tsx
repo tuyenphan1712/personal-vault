@@ -7,6 +7,7 @@ import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { PasswordInput } from '@/shared/components/PasswordInput'
 import { useLogin } from '../hooks/useLogin'
+import type { CurrentUser } from '../types/Session.types'
 
 function createLoginSchema(t: TFunction) {
   return z.object({
@@ -18,7 +19,7 @@ function createLoginSchema(t: TFunction) {
 type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>
 
 interface LoginFormProps {
-  onSuccess: () => void
+  onSuccess: (user: CurrentUser) => void
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
@@ -32,7 +33,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const login = useLogin()
 
   const onSubmit = handleSubmit((values) => {
-    login.mutate(values, { onSuccess })
+    login.mutate(values, { onSuccess: (result) => onSuccess(result.user) })
   })
 
   return (

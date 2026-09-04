@@ -19,7 +19,7 @@ export function LoginPage() {
           <h1 className="font-serif text-3xl font-light tracking-tight text-ink">{t('auth.loginTitle')}</h1>
           <p className="mt-1 text-sm text-muted">{t('auth.loginSubtitle')}</p>
         </div>
-        <LoginForm onSuccess={() => navigate(ROUTES.DASHBOARD)} />
+        <LoginForm onSuccess={(user) => navigate(user.role === 'admin' ? ROUTES.ADMIN_OVERVIEW : ROUTES.DASHBOARD)} />
         <div className="w-full border-t border-line pt-4 font-mono text-xs uppercase tracking-wide text-muted">
           {t('auth.encryptionFooter')}
         </div>

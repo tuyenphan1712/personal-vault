@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import App from '../app/App'
 import { DashboardPage } from '../app/pages/DashboardPage'
-import { AdminUsersPage } from '../features/admin'
+import { AdminLayout, AdminOverviewPage, AdminUsersPage } from '../features/admin'
 import { LoginPage, RegisterPage } from '../features/auth'
 import { CredentialDetailPage, CredentialListPage } from '../features/credentials'
 import { DocumentDetailPage, DocumentListPage } from '../features/documents'
@@ -26,7 +26,10 @@ export function AppRouter() {
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         </Route>
         <Route element={<AdminRoute />}>
-          <Route path={ROUTES.ADMIN_USERS} element={<AdminUsersPage />} />
+          <Route element={<AdminLayout />}>
+            <Route path={ROUTES.ADMIN_OVERVIEW} element={<AdminOverviewPage />} />
+            <Route path={ROUTES.ADMIN_USERS} element={<AdminUsersPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
