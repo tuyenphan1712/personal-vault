@@ -58,7 +58,11 @@ export default function Home() {
           subtitle="Saved platform passwords"
           onPress={() => router.push('/(protected)/credentials')}
         />
-        <NavCard title="Documents" subtitle="Personal files & scans" comingSoon />
+        <NavCard
+          title="Documents"
+          subtitle="Personal files & scans"
+          onPress={() => router.push('/(protected)/documents')}
+        />
         <NavCard title="Profile" subtitle="Account & settings" comingSoon />
         <Pressable
           accessibilityRole="button"

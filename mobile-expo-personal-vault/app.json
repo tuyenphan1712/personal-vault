@@ -44,7 +44,16 @@
       "expo-secure-store",
       "expo-font",
       "expo-asset",
-      "react-native-quick-crypto"
+      "react-native-quick-crypto",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Personal Vault to access your photos to upload a document scan.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      "expo-document-picker"
     ],
     "experiments": {
       "typedRoutes": true,

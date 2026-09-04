@@ -18,6 +18,7 @@ export default function ProtectedLayout() {
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="credentials" />
+      <Stack.Screen name="documents" />
     </Stack>
   )
 }
