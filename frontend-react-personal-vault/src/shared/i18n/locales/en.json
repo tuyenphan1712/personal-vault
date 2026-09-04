@@ -82,6 +82,9 @@
     "unlockAgain": "Unlock again",
     "lastUpdated": "Last updated {{date}}",
     "passwordLabel": "Password",
+    "accountLabel": "Account",
+    "copyAccountAria": "Copy account",
+    "accountCopiedToast": "Account copied to clipboard.",
     "fields": {
       "platform": "Platform",
       "account": "Account",

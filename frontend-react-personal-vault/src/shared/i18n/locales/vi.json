@@ -82,6 +82,9 @@
     "unlockAgain": "Mở khoá lại",
     "lastUpdated": "Cập nhật lần cuối {{date}}",
     "passwordLabel": "Mật khẩu",
+    "accountLabel": "Tài khoản",
+    "copyAccountAria": "Sao chép tài khoản",
+    "accountCopiedToast": "Đã sao chép tài khoản.",
     "fields": {
       "platform": "Nền tảng",
       "account": "Tài khoản",

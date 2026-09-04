@@ -82,6 +82,9 @@
     "unlockAgain": "もう一度開く",
     "lastUpdated": "最終更新: {{date}}",
     "passwordLabel": "パスワード",
+    "accountLabel": "アカウント",
+    "copyAccountAria": "アカウントをコピー",
+    "accountCopiedToast": "アカウントをコピーしました。",
     "fields": {
       "platform": "サービス名",
       "account": "アカウント",
