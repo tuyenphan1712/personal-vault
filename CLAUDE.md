@@ -22,6 +22,7 @@ A secure personal vault for managing credentials, personal identity data, and pr
 ## Shared Docs
 - @01-share-docs/API_SPEC.md
 - @01-share-docs/DATABASE.md
+- @01-share-docs/BACKLOG.md
 
 ## Available Skills
 
