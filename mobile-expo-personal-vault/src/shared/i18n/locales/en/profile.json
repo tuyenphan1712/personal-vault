@@ -1,0 +1,24 @@
+{
+  "title": "Profile",
+  "fullNameLabel": "Full name",
+  "fullNamePlaceholder": "Nguyen Van A",
+  "phone": "Phone",
+  "birthday": "Birthday",
+  "birthdayNotSet": "Not set",
+  "birthdayFieldLabel": "Birthday (optional)",
+  "birthdaySelect": "Select a date",
+  "editProfile": "Edit profile",
+  "saveError": "Could not save your profile.",
+  "loadError": "Could not load your profile.",
+  "validation": {
+    "fullNameRequired": "Full name is required"
+  },
+  "role": {
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "status": {
+    "active": "Active",
+    "locked": "Locked"
+  }
+}

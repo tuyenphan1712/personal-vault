@@ -1,0 +1,47 @@
+{
+  "list": {
+    "title": "Tài liệu",
+    "upload": "+ Tải lên",
+    "empty": "Chưa có tài liệu nào được tải lên.",
+    "loadError": "Không thể tải danh sách tài liệu."
+  },
+  "detail": {
+    "invalid": "Tài liệu không hợp lệ.",
+    "notFound": "Không tìm thấy tài liệu.",
+    "category": "Danh mục",
+    "file": "Tệp",
+    "uploaded": "Ngày tải lên",
+    "download": "Tải xuống",
+    "downloadFailedTitle": "Tải xuống thất bại",
+    "downloadFailedMessage": "Không thể tải xuống tài liệu này.",
+    "deleteTitle": "Xóa tài liệu",
+    "deleteMessage": "Xóa \"{{title}}\"? Hành động này không thể hoàn tác."
+  },
+  "upload": {
+    "title": "Tải lên tài liệu",
+    "titleLabel": "Tiêu đề",
+    "titlePlaceholder": "Trang đầu hộ chiếu",
+    "submit": "Tải lên",
+    "chooseFile": "Chọn tệp",
+    "choosePhoto": "Chọn ảnh",
+    "genericError": "Không thể tải lên tài liệu này.",
+    "tooLarge": "Tệp lớn hơn 10MB.",
+    "unsupportedType": "Chỉ hỗ trợ tệp JPEG, PNG hoặc PDF."
+  },
+  "docType": {
+    "label": "Danh mục (không bắt buộc)",
+    "customLabel": "Danh mục tùy chỉnh",
+    "customPlaceholder": "ví dụ: Bảo hiểm",
+    "other": "Khác",
+    "uncategorized": "Chưa phân loại",
+    "categories": {
+      "identity_civil_status": "Giấy tờ tùy thân & hộ tịch",
+      "education_qualifications": "Học vấn & bằng cấp",
+      "employment_contracts": "Việc làm & hợp đồng",
+      "medical_health": "Y tế & sức khỏe",
+      "finance_tax": "Tài chính & thuế",
+      "property_vehicles": "Tài sản & phương tiện",
+      "legal_misc": "Pháp lý & khác"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Cài đặt",
+  "appearance": {
+    "sectionLabel": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  },
+  "language": {
+    "sectionLabel": "Ngôn ngữ",
+    "rowLabel": "Ngôn ngữ hiển thị",
+    "vi": "Tiếng Việt",
+    "en": "Tiếng Anh"
+  }
+}

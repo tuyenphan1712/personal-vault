@@ -1,0 +1,18 @@
+{
+  "actions": {
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "retry": "Thử lại",
+    "copy": "Sao chép",
+    "show": "Hiện",
+    "hide": "Ẩn"
+  },
+  "status": {
+    "offline": "Bạn đang ngoại tuyến. Vui lòng kiểm tra kết nối mạng và thử lại."
+  },
+  "a11y": {
+    "goBack": "Quay lại"
+  }
+}

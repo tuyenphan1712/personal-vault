@@ -1,0 +1,47 @@
+{
+  "list": {
+    "title": "Documents",
+    "upload": "+ Upload",
+    "empty": "No documents uploaded yet.",
+    "loadError": "Could not load documents."
+  },
+  "detail": {
+    "invalid": "Invalid document.",
+    "notFound": "Document not found.",
+    "category": "Category",
+    "file": "File",
+    "uploaded": "Uploaded",
+    "download": "Download",
+    "downloadFailedTitle": "Download failed",
+    "downloadFailedMessage": "Could not download this document.",
+    "deleteTitle": "Delete document",
+    "deleteMessage": "Delete \"{{title}}\"? This cannot be undone."
+  },
+  "upload": {
+    "title": "Upload document",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Passport front page",
+    "submit": "Upload",
+    "chooseFile": "Choose file",
+    "choosePhoto": "Choose photo",
+    "genericError": "Could not upload this document.",
+    "tooLarge": "File is larger than 10MB.",
+    "unsupportedType": "Only JPEG, PNG, or PDF files are supported."
+  },
+  "docType": {
+    "label": "Category (optional)",
+    "customLabel": "Custom category",
+    "customPlaceholder": "e.g. Insurance",
+    "other": "Other",
+    "uncategorized": "Uncategorized",
+    "categories": {
+      "identity_civil_status": "Identity & Civil Status",
+      "education_qualifications": "Education & Qualifications",
+      "employment_contracts": "Employment & Contracts",
+      "medical_health": "Medical & Health",
+      "finance_tax": "Finance & Tax",
+      "property_vehicles": "Property & Vehicles",
+      "legal_misc": "Legal & Miscellaneous"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "Hồ sơ",
+  "fullNameLabel": "Họ và tên",
+  "fullNamePlaceholder": "Nguyễn Văn A",
+  "phone": "Số điện thoại",
+  "birthday": "Ngày sinh",
+  "birthdayNotSet": "Chưa đặt",
+  "birthdayFieldLabel": "Ngày sinh (không bắt buộc)",
+  "birthdaySelect": "Chọn ngày",
+  "editProfile": "Sửa hồ sơ",
+  "saveError": "Không thể lưu hồ sơ của bạn.",
+  "loadError": "Không thể tải hồ sơ của bạn.",
+  "validation": {
+    "fullNameRequired": "Vui lòng nhập họ và tên"
+  },
+  "role": {
+    "admin": "Quản trị viên",
+    "member": "Thành viên"
+  },
+  "status": {
+    "active": "Đang hoạt động",
+    "locked": "Đã khóa"
+  }
+}

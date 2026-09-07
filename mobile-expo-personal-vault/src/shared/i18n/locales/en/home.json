@@ -1,0 +1,15 @@
+{
+  "welcome": "Welcome back",
+  "defaultName": "there",
+  "vaultSection": "Your vault",
+  "credentialsTitle": "Credentials",
+  "credentialsSubtitle": "Saved platform passwords",
+  "documentsTitle": "Documents",
+  "documentsSubtitle": "Personal files & scans",
+  "profileTitle": "Profile",
+  "profileSubtitle": "Account & settings",
+  "logout": "Log out",
+  "loggingOut": "Logging out…",
+  "settingsA11y": "Settings",
+  "soonTag": "Soon"
+}

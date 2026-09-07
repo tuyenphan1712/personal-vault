@@ -1,0 +1,15 @@
+{
+  "title": "Settings",
+  "appearance": {
+    "sectionLabel": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "sectionLabel": "Language",
+    "rowLabel": "Display language",
+    "vi": "Vietnamese",
+    "en": "English"
+  }
+}

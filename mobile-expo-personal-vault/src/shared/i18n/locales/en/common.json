@@ -1,0 +1,18 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "retry": "Retry",
+    "copy": "Copy",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "status": {
+    "offline": "You're offline. Check your connection and try again."
+  },
+  "a11y": {
+    "goBack": "Go back"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "welcome": "Chào mừng trở lại",
+  "defaultName": "bạn",
+  "vaultSection": "Kho lưu trữ của bạn",
+  "credentialsTitle": "Thông tin đăng nhập",
+  "credentialsSubtitle": "Mật khẩu nền tảng đã lưu",
+  "documentsTitle": "Tài liệu",
+  "documentsSubtitle": "Tệp cá nhân & bản scan",
+  "profileTitle": "Hồ sơ",
+  "profileSubtitle": "Tài khoản & cài đặt",
+  "logout": "Đăng xuất",
+  "loggingOut": "Đang đăng xuất…",
+  "settingsA11y": "Cài đặt",
+  "soonTag": "Sắp ra mắt"
+}
