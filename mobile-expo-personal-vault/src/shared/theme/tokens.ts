@@ -37,12 +37,6 @@ export const darkColors = {
 
 export type Colors = typeof lightColors
 
-// TEMPORARY SHIM (Tasks 8-14): 27 files still `import { colors }` directly and assume
-// the light palette. Keep this alias until every one of them is migrated to read colors
-// from the theme context instead. Task 14's last step deletes this alias once a grep
-// confirms nothing imports `colors` from this module anymore.
-export const colors = lightColors
-
 export const fonts = {
   serif: 'Newsreader_500Medium',
   serifLight: 'Newsreader_300Light',
