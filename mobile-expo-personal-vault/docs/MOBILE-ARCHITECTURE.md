@@ -107,7 +107,7 @@ features/documents/
 | `credentials` | CRUD and local encryption/decryption of credential values |
 | `documents` | Pick, validate, upload, list, preview, download, delete |
 | `profile` | Read and update the current user's profile |
-| `settings` | App lock, biometric preference, privacy and session settings |
+| `settings` | Appearance (light/dark/system) and display language (vi default, en) preferences |
 
 ## 5. Request and State Flow
 
