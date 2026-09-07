@@ -1,7 +1,8 @@
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
 import { useState } from 'react'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
-import { colors, fonts } from '@/src/shared/theme/tokens'
+import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
 
 interface BirthdayFieldProps {
   value: Date | null
@@ -17,6 +18,8 @@ function formatDate(date: Date): string {
 }
 
 export function BirthdayField({ value, onChange, error }: BirthdayFieldProps) {
+  const { colors, fonts } = useTheme()
+  const { t } = useTranslation('profile')
   const [showIosPicker, setShowIosPicker] = useState(false)
 
   function openPicker() {
@@ -36,12 +39,48 @@ export function BirthdayField({ value, onChange, error }: BirthdayFieldProps) {
     }
   }
 
+  const styles = StyleSheet.create({
+    label: {
+      fontFamily: fonts.mono,
+      fontSize: 10.5,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      color: colors.mist,
+    },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+      borderRadius: 9,
+      paddingHorizontal: 13,
+      paddingVertical: 12,
+    },
+    inputError: {
+      borderColor: colors.danger,
+    },
+    valueText: {
+      fontFamily: fonts.sans,
+      fontSize: 14,
+      color: colors.ink,
+    },
+    placeholderText: {
+      fontFamily: fonts.sans,
+      fontSize: 14,
+      color: colors.muted,
+    },
+    errorText: {
+      fontFamily: fonts.sans,
+      fontSize: 13,
+      color: colors.danger,
+    },
+  })
+
   return (
     <View style={{ gap: 5, alignSelf: 'stretch' }}>
-      <Text style={styles.label}>Birthday (optional)</Text>
+      <Text style={styles.label}>{t('birthdayFieldLabel')}</Text>
       <Pressable accessibilityRole="button" onPress={openPicker} style={[styles.input, error && styles.inputError]}>
         <Text style={value ? styles.valueText : styles.placeholderText}>
-          {value ? formatDate(value) : 'Select a date'}
+          {value ? formatDate(value) : t('birthdaySelect')}
         </Text>
       </Pressable>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -63,41 +102,5 @@ export function BirthdayField({ value, onChange, error }: BirthdayFieldProps) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  label: {
-    fontFamily: fonts.mono,
-    fontSize: 10.5,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.mist,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: 9,
-    paddingHorizontal: 13,
-    paddingVertical: 12,
-  },
-  inputError: {
-    borderColor: colors.danger,
-  },
-  valueText: {
-    fontFamily: fonts.sans,
-    fontSize: 14,
-    color: colors.ink,
-  },
-  placeholderText: {
-    fontFamily: fonts.sans,
-    fontSize: 14,
-    color: colors.muted,
-  },
-  errorText: {
-    fontFamily: fonts.sans,
-    fontSize: 13,
-    color: colors.danger,
-  },
-})
 
 export { formatDate as formatBirthday }
