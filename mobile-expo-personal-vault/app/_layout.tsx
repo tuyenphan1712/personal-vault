@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
 import { IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold } from '@expo-google-fonts/ibm-plex-sans';
 import { Newsreader_300Light, Newsreader_500Medium, Newsreader_600SemiBold } from '@expo-google-fonts/newsreader';
@@ -9,9 +9,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSessionBootstrap } from '@/src/features/auth';
 import { AppProviders } from '@/src/providers/AppProviders';
+import { useAppReady } from '@/src/providers/useAppReady';
+import { ThemeProvider as VaultThemeProvider, useTheme } from '@/src/shared/theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,17 +21,17 @@ export const unstable_settings = {
 };
 
 function RootNavigator() {
-  const colorScheme = useColorScheme();
+  const { resolvedScheme } = useTheme();
   useSessionBootstrap();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationThemeProvider value={resolvedScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(protected)" />
         <Stack.Screen name="(public)" />
       </Stack>
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </NavigationThemeProvider>
   );
 }
 
@@ -46,19 +47,23 @@ export default function RootLayout() {
     IBMPlexMono_500Medium,
   });
 
+  const isAppReady = useAppReady(fontsLoaded);
+
   useEffect(() => {
-    if (fontsLoaded) {
+    if (isAppReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [isAppReady]);
 
-  if (!fontsLoaded) {
+  if (!isAppReady) {
     return null;
   }
 
   return (
-    <AppProviders>
-      <RootNavigator />
-    </AppProviders>
+    <VaultThemeProvider>
+      <AppProviders>
+        <RootNavigator />
+      </AppProviders>
+    </VaultThemeProvider>
   );
 }
