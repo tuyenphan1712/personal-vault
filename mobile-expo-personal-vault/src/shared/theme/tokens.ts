@@ -1,6 +1,7 @@
-// Mirrors the web client's design tokens exactly (frontend-react-personal-vault/src/index.css)
-// so the two clients read as the same product.
-export const colors = {
+// Mirrors the web client's design tokens exactly (frontend-react-personal-vault/src/shared/theme/palettes.ts)
+// so the two clients read as the same product. Keys map 1:1 from the web's ColorPalette
+// by stripping the `color` prefix and lowercasing the first letter.
+export const lightColors = {
   bg: '#e7e2d5',
   surface: '#ffffff',
   surfaceHover: '#f0e9da',
@@ -16,6 +17,31 @@ export const colors = {
   dangerDark: '#7a3728',
   dangerSoft: '#f5e1dc',
 } as const
+
+export const darkColors = {
+  bg: '#1c1914',
+  surface: '#2e2820',
+  surfaceHover: '#3a3226',
+  primary: '#79ac93',
+  primaryDark: '#5c8a72',
+  primarySoft: '#354a3d',
+  mist: '#c2b7a4',
+  mistSoft: '#3a3226',
+  ink: '#f2ede4',
+  muted: '#a89d8c',
+  line: '#4d4433',
+  danger: '#d2836a',
+  dangerDark: '#ad6650',
+  dangerSoft: '#4d3023',
+} as const
+
+export type Colors = typeof lightColors
+
+// TEMPORARY SHIM (Tasks 8-14): 27 files still `import { colors }` directly and assume
+// the light palette. Keep this alias until every one of them is migrated to read colors
+// from the theme context instead. Task 14's last step deletes this alias once a grep
+// confirms nothing imports `colors` from this module anymore.
+export const colors = lightColors
 
 export const fonts = {
   serif: 'Newsreader_500Medium',
