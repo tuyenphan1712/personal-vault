@@ -1,26 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { waitFor } from '@testing-library/react-native'
 import { useThemeStore } from '../theme.store'
 
 const STORAGE_KEY = 'vault-theme-mode'
-
-function waitFor(assertion: () => void | Promise<void>, timeoutMs = 2000): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const start = Date.now()
-    const tick = async () => {
-      try {
-        await assertion()
-        resolve()
-      } catch (error) {
-        if (Date.now() - start > timeoutMs) {
-          reject(error)
-          return
-        }
-        setTimeout(tick, 10)
-      }
-    }
-    tick()
-  })
-}
 
 beforeEach(async () => {
   await AsyncStorage.clear()
@@ -46,10 +28,6 @@ describe('useThemeStore', () => {
       expect(raw).not.toBeNull()
       expect(JSON.parse(raw as string).state.mode).toBe('dark')
     })
-
-    const raw = await AsyncStorage.getItem(STORAGE_KEY)
-    const parsed = JSON.parse(raw as string)
-    expect(parsed.state.mode).toBe('dark')
   })
 
   it('flips hasHydrated to true after rehydration', async () => {
