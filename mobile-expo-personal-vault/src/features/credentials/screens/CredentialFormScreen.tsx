@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
 import { encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
 import { BackButton } from '@/src/shared/components/BackButton'
-import { colors, fonts, spacing } from '@/src/shared/theme/tokens'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import { CredentialForm, type CredentialFormValues } from '../components/CredentialForm'
 import { useCredential } from '../hooks/useCredential'
 import { useCreateCredential } from '../hooks/useCreateCredential'
@@ -16,6 +17,8 @@ interface CredentialFormScreenProps {
 
 export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps) {
   const router = useRouter()
+  const { colors, fonts, spacing } = useTheme()
+  const { t } = useTranslation('credentials')
   const isEditing = Boolean(credentialId)
   const { data: existingCredential, isLoading } = useCredential(credentialId ?? '')
   const createCredential = useCreateCredential()
@@ -47,6 +50,31 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
     }
   }
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.bg,
+    },
+    centered: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    header: {
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.lg,
+    },
+    content: {
+      padding: spacing.xl,
+      gap: spacing.lg,
+    },
+    title: {
+      fontFamily: fonts.serif,
+      fontSize: 21,
+      color: colors.ink,
+    },
+  })
+
   if (isEditing && isLoading) {
     return (
       <SafeAreaView style={[styles.container, styles.centered]}>
@@ -61,7 +89,7 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
         <BackButton />
       </View>
       <View style={styles.content}>
-        <Text style={styles.title}>{isEditing ? 'Edit credential' : 'Add credential'}</Text>
+        <Text style={styles.title}>{isEditing ? t('form.editTitle') : t('form.addTitle')}</Text>
         <CredentialForm
           defaultValues={
             existingCredential
@@ -70,35 +98,10 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
           }
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          errorMessage={mutationError ? 'Could not save this credential.' : null}
-          submitLabel={isEditing ? 'Save changes' : 'Add credential'}
+          errorMessage={mutationError ? t('form.saveError') : null}
+          submitLabel={isEditing ? t('form.saveChanges') : t('form.addSubmit')}
         />
       </View>
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-  },
-  content: {
-    padding: spacing.xl,
-    gap: spacing.lg,
-  },
-  title: {
-    fontFamily: fonts.serif,
-    fontSize: 21,
-    color: colors.ink,
-  },
-})

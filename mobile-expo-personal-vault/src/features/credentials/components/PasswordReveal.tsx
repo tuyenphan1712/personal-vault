@@ -1,10 +1,11 @@
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { decryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
 import { Button } from '@/src/shared/components/Button'
-import { colors, fonts, radii } from '@/src/shared/theme/tokens'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
 
 interface PasswordRevealProps {
   encryptedPassword: string
@@ -13,6 +14,8 @@ interface PasswordRevealProps {
 }
 
 export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: PasswordRevealProps) {
+  const { colors, fonts, radii } = useTheme()
+  const { t } = useTranslation(['credentials', 'common'])
   const [revealed, setRevealed] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,13 +27,13 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
     setError(null)
     const key = getEncryptionKey()
     if (!key) {
-      setError('Vault is locked')
+      setError(t('password.locked'))
       return
     }
     try {
       setRevealed(await decryptCredential(encryptedPassword, key))
     } catch {
-      setError('Could not decrypt this password')
+      setError(t('password.decryptError'))
     }
   }
 
@@ -42,9 +45,72 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
     onCopied()
   }
 
+  const styles = StyleSheet.create({
+    container: {
+      gap: 6,
+    },
+    label: {
+      fontFamily: fonts.mono,
+      fontSize: 10.5,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      color: colors.mist,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+      borderRadius: radii.md,
+      padding: 14,
+      gap: 10,
+    },
+    value: {
+      fontFamily: fonts.mono,
+      fontSize: 15,
+      letterSpacing: 1,
+      color: colors.ink,
+    },
+    actions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 8,
+    },
+    pill: {
+      borderWidth: 1,
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySoft,
+      borderRadius: radii.pill,
+      paddingHorizontal: 11,
+      paddingVertical: 5,
+    },
+    pillText: {
+      fontFamily: fonts.monoMedium,
+      fontSize: 10.5,
+      letterSpacing: 0.4,
+      textTransform: 'uppercase',
+      color: colors.primaryDark,
+    },
+    errorRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: 2,
+    },
+    errorText: {
+      fontFamily: fonts.sans,
+      color: colors.danger,
+      fontSize: 13,
+      flexShrink: 1,
+    },
+    unlockButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+    },
+  })
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>{t('password.label')}</Text>
       <View style={styles.card}>
         <Text style={styles.value} numberOfLines={1}>
           {revealed ?? '••••••••••••'}
@@ -52,7 +118,7 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
         <View style={styles.actions}>
           {revealed ? (
             <Pressable accessibilityRole="button" onPress={handleCopy} style={styles.pill}>
-              <Text style={styles.pillText}>Copy</Text>
+              <Text style={styles.pillText}>{t('common:actions.copy')}</Text>
             </Pressable>
           ) : null}
           <Pressable
@@ -61,79 +127,16 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
             onPress={handleToggle}
             style={styles.pill}
           >
-            <Text style={styles.pillText}>{revealed ? 'Hide' : 'Show'}</Text>
+            <Text style={styles.pillText}>{revealed ? t('common:actions.hide') : t('common:actions.show')}</Text>
           </Pressable>
         </View>
       </View>
       {error ? (
         <View style={styles.errorRow}>
           <Text style={styles.errorText}>{error}</Text>
-          <Button label="Unlock vault again" variant="outline" onPress={onUnlockNeeded} style={styles.unlockButton} />
+          <Button label={t('password.unlockAgain')} variant="outline" onPress={onUnlockNeeded} style={styles.unlockButton} />
         </View>
       ) : null}
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 6,
-  },
-  label: {
-    fontFamily: fonts.mono,
-    fontSize: 10.5,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.mist,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radii.md,
-    padding: 14,
-    gap: 10,
-  },
-  value: {
-    fontFamily: fonts.mono,
-    fontSize: 15,
-    letterSpacing: 1,
-    color: colors.ink,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 8,
-  },
-  pill: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-    borderRadius: radii.pill,
-    paddingHorizontal: 11,
-    paddingVertical: 5,
-  },
-  pillText: {
-    fontFamily: fonts.monoMedium,
-    fontSize: 10.5,
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-    color: colors.primaryDark,
-  },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 2,
-  },
-  errorText: {
-    fontFamily: fonts.sans,
-    color: colors.danger,
-    fontSize: 13,
-    flexShrink: 1,
-  },
-  unlockButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-})

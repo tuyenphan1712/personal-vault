@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { StyleSheet, Text, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/src/shared/components/Button'
 import { TextField } from '@/src/shared/components/TextField'
-import { colors, fonts } from '@/src/shared/theme/tokens'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
 
 const credentialSchema = z.object({
   platformName: z.string().min(1, 'Platform is required'),
@@ -24,13 +26,43 @@ interface CredentialFormProps {
 }
 
 export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMessage, submitLabel }: CredentialFormProps) {
+  const { colors, fonts } = useTheme()
+  const { t } = useTranslation('credentials')
+
+  const resolver = useMemo(
+    () =>
+      zodResolver(
+        z.object({
+          platformName: z.string().min(1, t('validation.platformRequired')),
+          account: z.string().min(1, t('validation.accountRequired')),
+          password: z.string().min(1, t('validation.passwordRequired')),
+          note: z.string().optional(),
+        }),
+      ),
+    [t],
+  )
+
   const { control, handleSubmit, formState: { errors } } = useForm<CredentialFormValues>({
-    resolver: zodResolver(credentialSchema),
+    resolver,
     defaultValues: {
       platformName: defaultValues?.platformName ?? '',
       account: defaultValues?.account ?? '',
       password: '',
       note: defaultValues?.note ?? '',
+    },
+  })
+
+  const styles = StyleSheet.create({
+    container: {
+      gap: 14,
+    },
+    errorText: {
+      fontFamily: fonts.sans,
+      color: colors.danger,
+      fontSize: 13,
+    },
+    button: {
+      marginTop: 4,
     },
   })
 
@@ -41,8 +73,8 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
         name="platformName"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextField
-            label="Platform"
-            placeholder="Gmail"
+            label={t('form.platformLabel')}
+            placeholder={t('form.platformPlaceholder')}
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
@@ -56,8 +88,8 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
         name="account"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextField
-            label="Account"
-            placeholder="user@gmail.com"
+            label={t('form.accountLabel')}
+            placeholder={t('form.accountPlaceholder')}
             autoCapitalize="none"
             onBlur={onBlur}
             onChangeText={onChange}
@@ -72,8 +104,8 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
         name="password"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextField
-            label="Password"
-            placeholder="••••••••••"
+            label={t('form.passwordLabel')}
+            placeholder={t('form.passwordPlaceholder')}
             secureTextEntry
             autoCapitalize="none"
             onBlur={onBlur}
@@ -89,8 +121,8 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
         name="note"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextField
-            label="Note (optional)"
-            placeholder="Personal account"
+            label={t('form.noteLabel')}
+            placeholder={t('form.notePlaceholder')}
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
@@ -104,17 +136,3 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 14,
-  },
-  errorText: {
-    fontFamily: fonts.sans,
-    color: colors.danger,
-    fontSize: 13,
-  },
-  button: {
-    marginTop: 4,
-  },
-})
