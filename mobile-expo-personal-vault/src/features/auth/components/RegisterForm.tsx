@@ -43,7 +43,9 @@ export function RegisterForm({ onSubmit, isSubmitting, errorMessage }: RegisterF
     defaultValues: { fullName: '', phone: '', password: '' },
   })
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 14,
     },
@@ -55,7 +57,9 @@ export function RegisterForm({ onSubmit, isSubmitting, errorMessage }: RegisterF
     button: {
       marginTop: 4,
     },
-  })
+  }),
+  [colors, fonts],
+  )
 
   return (
     <View style={styles.container}>

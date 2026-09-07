@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { TextField } from '@/src/shared/components/TextField'
@@ -16,7 +16,9 @@ export function DocumentTypeSelect({ value, onChange }: DocumentTypeSelectProps)
   const isMatchedCategory = DOC_TYPE_CATEGORY_VALUES.includes(value as (typeof DOC_TYPE_CATEGORY_VALUES)[number])
   const [isOther, setIsOther] = useState(Boolean(value) && !isMatchedCategory)
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 8,
     },
@@ -53,7 +55,9 @@ export function DocumentTypeSelect({ value, onChange }: DocumentTypeSelectProps)
       fontFamily: fonts.sansSemiBold,
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.container}>

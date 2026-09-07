@@ -1,4 +1,5 @@
 import * as Clipboard from 'expo-clipboard'
+import { useMemo } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -18,7 +19,9 @@ export function CopyableField({ label, value, onCopied }: CopyableFieldProps) {
     onCopied()
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 6,
     },
@@ -61,7 +64,9 @@ export function CopyableField({ label, value, onCopied }: CopyableFieldProps) {
       textTransform: 'uppercase',
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.container}>

@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { decryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
@@ -45,7 +45,9 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
     onCopied()
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 6,
     },
@@ -106,7 +108,9 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onCopied }: 
       paddingVertical: 6,
       paddingHorizontal: 10,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.container}>

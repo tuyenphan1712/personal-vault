@@ -1,5 +1,5 @@
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -39,7 +39,9 @@ export function BirthdayField({ value, onChange, error }: BirthdayFieldProps) {
     }
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     label: {
       fontFamily: fonts.mono,
       fontSize: 10.5,
@@ -73,7 +75,9 @@ export function BirthdayField({ value, onChange, error }: BirthdayFieldProps) {
       fontSize: 13,
       color: colors.danger,
     },
-  })
+  }),
+  [colors, fonts],
+  )
 
   return (
     <View style={{ gap: 5, alignSelf: 'stretch' }}>

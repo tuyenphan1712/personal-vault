@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -44,7 +44,9 @@ export function DocumentUploadScreen() {
 
   const serverErrorCode = getServerErrorCode(uploadDocument.error)
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -83,7 +85,9 @@ export function DocumentUploadScreen() {
     submitButton: {
       marginTop: 4,
     },
-  })
+  }),
+  [colors, fonts, spacing],
+  )
 
   return (
     <SafeAreaView style={styles.container}>

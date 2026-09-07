@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -50,7 +51,9 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
     }
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -73,7 +76,9 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
       fontSize: 21,
       color: colors.ink,
     },
-  })
+  }),
+  [colors, fonts, spacing],
+  )
 
   if (isEditing && isLoading) {
     return (

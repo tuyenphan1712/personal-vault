@@ -42,7 +42,9 @@ export function LoginForm({ onSubmit, isSubmitting, errorMessage, statusLabel }:
     defaultValues: { phone: '', password: '' },
   })
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 14,
     },
@@ -60,7 +62,9 @@ export function LoginForm({ onSubmit, isSubmitting, errorMessage, statusLabel }:
       fontSize: 12.5,
       textAlign: 'center',
     },
-  })
+  }),
+  [colors, fonts],
+  )
 
   return (
     <View style={styles.container}>

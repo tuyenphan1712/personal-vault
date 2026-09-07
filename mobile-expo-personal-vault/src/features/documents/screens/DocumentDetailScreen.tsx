@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -18,13 +19,15 @@ interface DocumentDetailScreenProps {
 export function DocumentDetailScreen({ documentId }: DocumentDetailScreenProps) {
   const router = useRouter()
   const { colors, fonts, spacing } = useTheme()
-  const { t } = useTranslation(['documents', 'common'])
+  const { t, i18n } = useTranslation(['documents', 'common'])
   const docTypeLabel = useDocTypeLabel()
   const { data: document, isLoading, isError } = useDocument(documentId)
   const deleteDocument = useDeleteDocument()
   const downloadDocument = useDownloadDocument()
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -80,7 +83,9 @@ export function DocumentDetailScreen({ documentId }: DocumentDetailScreenProps) 
     actionButton: {
       flex: 1,
     },
-  })
+  }),
+  [colors, fonts, spacing],
+  )
 
   if (!documentId) {
     return (
@@ -148,7 +153,7 @@ export function DocumentDetailScreen({ documentId }: DocumentDetailScreenProps) 
 
         <View style={styles.kvBlock}>
           <Text style={styles.kvLabel}>{t('detail.uploaded')}</Text>
-          <Text style={styles.kvValue}>{new Date(document.createdAt).toLocaleDateString()}</Text>
+          <Text style={styles.kvValue}>{new Date(document.createdAt).toLocaleDateString(i18n.language)}</Text>
         </View>
 
         <View style={styles.actions}>

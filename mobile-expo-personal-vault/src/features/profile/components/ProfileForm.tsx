@@ -44,7 +44,9 @@ export function ProfileForm({ defaultValues, onSubmit, onCancel, isSubmitting, e
     defaultValues,
   })
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 14,
     },
@@ -61,7 +63,9 @@ export function ProfileForm({ defaultValues, onSubmit, onCancel, isSubmitting, e
     actionButton: {
       flex: 1,
     },
-  })
+  }),
+  [colors, fonts],
+  )
 
   return (
     <View style={styles.container}>

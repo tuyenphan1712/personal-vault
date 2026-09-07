@@ -1,5 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as ImagePicker from 'expo-image-picker'
+import { useMemo } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { ALLOWED_DOCUMENT_TYPES } from '@/src/config/constants'
@@ -53,7 +54,9 @@ export function DocumentPickerButton({ onPicked }: DocumentPickerButtonProps) {
     })
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     row: {
       flexDirection: 'row',
       gap: 10,
@@ -72,7 +75,9 @@ export function DocumentPickerButton({ onPicked }: DocumentPickerButtonProps) {
       fontSize: 13.5,
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.row}>

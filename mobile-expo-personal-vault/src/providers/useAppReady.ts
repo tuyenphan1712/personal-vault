@@ -14,11 +14,13 @@ export function useAppReady(fontsLoaded: boolean): boolean {
   useEffect(() => {
     let isMounted = true
 
-    loadPersistedLanguage().finally(() => {
+    const markLoaded = () => {
       if (isMounted) {
         setIsLanguageLoaded(true)
       }
-    })
+    }
+
+    loadPersistedLanguage().then(markLoaded, markLoaded)
 
     return () => {
       isMounted = false

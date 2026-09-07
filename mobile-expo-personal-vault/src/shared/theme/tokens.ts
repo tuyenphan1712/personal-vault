@@ -23,7 +23,7 @@ export const darkColors = {
   surface: '#2e2820',
   surfaceHover: '#3a3226',
   primary: '#79ac93',
-  primaryDark: '#5c8a72',
+  primaryDark: '#b8dcc5',
   primarySoft: '#354a3d',
   mist: '#c2b7a4',
   mistSoft: '#3a3226',
@@ -31,11 +31,11 @@ export const darkColors = {
   muted: '#a89d8c',
   line: '#4d4433',
   danger: '#d2836a',
-  dangerDark: '#ad6650',
+  dangerDark: '#e0a68f',
   dangerSoft: '#4d3023',
-} as const
+} as const satisfies Record<keyof typeof lightColors, string>
 
-export type Colors = typeof lightColors
+export type Colors = Record<keyof typeof lightColors, string>
 
 export const fonts = {
   serif: 'Newsreader_500Medium',

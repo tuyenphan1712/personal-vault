@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -8,9 +8,13 @@ export function LanguagePicker() {
   const { colors, fonts, radii } = useTheme()
   const { t, i18n } = useTranslation('settings')
   const [isOpen, setIsOpen] = useState(false)
-  const currentLanguage = i18n.language as SupportedLanguage
+  const currentLanguage = SUPPORTED_LANGUAGES.includes(i18n.language as SupportedLanguage)
+    ? (i18n.language as SupportedLanguage)
+    : 'vi'
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     row: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -59,7 +63,9 @@ export function LanguagePicker() {
       fontFamily: fonts.sansSemiBold,
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   async function handleSelect(language: SupportedLanguage) {
     setIsOpen(false)

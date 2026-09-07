@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { Pressable, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme/ThemeProvider'
@@ -9,7 +10,9 @@ export function BackButton() {
   const { colors } = useTheme()
   const { t } = useTranslation('common')
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     button: {
       width: 34,
       height: 34,
@@ -20,7 +23,9 @@ export function BackButton() {
       alignItems: 'center',
       justifyContent: 'center',
     },
-  })
+  }),
+  [colors],
+  )
 
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={t('a11y.goBack')} onPress={() => router.back()} style={styles.button}>

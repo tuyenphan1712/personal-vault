@@ -45,7 +45,9 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
     onUnlocked()
   })
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       padding: 24,
       alignItems: 'center',
@@ -83,7 +85,9 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
       fontSize: 12.5,
       textAlign: 'center',
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.container}>

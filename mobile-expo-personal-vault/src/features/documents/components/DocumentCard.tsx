@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import type { DocumentRecord } from '../types/document.types'
@@ -20,47 +21,51 @@ export function DocumentCard({ document, onPress }: DocumentCardProps) {
   const { colors, fonts, radii } = useTheme()
   const docTypeLabel = useDocTypeLabel()
 
-  const styles = StyleSheet.create({
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.line,
-      borderRadius: radii.md,
-      paddingHorizontal: 14,
-      paddingVertical: 13,
-    },
-    icon: {
-      width: 40,
-      height: 40,
-      borderRadius: radii.sm,
-      backgroundColor: colors.primarySoft,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: 0,
-    },
-    iconText: {
-      fontFamily: fonts.monoMedium,
-      fontSize: 10,
-      color: colors.primaryDark,
-    },
-    copy: {
-      flex: 1,
-      minWidth: 0,
-    },
-    title: {
-      fontFamily: fonts.sansSemiBold,
-      fontSize: 14,
-      color: colors.ink,
-    },
-    meta: {
-      fontFamily: fonts.sans,
-      fontSize: 12,
-      color: colors.muted,
-    },
-  })
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.line,
+          borderRadius: radii.md,
+          paddingHorizontal: 14,
+          paddingVertical: 13,
+        },
+        icon: {
+          width: 40,
+          height: 40,
+          borderRadius: radii.sm,
+          backgroundColor: colors.primarySoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        },
+        iconText: {
+          fontFamily: fonts.monoMedium,
+          fontSize: 10,
+          color: colors.primaryDark,
+        },
+        copy: {
+          flex: 1,
+          minWidth: 0,
+        },
+        title: {
+          fontFamily: fonts.sansSemiBold,
+          fontSize: 14,
+          color: colors.ink,
+        },
+        meta: {
+          fontFamily: fonts.sans,
+          fontSize: 12,
+          color: colors.muted,
+        },
+      }),
+    [colors, fonts, radii],
+  )
 
   return (
     <Pressable accessibilityRole="button" style={styles.card} onPress={() => onPress(document.id)}>

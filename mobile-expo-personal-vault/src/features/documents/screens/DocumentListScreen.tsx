@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios'
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +16,9 @@ export function DocumentListScreen() {
   const { t } = useTranslation(['documents', 'common'])
   const { data, isLoading, isError, error, refetch, isRefetching } = useDocuments()
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -78,7 +81,9 @@ export function DocumentListScreen() {
       fontSize: 14,
       textAlign: 'center',
     },
-  })
+  }),
+  [colors, fonts, radii, spacing],
+  )
 
   return (
     <SafeAreaView style={styles.container}>

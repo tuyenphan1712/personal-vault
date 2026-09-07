@@ -52,7 +52,9 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
     },
   })
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       gap: 14,
     },
@@ -64,7 +66,9 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
     button: {
       marginTop: 4,
     },
-  })
+  }),
+  [colors, fonts],
+  )
 
   return (
     <View style={styles.container}>

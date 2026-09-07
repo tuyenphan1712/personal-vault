@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -25,7 +26,9 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
   const hasKey = useHasEncryptionKey()
   const isDerivingKey = useIsDerivingKey()
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -104,7 +107,9 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
     actionButton: {
       flex: 1,
     },
-  })
+  }),
+  [colors, fonts, radii, spacing],
+  )
 
   if (!credentialId) {
     return (

@@ -26,7 +26,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ThemeContextValue>(
     () => ({
-      colors: (resolvedScheme === 'dark' ? darkColors : lightColors) as Colors,
+      colors: resolvedScheme === 'dark' ? darkColors : lightColors,
       fonts,
       radii,
       spacing,

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -9,7 +10,9 @@ export function AppearancePicker() {
   const { colors, fonts, radii, mode, setMode } = useTheme()
   const { t } = useTranslation('settings')
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flexDirection: 'row',
       borderWidth: 1,
@@ -41,7 +44,9 @@ export function AppearancePicker() {
       fontFamily: fonts.sansSemiBold,
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, radii],
+  )
 
   return (
     <View style={styles.container}>

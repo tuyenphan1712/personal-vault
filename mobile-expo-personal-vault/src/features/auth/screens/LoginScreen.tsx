@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useMemo } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +28,9 @@ export function LoginScreen() {
     mutate(values)
   }
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -66,7 +69,9 @@ export function LoginScreen() {
       fontSize: 13,
       color: colors.primaryDark,
     },
-  })
+  }),
+  [colors, fonts, spacing],
+  )
 
   return (
     <SafeAreaView style={styles.container}>

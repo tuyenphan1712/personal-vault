@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +11,9 @@ export function SettingsScreen() {
   const { colors, fonts, spacing } = useTheme()
   const { t } = useTranslation('settings')
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.bg,
@@ -42,7 +45,9 @@ export function SettingsScreen() {
       textTransform: 'uppercase',
       color: colors.mist,
     },
-  })
+  }),
+  [colors, fonts, spacing],
+  )
 
   return (
     <SafeAreaView style={styles.container}>
