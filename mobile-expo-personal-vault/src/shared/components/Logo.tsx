@@ -1,5 +1,5 @@
 import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg'
-import { colors } from '../theme/tokens'
+import { useTheme } from '../theme/ThemeProvider'
 
 interface LogoProps {
   width?: number
@@ -9,6 +9,8 @@ interface LogoProps {
 
 // Ported 1:1 from the web client's shared/components/Logo.tsx so both clients show the same mark.
 export function Logo({ width = 176, height = 32, showWordmark = true }: LogoProps) {
+  const { colors } = useTheme()
+
   if (!showWordmark) {
     return (
       <Svg width={height} height={height} viewBox="0 0 48 48" fill="none">

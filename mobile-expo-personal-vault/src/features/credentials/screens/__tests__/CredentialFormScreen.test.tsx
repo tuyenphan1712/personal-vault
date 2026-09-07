@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
+import { fireEvent, screen, waitFor } from '@testing-library/react-native'
+import { renderWithProviders } from '@/src/shared/testing/renderWithProviders'
 import { rest } from 'msw'
 import { API_BASE_URL } from '@/src/config/constants'
 import { server } from '@/src/shared/testing/msw/server'
@@ -17,7 +18,7 @@ jest.mock('expo-router', () => ({ useRouter: () => ({ back: mockBack }) }))
 
 function renderScreen(credentialId?: string) {
   const queryClient = createTestQueryClient()
-  return render(
+  return renderWithProviders(
     <QueryClientProvider client={queryClient}>
       <CredentialFormScreen credentialId={credentialId} />
     </QueryClientProvider>,

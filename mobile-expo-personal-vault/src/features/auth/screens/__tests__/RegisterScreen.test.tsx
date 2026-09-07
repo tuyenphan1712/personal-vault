@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
+import { fireEvent, screen, waitFor } from '@testing-library/react-native'
+import { renderWithProviders } from '@/src/shared/testing/renderWithProviders'
 import { server } from '@/src/shared/testing/msw/server'
 import { createTestQueryClient } from '@/src/shared/testing/queryClient'
 import { RegisterScreen } from '../RegisterScreen'
@@ -10,7 +11,7 @@ jest.mock('expo-router', () => ({ useRouter: () => ({ replace: mockReplace }) })
 
 function renderScreen() {
   const queryClient = createTestQueryClient()
-  return render(
+  return renderWithProviders(
     <QueryClientProvider client={queryClient}>
       <RegisterScreen />
     </QueryClientProvider>,

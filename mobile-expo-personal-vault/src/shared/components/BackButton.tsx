@@ -1,27 +1,30 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { Pressable, StyleSheet } from 'react-native'
-import { colors } from '../theme/tokens'
+import { useTranslation } from 'react-i18next'
+import { useTheme } from '../theme/ThemeProvider'
 
 export function BackButton() {
   const router = useRouter()
+  const { colors } = useTheme()
+  const { t } = useTranslation('common')
+
+  const styles = StyleSheet.create({
+    button: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.line,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  })
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={styles.button}>
+    <Pressable accessibilityRole="button" accessibilityLabel={t('a11y.goBack')} onPress={() => router.back()} style={styles.button}>
       <Ionicons name="chevron-back" size={18} color={colors.ink} />
     </Pressable>
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

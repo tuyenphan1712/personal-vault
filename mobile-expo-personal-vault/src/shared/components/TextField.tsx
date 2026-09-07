@@ -1,5 +1,5 @@
 import { Text, TextInput, View, type TextInputProps } from 'react-native'
-import { colors, fonts } from '../theme/tokens'
+import { useTheme } from '../theme/ThemeProvider'
 
 interface TextFieldProps extends Omit<TextInputProps, 'style'> {
   label: string
@@ -7,6 +7,8 @@ interface TextFieldProps extends Omit<TextInputProps, 'style'> {
 }
 
 export function TextField({ label, error, ...inputProps }: TextFieldProps) {
+  const { colors, fonts } = useTheme()
+
   return (
     <View style={{ gap: 5, alignSelf: 'stretch' }}>
       <Text style={{ fontFamily: fonts.mono, fontSize: 10.5, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.mist }}>

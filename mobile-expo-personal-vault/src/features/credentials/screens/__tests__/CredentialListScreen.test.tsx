@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react-native'
+import { screen, waitFor } from '@testing-library/react-native'
+import { renderWithProviders } from '@/src/shared/testing/renderWithProviders'
 import { server } from '@/src/shared/testing/msw/server'
 import { createTestQueryClient } from '@/src/shared/testing/queryClient'
 import { setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
@@ -14,7 +15,7 @@ jest.mock('expo-router', () => ({ useRouter: () => ({ push: jest.fn() }) }))
 
 function renderScreen() {
   const queryClient = createTestQueryClient()
-  return render(
+  return renderWithProviders(
     <QueryClientProvider client={queryClient}>
       <CredentialListScreen />
     </QueryClientProvider>,

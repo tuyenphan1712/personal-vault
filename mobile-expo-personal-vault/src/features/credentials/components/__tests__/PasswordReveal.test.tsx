@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
+import { fireEvent, screen, waitFor } from '@testing-library/react-native'
+import { renderWithProviders } from '@/src/shared/testing/renderWithProviders'
 import { PasswordReveal } from '../PasswordReveal'
 
 jest.mock('expo-clipboard', () => ({
@@ -26,7 +27,7 @@ beforeEach(() => {
 describe('PasswordReveal', () => {
   it('hides the password by default', async () => {
     ;(getEncryptionKey as jest.Mock).mockReturnValue(new Uint8Array(32))
-    await render(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
+    await renderWithProviders(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
 
     expect(screen.getByText('••••••••••••')).toBeTruthy()
     expect(decryptCredential).not.toHaveBeenCalled()
@@ -35,7 +36,7 @@ describe('PasswordReveal', () => {
   it('decrypts and shows the plaintext when "Show" is pressed', async () => {
     ;(getEncryptionKey as jest.Mock).mockReturnValue(new Uint8Array(32))
     ;(decryptCredential as jest.Mock).mockResolvedValue('my-secret-password')
-    await render(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
+    await renderWithProviders(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
 
     await fireEvent.press(screen.getByRole('button', { name: 'Show' }))
 
@@ -45,7 +46,7 @@ describe('PasswordReveal', () => {
   it('prompts to unlock the vault when the encryption key is missing', async () => {
     ;(getEncryptionKey as jest.Mock).mockReturnValue(null)
     const onUnlockNeeded = jest.fn()
-    await render(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={onUnlockNeeded} onCopied={jest.fn()} />)
+    await renderWithProviders(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={onUnlockNeeded} onCopied={jest.fn()} />)
 
     await fireEvent.press(screen.getByRole('button', { name: 'Show' }))
 
@@ -56,7 +57,7 @@ describe('PasswordReveal', () => {
   it('shows a decrypt error message when decryption throws (e.g. wrong key)', async () => {
     ;(getEncryptionKey as jest.Mock).mockReturnValue(new Uint8Array(32))
     ;(decryptCredential as jest.Mock).mockRejectedValue(new Error('bad auth tag'))
-    await render(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
+    await renderWithProviders(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={jest.fn()} />)
 
     await fireEvent.press(screen.getByRole('button', { name: 'Show' }))
 
@@ -67,7 +68,7 @@ describe('PasswordReveal', () => {
     ;(getEncryptionKey as jest.Mock).mockReturnValue(new Uint8Array(32))
     ;(decryptCredential as jest.Mock).mockResolvedValue('my-secret-password')
     const onCopied = jest.fn()
-    await render(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={onCopied} />)
+    await renderWithProviders(<PasswordReveal encryptedPassword={ENCRYPTED} onUnlockNeeded={jest.fn()} onCopied={onCopied} />)
 
     await fireEvent.press(screen.getByRole('button', { name: 'Show' }))
     await screen.findByText('my-secret-password')

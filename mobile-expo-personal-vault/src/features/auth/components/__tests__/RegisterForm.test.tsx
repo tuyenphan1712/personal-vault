@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
+import { fireEvent, screen, waitFor } from '@testing-library/react-native'
+import { renderWithProviders } from '@/src/shared/testing/renderWithProviders'
 import { RegisterForm } from '../RegisterForm'
 
 describe('RegisterForm', () => {
   it('renders all fields', async () => {
-    await render(<RegisterForm onSubmit={jest.fn()} isSubmitting={false} errorMessage={null} />)
+    await renderWithProviders(<RegisterForm onSubmit={jest.fn()} isSubmitting={false} errorMessage={null} />)
 
     expect(screen.getByLabelText('Full name')).toBeTruthy()
     expect(screen.getByLabelText('Phone number')).toBeTruthy()
@@ -12,7 +13,7 @@ describe('RegisterForm', () => {
 
   it('shows validation errors for invalid input', async () => {
     const onSubmit = jest.fn()
-    await render(<RegisterForm onSubmit={onSubmit} isSubmitting={false} errorMessage={null} />)
+    await renderWithProviders(<RegisterForm onSubmit={onSubmit} isSubmitting={false} errorMessage={null} />)
 
     await fireEvent.changeText(screen.getByLabelText('Password'), 'short')
     await fireEvent.press(screen.getByRole('button', { name: 'Register' }))
@@ -25,7 +26,7 @@ describe('RegisterForm', () => {
 
   it('calls onSubmit with the entered values when valid', async () => {
     const onSubmit = jest.fn()
-    await render(<RegisterForm onSubmit={onSubmit} isSubmitting={false} errorMessage={null} />)
+    await renderWithProviders(<RegisterForm onSubmit={onSubmit} isSubmitting={false} errorMessage={null} />)
 
     await fireEvent.changeText(screen.getByLabelText('Full name'), 'Nguyen Van A')
     await fireEvent.changeText(screen.getByLabelText('Phone number'), '0900000000')
@@ -41,13 +42,13 @@ describe('RegisterForm', () => {
   })
 
   it('shows the server error message when provided', async () => {
-    await render(<RegisterForm onSubmit={jest.fn()} isSubmitting={false} errorMessage="Phone number already registered" />)
+    await renderWithProviders(<RegisterForm onSubmit={jest.fn()} isSubmitting={false} errorMessage="Phone number already registered" />)
 
     expect(screen.getByText('Phone number already registered')).toBeTruthy()
   })
 
   it('disables the submit button while submitting', async () => {
-    await render(<RegisterForm onSubmit={jest.fn()} isSubmitting errorMessage={null} />)
+    await renderWithProviders(<RegisterForm onSubmit={jest.fn()} isSubmitting errorMessage={null} />)
 
     expect(screen.getByRole('button')).toBeDisabled()
   })
