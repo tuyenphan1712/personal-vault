@@ -1,8 +1,9 @@
 import * as DocumentPicker from 'expo-document-picker'
 import * as ImagePicker from 'expo-image-picker'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { ALLOWED_DOCUMENT_TYPES } from '@/src/config/constants'
-import { colors, fonts, radii } from '@/src/shared/theme/tokens'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import type { PickedFile } from '../types/document.types'
 
 interface DocumentPickerButtonProps {
@@ -10,6 +11,9 @@ interface DocumentPickerButtonProps {
 }
 
 export function DocumentPickerButton({ onPicked }: DocumentPickerButtonProps) {
+  const { colors, fonts, radii } = useTheme()
+  const { t } = useTranslation('documents')
+
   async function handlePickFile() {
     const result = await DocumentPicker.getDocumentAsync({
       type: [...ALLOWED_DOCUMENT_TYPES],
@@ -49,35 +53,35 @@ export function DocumentPickerButton({ onPicked }: DocumentPickerButtonProps) {
     })
   }
 
+  const styles = StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    button: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySoft,
+      borderRadius: radii.sm,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    buttonText: {
+      fontFamily: fonts.sansSemiBold,
+      fontSize: 13.5,
+      color: colors.primaryDark,
+    },
+  })
+
   return (
     <View style={styles.row}>
       <Pressable accessibilityRole="button" style={styles.button} onPress={handlePickFile}>
-        <Text style={styles.buttonText}>Choose file</Text>
+        <Text style={styles.buttonText}>{t('upload.chooseFile')}</Text>
       </Pressable>
       <Pressable accessibilityRole="button" style={styles.button} onPress={handlePickPhoto}>
-        <Text style={styles.buttonText}>Choose photo</Text>
+        <Text style={styles.buttonText}>{t('upload.choosePhoto')}</Text>
       </Pressable>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  button: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-    borderRadius: radii.sm,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontFamily: fonts.sansSemiBold,
-    fontSize: 13.5,
-    color: colors.primaryDark,
-  },
-})

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { TextField } from '@/src/shared/components/TextField'
-import { colors, fonts, radii } from '@/src/shared/theme/tokens'
-import { DOC_TYPE_CATEGORIES } from '../utils/documentValidation'
+import { useTheme } from '@/src/shared/theme/ThemeProvider'
+import { DOC_TYPE_CATEGORY_VALUES } from '../utils/documentValidation'
 
 interface DocumentTypeSelectProps {
   value: string
@@ -10,26 +11,69 @@ interface DocumentTypeSelectProps {
 }
 
 export function DocumentTypeSelect({ value, onChange }: DocumentTypeSelectProps) {
-  const matchedCategory = DOC_TYPE_CATEGORIES.find((category) => category.value === value)
-  const [isOther, setIsOther] = useState(Boolean(value) && !matchedCategory)
+  const { colors, fonts, radii } = useTheme()
+  const { t } = useTranslation('documents')
+  const isMatchedCategory = DOC_TYPE_CATEGORY_VALUES.includes(value as (typeof DOC_TYPE_CATEGORY_VALUES)[number])
+  const [isOther, setIsOther] = useState(Boolean(value) && !isMatchedCategory)
+
+  const styles = StyleSheet.create({
+    container: {
+      gap: 8,
+    },
+    label: {
+      fontFamily: fonts.mono,
+      fontSize: 10.5,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      color: colors.mist,
+    },
+    chips: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    chip: {
+      borderWidth: 1,
+      borderColor: colors.line,
+      backgroundColor: colors.surface,
+      borderRadius: radii.pill,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+    },
+    chipSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySoft,
+    },
+    chipText: {
+      fontFamily: fonts.sans,
+      fontSize: 12.5,
+      color: colors.muted,
+    },
+    chipTextSelected: {
+      fontFamily: fonts.sansSemiBold,
+      color: colors.primaryDark,
+    },
+  })
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Category (optional)</Text>
+      <Text style={styles.label}>{t('docType.label')}</Text>
       <View style={styles.chips}>
-        {DOC_TYPE_CATEGORIES.map((category) => {
-          const selected = !isOther && value === category.value
+        {DOC_TYPE_CATEGORY_VALUES.map((categoryValue) => {
+          const selected = !isOther && value === categoryValue
           return (
             <Pressable
-              key={category.value}
+              key={categoryValue}
               accessibilityRole="button"
               style={[styles.chip, selected && styles.chipSelected]}
               onPress={() => {
                 setIsOther(false)
-                onChange(category.value)
+                onChange(categoryValue)
               }}
             >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{category.label}</Text>
+              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                {t(`docType.categories.${categoryValue}`)}
+              </Text>
             </Pressable>
           )
         })}
@@ -41,14 +85,14 @@ export function DocumentTypeSelect({ value, onChange }: DocumentTypeSelectProps)
             onChange('')
           }}
         >
-          <Text style={[styles.chipText, isOther && styles.chipTextSelected]}>Other</Text>
+          <Text style={[styles.chipText, isOther && styles.chipTextSelected]}>{t('docType.other')}</Text>
         </Pressable>
       </View>
 
       {isOther ? (
         <TextField
-          label="Custom category"
-          placeholder="e.g. Insurance"
+          label={t('docType.customLabel')}
+          placeholder={t('docType.customPlaceholder')}
           value={value}
           onChangeText={onChange}
         />
@@ -56,42 +100,3 @@ export function DocumentTypeSelect({ value, onChange }: DocumentTypeSelectProps)
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-  },
-  label: {
-    fontFamily: fonts.mono,
-    fontSize: 10.5,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.mist,
-  },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-    borderRadius: radii.pill,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  chipSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-  },
-  chipText: {
-    fontFamily: fonts.sans,
-    fontSize: 12.5,
-    color: colors.muted,
-  },
-  chipTextSelected: {
-    fontFamily: fonts.sansSemiBold,
-    color: colors.primaryDark,
-  },
-})
