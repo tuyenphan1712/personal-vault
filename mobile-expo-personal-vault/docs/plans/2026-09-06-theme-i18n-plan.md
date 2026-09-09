@@ -8,7 +8,7 @@
 
 **Tech Stack:** React Native, Expo Router, Zustand (`persist` middleware), `@react-native-async-storage/async-storage`, `i18next`, `react-i18next`, Jest + React Native Testing Library + MSW.
 
-**Spec:** `mobile-expo-personal-vault/docs/superpowers/specs/2026-09-05-theme-i18n-design.md`
+**Spec:** `mobile-expo-personal-vault/docs/specs/2026-09-05-theme-i18n-design.md`
 
 ## Global Constraints
 
