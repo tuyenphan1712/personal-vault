@@ -18,7 +18,7 @@ describe('useCreateCredential', () => {
         capturedBody = await request.json()
         return HttpResponse.json({
           success: true,
-          data: { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, note: null, createdAt: 't', updatedAt: 't' },
+          data: { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: 't', updatedAt: 't' },
           meta: null,
         })
       }),
@@ -45,7 +45,7 @@ describe('useCreateCredential', () => {
       http.post(`${API_BASE_URL}/credentials`, () =>
         HttpResponse.json({
           success: true,
-          data: { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, note: null, createdAt: 't', updatedAt: 't' },
+          data: { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: 't', updatedAt: 't' },
           meta: null,
         }),
       ),

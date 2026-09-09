@@ -56,7 +56,7 @@ class CredentialControllerTest {
 
     private CredentialResponse sampleResponse() {
         return new CredentialResponse(UUID.randomUUID(), "Gmail", "user@gmail.com",
-                "base64(iv):base64(cipher)", 1, "note", LocalDateTime.now(), LocalDateTime.now());
+                "base64(iv):base64(cipher)", 1, null, "note", LocalDateTime.now(), LocalDateTime.now());
     }
 
     @Test

@@ -66,6 +66,7 @@ public class CredentialService {
                 request.account(),
                 request.encryptedPassword(),
                 request.ciphertextVersionOrDefault(),
+                request.encryptedPin(),
                 request.note()
         );
         credentialRepository.save(credential);
@@ -86,6 +87,9 @@ public class CredentialService {
         }
         if (request.ciphertextVersion() != null) {
             credential.setCiphertextVersion(request.ciphertextVersion());
+        }
+        if (request.encryptedPin() != null) {
+            credential.setEncryptedPin(request.encryptedPin());
         }
         if (request.note() != null) {
             credential.setNote(request.note());

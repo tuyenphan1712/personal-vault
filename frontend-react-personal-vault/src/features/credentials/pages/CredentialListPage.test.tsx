@@ -12,7 +12,7 @@ import type { Credential } from '../types/credential.types'
 import { CredentialListPage } from './CredentialListPage'
 
 const CREDENTIALS: Credential[] = [
-  { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, note: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
+  { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
 ]
 
 function renderPage() {
@@ -72,7 +72,7 @@ describe('CredentialListPage', () => {
         capturedBody = (await request.json()) as typeof capturedBody
         return HttpResponse.json({
           success: true,
-          data: { id: 'c2', platformName: 'Facebook', account: 'me@example.com', encryptedPassword: capturedBody?.encryptedPassword ?? '', ciphertextVersion: 1, note: null, createdAt: 't', updatedAt: 't' },
+          data: { id: 'c2', platformName: 'Facebook', account: 'me@example.com', encryptedPassword: capturedBody?.encryptedPassword ?? '', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: 't', updatedAt: 't' },
           meta: null,
         })
       }),

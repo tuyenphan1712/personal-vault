@@ -264,7 +264,7 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 | PATCH | `/credentials/{id}` | Update owned credential | User |
 | DELETE | `/credentials/{id}` | Delete owned credential | User |
 
-> `encryptedPassword` may be returned to the authenticated owner because the Frontend needs it to decrypt the value locally. Plaintext passwords must never be sent or stored by the backend. The ciphertext must never be returned to another user or written to logs.
+> `encryptedPassword` may be returned to the authenticated owner because the Frontend needs it to decrypt the value locally. Plaintext passwords must never be sent or stored by the backend. The ciphertext must never be returned to another user or written to logs. `encryptedPin` follows the identical rule and is `null` when the user has not set a PIN.
 
 ### Documents
 
@@ -373,6 +373,7 @@ Request:
   "account": "user@gmail.com",
   "encryptedPassword": "base64(iv):base64(ciphertext+authTag)",
   "ciphertextVersion": 1,
+  "encryptedPin": null,
   "note": null
 }
 ```
@@ -383,6 +384,12 @@ Request:
 - Encoding: `encryptedPassword` is `base64(iv)` and `base64(ciphertext + authTag)` joined with a single `:` separator — never concatenate without a separator, since IV length must stay decodable independent of ciphertext length.
 - `ciphertextVersion` (integer, defaults to `1` if omitted) identifies the algorithm/encoding version. A future crypto change increments this — the backend stores it as-is and never validates its contents; only the client uses it to pick the right decryption path. Never reinterpret an existing version's stored ciphertext under a new format.
 - The backend validates ownership from JWT, stores `encryptedPassword` and `ciphertextVersion` as opaque values, and never decrypts them.
+
+**`encryptedPin`** — optional numeric PIN, encrypted client-side with the exact same scheme (and the same `ciphertextVersion`, not a separate version) as `encryptedPassword`:
+
+- Optional: `null`/omitted when the user sets no PIN. The Frontend/Mobile UI must hide the PIN field entirely on the credential detail view when `encryptedPin` is `null` — do not render an empty/placeholder PIN row.
+- Plaintext PIN must be digits only (`0-9`); this is enforced by the client (Zod on Frontend/Mobile) before encryption — the backend never sees or validates plaintext, so it applies no digit check of its own (the stored value is opaque ciphertext, same as `encryptedPassword`).
+- Reveal UX: like the password field, hidden by default and decrypted-on-tap by the client. Unlike the password field, the PIN reveal control has **no copy-to-clipboard button** — a PIN is short-lived/glance-only, not something users copy elsewhere.
 
 ### `POST /documents`
 

@@ -10,6 +10,7 @@ export const credentialFixture: Credential = {
   account: 'user@gmail.com',
   encryptedPassword: 'AAAAAAAAAAAAAAAA:ZmFrZS1jaXBoZXJ0ZXh0',
   ciphertextVersion: 1,
+  encryptedPin: null,
   note: 'Personal account',
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',

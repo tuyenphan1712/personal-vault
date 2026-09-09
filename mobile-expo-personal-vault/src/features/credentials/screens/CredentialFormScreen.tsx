@@ -34,10 +34,12 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
     }
 
     const encryptedPassword = await encryptCredential(values.password, key)
+    const encryptedPin = values.pin ? await encryptCredential(values.pin, key) : null
     const payload = {
       platformName: values.platformName,
       account: values.account,
       encryptedPassword,
+      encryptedPin,
       note: values.note || null,
     }
 

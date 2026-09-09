@@ -17,6 +17,10 @@ function createCredentialSchema(t: TFunction) {
     platformName: z.string().min(1, t('credentials.errors.platformRequired')),
     account: z.string().min(1, t('credentials.errors.accountRequired')),
     password: z.string().min(1, t('credentials.errors.passwordRequired')),
+    pin: z
+      .string()
+      .optional()
+      .refine((value) => !value || /^\d+$/.test(value), t('credentials.errors.pinDigitsOnly')),
     note: z.string().optional(),
   })
 }
@@ -40,6 +44,7 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
     defaultValues: {
       platformName: credential?.platformName ?? '',
       account: credential?.account ?? '',
+      pin: '',
       note: credential?.note ?? '',
     },
   })
@@ -54,18 +59,19 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
     }
 
     const encryptedPassword = await encryptValue(values.password, key)
+    const encryptedPin = values.pin ? await encryptValue(values.pin, key) : null
 
     if (credential) {
       updateCredential.mutate(
         {
           id: credential.id,
-          payload: { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
+          payload: { platformName: values.platformName, account: values.account, encryptedPassword, encryptedPin, note: values.note ?? null },
         },
         { onSuccess: () => onSuccess(t('credentials.savedToastEdit')) },
       )
     } else {
       createCredential.mutate(
-        { platformName: values.platformName, account: values.account, encryptedPassword, note: values.note ?? null },
+        { platformName: values.platformName, account: values.account, encryptedPassword, encryptedPin, note: values.note ?? null },
         { onSuccess: () => onSuccess(t('credentials.savedToastCreate')) },
       )
     }
@@ -76,6 +82,14 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
       <Input label={t('credentials.fields.platform')} {...register('platformName')} error={errors.platformName?.message} />
       <Input label={t('credentials.fields.account')} {...register('account')} error={errors.account?.message} />
       <Input label={t('credentials.fields.password')} type="password" {...register('password')} error={errors.password?.message} />
+      <Input
+        label={t('credentials.fields.pin')}
+        type="password"
+        inputMode="numeric"
+        autoComplete="off"
+        {...register('pin')}
+        error={errors.pin?.message}
+      />
       <Input label={t('credentials.fields.note')} {...register('note')} error={errors.note?.message} />
       {createCredential.isError || updateCredential.isError ? (
         <p className="text-sm text-danger">{t('credentials.saveError')}</p>

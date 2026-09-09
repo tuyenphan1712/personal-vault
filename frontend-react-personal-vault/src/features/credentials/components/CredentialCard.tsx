@@ -4,6 +4,7 @@ import { toIntlLocale } from '@/shared/i18n'
 import { useDeleteCredential } from '../hooks/useDeleteCredential'
 import type { Credential } from '../types/credential.types'
 import { PasswordReveal } from './PasswordReveal'
+import { PinReveal } from './PinReveal'
 
 interface CredentialCardProps {
   credential: Credential
@@ -47,11 +48,14 @@ export function CredentialCard({ credential, onEdit, onUnlockNeeded, onNotify }:
           </Button>
         </div>
       </div>
-      <PasswordReveal
-        encryptedPassword={credential.encryptedPassword}
-        onUnlockNeeded={onUnlockNeeded}
-        onNotify={onNotify}
-      />
+      <div className="flex flex-col gap-3">
+        <PasswordReveal
+          encryptedPassword={credential.encryptedPassword}
+          onUnlockNeeded={onUnlockNeeded}
+          onNotify={onNotify}
+        />
+        {credential.encryptedPin ? <PinReveal encryptedPin={credential.encryptedPin} onUnlockNeeded={onUnlockNeeded} /> : null}
+      </div>
     </li>
   )
 }

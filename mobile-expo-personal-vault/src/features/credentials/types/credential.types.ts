@@ -4,6 +4,7 @@ export interface Credential {
   account: string
   encryptedPassword: string
   ciphertextVersion: number
+  encryptedPin: string | null
   note: string | null
   createdAt: string
   updatedAt: string
@@ -14,6 +15,7 @@ export interface CreateCredentialRequest {
   account: string
   encryptedPassword: string
   ciphertextVersion?: number
+  encryptedPin?: string | null
   note?: string | null
 }
 

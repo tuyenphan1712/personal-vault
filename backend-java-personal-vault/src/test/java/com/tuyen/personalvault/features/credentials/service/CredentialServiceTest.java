@@ -71,7 +71,7 @@ class CredentialServiceTest {
 
     private Credential credential() {
         return new Credential(UUID.randomUUID(), owner(), "Gmail", "user@gmail.com",
-                "base64(iv):base64(cipher)", 1, "note");
+                "base64(iv):base64(cipher)", 1, null, "note");
     }
 
     @Nested
@@ -158,7 +158,7 @@ class CredentialServiceTest {
         void createsCredentialWithProvidedCiphertextVersion() {
             when(userRepository.getReferenceById(CURRENT_USER_ID)).thenReturn(owner());
             CreateCredentialRequest request = new CreateCredentialRequest(
-                    "Gmail", "user@gmail.com", "base64(iv):base64(cipher)", 2, "note");
+                    "Gmail", "user@gmail.com", "base64(iv):base64(cipher)", 2, null, "note");
 
             CredentialResponse response = credentialService.create(request);
 
@@ -171,7 +171,7 @@ class CredentialServiceTest {
         void defaultsCiphertextVersionToOneWhenOmitted() {
             when(userRepository.getReferenceById(CURRENT_USER_ID)).thenReturn(owner());
             CreateCredentialRequest request = new CreateCredentialRequest(
-                    "Gmail", "user@gmail.com", "base64(iv):base64(cipher)", null, null);
+                    "Gmail", "user@gmail.com", "base64(iv):base64(cipher)", null, null, null);
 
             CredentialResponse response = credentialService.create(request);
 
@@ -187,7 +187,7 @@ class CredentialServiceTest {
             Credential credential = credential();
             when(credentialRepository.findByIdAndUserId(credential.getId(), CURRENT_USER_ID))
                     .thenReturn(Optional.of(credential));
-            UpdateCredentialRequest request = new UpdateCredentialRequest(null, null, null, null, "updated note");
+            UpdateCredentialRequest request = new UpdateCredentialRequest(null, null, null, null, null, "updated note");
 
             CredentialResponse response = credentialService.update(credential.getId(), request);
 
@@ -200,7 +200,7 @@ class CredentialServiceTest {
         void throwsNotFoundWhenMissing() {
             UUID id = UUID.randomUUID();
             when(credentialRepository.findByIdAndUserId(id, CURRENT_USER_ID)).thenReturn(Optional.empty());
-            UpdateCredentialRequest request = new UpdateCredentialRequest(null, null, null, null, "x");
+            UpdateCredentialRequest request = new UpdateCredentialRequest(null, null, null, null, null, "x");
 
             assertThatThrownBy(() -> credentialService.update(id, request))
                     .isInstanceOf(CredentialNotFoundException.class);

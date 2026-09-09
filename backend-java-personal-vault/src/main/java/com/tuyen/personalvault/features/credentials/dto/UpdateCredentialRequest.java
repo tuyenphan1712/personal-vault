@@ -5,6 +5,7 @@ public record UpdateCredentialRequest(
         String account,
         String encryptedPassword,
         Integer ciphertextVersion,
+        String encryptedPin,
         String note
 ) {
 }

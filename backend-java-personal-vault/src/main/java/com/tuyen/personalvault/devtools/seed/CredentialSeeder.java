@@ -40,6 +40,7 @@ public class CredentialSeeder {
                     faker.internet().emailAddress(),
                     fakeCiphertext(),
                     1,
+                    faker.random().nextBoolean() ? fakeCiphertext() : null,
                     faker.random().nextBoolean() ? faker.lorem().sentence() : null
             );
             credentialRepository.save(credential);

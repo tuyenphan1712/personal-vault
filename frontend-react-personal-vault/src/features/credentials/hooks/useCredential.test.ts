@@ -12,6 +12,7 @@ const CREDENTIAL = {
   account: 'user@example.com',
   encryptedPassword: 'ZmFrZS1pdg==:ZmFrZS1jaXBoZXJ0ZXh0',
   ciphertextVersion: 1,
+  encryptedPin: null,
   note: null,
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',

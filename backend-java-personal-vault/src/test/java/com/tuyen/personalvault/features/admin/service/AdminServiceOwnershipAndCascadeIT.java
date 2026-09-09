@@ -80,7 +80,7 @@ class AdminServiceOwnershipAndCascadeIT extends AbstractIntegrationTest {
 
         actAs(owner.getId());
         CredentialResponse credential = credentialService.create(
-                new CreateCredentialRequest("Gmail", "owner@gmail.com", "iv:cipher", 1, null));
+                new CreateCredentialRequest("Gmail", "owner@gmail.com", "iv:cipher", 1, null, null));
 
         actAs(otherUser.getId());
         assertThatThrownBy(() -> credentialService.get(credential.id()))
@@ -96,7 +96,7 @@ class AdminServiceOwnershipAndCascadeIT extends AbstractIntegrationTest {
         actAs(user.getId());
 
         CredentialResponse credential = credentialService.create(
-                new CreateCredentialRequest("Facebook", "owner@fb.com", "iv:cipher", 1, null));
+                new CreateCredentialRequest("Facebook", "owner@fb.com", "iv:cipher", 1, null, null));
 
         byte[] pngBytes = {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3};
         MockMultipartFile file = new MockMultipartFile("file", "id.png", "image/png", pngBytes);

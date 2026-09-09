@@ -42,6 +42,10 @@ public class Credential {
     private int ciphertextVersion;
 
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "encrypted_pin")
+    private String encryptedPin;
+
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "note")
     private String note;
 
@@ -57,13 +61,14 @@ public class Credential {
     }
 
     public Credential(UUID id, User user, String platformName, String account,
-                       String encryptedPassword, int ciphertextVersion, String note) {
+                       String encryptedPassword, int ciphertextVersion, String encryptedPin, String note) {
         this.id = id;
         this.user = user;
         this.platformName = platformName;
         this.account = account;
         this.encryptedPassword = encryptedPassword;
         this.ciphertextVersion = ciphertextVersion;
+        this.encryptedPin = encryptedPin;
         this.note = note;
     }
 
@@ -105,6 +110,14 @@ public class Credential {
 
     public void setCiphertextVersion(int ciphertextVersion) {
         this.ciphertextVersion = ciphertextVersion;
+    }
+
+    public String getEncryptedPin() {
+        return encryptedPin;
+    }
+
+    public void setEncryptedPin(String encryptedPin) {
+        this.encryptedPin = encryptedPin;
     }
 
     public String getNote() {

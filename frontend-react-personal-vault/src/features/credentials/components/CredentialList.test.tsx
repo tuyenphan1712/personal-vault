@@ -8,8 +8,8 @@ import type { Credential } from '../types/credential.types'
 import { CredentialList } from './CredentialList'
 
 const CREDENTIALS: Credential[] = [
-  { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, note: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
-  { id: 'c2', platformName: 'Facebook', account: 'user2@example.com', encryptedPassword: 'aXY=:Y2lwaGVy2', ciphertextVersion: 1, note: null, createdAt: '2026-01-02T00:00:00Z', updatedAt: '2026-01-02T00:00:00Z' },
+  { id: 'c1', platformName: 'Gmail', account: 'user@example.com', encryptedPassword: 'aXY=:Y2lwaGVy', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
+  { id: 'c2', platformName: 'Facebook', account: 'user2@example.com', encryptedPassword: 'aXY=:Y2lwaGVy2', ciphertextVersion: 1, encryptedPin: null, note: null, createdAt: '2026-01-02T00:00:00Z', updatedAt: '2026-01-02T00:00:00Z' },
 ]
 
 function mockCredentialsEndpoint(handler: Parameters<typeof http.get>[1]) {

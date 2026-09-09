@@ -19,6 +19,7 @@ const EXISTING_CREDENTIAL: Credential = {
   account: 'user@example.com',
   encryptedPassword: 'aXY=:Y2lwaGVy',
   ciphertextVersion: 1,
+  encryptedPin: null,
   note: 'Personal',
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
@@ -44,6 +45,7 @@ describe('CredentialForm', () => {
     expect(screen.getByLabelText('Platform')).toBeInTheDocument()
     expect(screen.getByLabelText('Account')).toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toBeInTheDocument()
+    expect(screen.getByLabelText('PIN (optional)')).toBeInTheDocument()
     expect(screen.getByLabelText('Note (optional)')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add credential' })).toBeInTheDocument()
   })
@@ -125,6 +127,72 @@ describe('CredentialForm', () => {
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledWith('Changes sealed.'))
     expect(capturedBody?.encryptedPassword).not.toContain('new-password-123')
+  })
+
+  it('rejects a PIN containing non-digit characters without submitting', async () => {
+    setEncryptionKey(await deriveEncryptionKey('unlock-pass', 'user-1'))
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('Platform'), 'Gmail')
+    await userEvent.type(screen.getByLabelText('Account'), 'user@example.com')
+    await userEvent.type(screen.getByLabelText('Password'), PLAINTEXT_PASSWORD)
+    await userEvent.type(screen.getByLabelText('PIN (optional)'), '12a4')
+    await userEvent.click(screen.getByRole('button', { name: 'Add credential' }))
+
+    expect(await screen.findByText('PIN must contain digits only')).toBeInTheDocument()
+  })
+
+  it('creates a credential with no PIN when the PIN field is left blank', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+
+    let capturedBody: { encryptedPin?: string | null } | undefined
+    server.use(
+      http.post(`${API_BASE_URL}/credentials`, async ({ request }) => {
+        capturedBody = (await request.json()) as typeof capturedBody
+        return HttpResponse.json({ success: true, data: EXISTING_CREDENTIAL, meta: null })
+      }),
+    )
+
+    const onSuccess = vi.fn()
+    renderForm({ onSuccess })
+
+    await userEvent.type(screen.getByLabelText('Platform'), 'Gmail')
+    await userEvent.type(screen.getByLabelText('Account'), 'user@example.com')
+    await userEvent.type(screen.getByLabelText('Password'), PLAINTEXT_PASSWORD)
+    await userEvent.click(screen.getByRole('button', { name: 'Add credential' }))
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    expect(capturedBody?.encryptedPin).toBeNull()
+  })
+
+  it('sends an AES-GCM encrypted PIN that never contains the plaintext PIN', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+    const PLAINTEXT_PIN = '1357'
+
+    let capturedBody: { encryptedPin?: string | null } | undefined
+    server.use(
+      http.post(`${API_BASE_URL}/credentials`, async ({ request }) => {
+        capturedBody = (await request.json()) as typeof capturedBody
+        return HttpResponse.json({ success: true, data: EXISTING_CREDENTIAL, meta: null })
+      }),
+    )
+
+    const onSuccess = vi.fn()
+    renderForm({ onSuccess })
+
+    await userEvent.type(screen.getByLabelText('Platform'), 'Gmail')
+    await userEvent.type(screen.getByLabelText('Account'), 'user@example.com')
+    await userEvent.type(screen.getByLabelText('Password'), PLAINTEXT_PASSWORD)
+    await userEvent.type(screen.getByLabelText('PIN (optional)'), PLAINTEXT_PIN)
+    await userEvent.click(screen.getByRole('button', { name: 'Add credential' }))
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+    expect(capturedBody?.encryptedPin).toBeTruthy()
+    expect(capturedBody?.encryptedPin).not.toContain(PLAINTEXT_PIN)
+    expect(await decryptValue(capturedBody!.encryptedPin!, key)).toBe(PLAINTEXT_PIN)
   })
 
   it('does not submit when the vault is locked (no encryption key available)', async () => {

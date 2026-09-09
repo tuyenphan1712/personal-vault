@@ -9,6 +9,7 @@ import { Button } from '@/src/shared/components/Button'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import { CopyableField } from '../components/CopyableField'
 import { PasswordReveal } from '../components/PasswordReveal'
+import { PinReveal } from '../components/PinReveal'
 import { UnlockVaultPrompt } from '../components/UnlockVaultPrompt'
 import { useCredential } from '../hooks/useCredential'
 import { useDeleteCredential } from '../hooks/useDeleteCredential'
@@ -197,6 +198,10 @@ export function CredentialDetailScreen({ credentialId }: CredentialDetailScreenP
           onUnlockNeeded={() => {}}
           onCopied={() => Alert.alert(t('detail.copiedTitle'), t('detail.passwordCopied'))}
         />
+
+        {credential.encryptedPin ? (
+          <PinReveal encryptedPin={credential.encryptedPin} onUnlockNeeded={() => {}} />
+        ) : null}
 
         {credential.note ? (
           <View style={styles.kvBlock}>

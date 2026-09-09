@@ -9,6 +9,7 @@ public record CredentialResponse(
         String account,
         String encryptedPassword,
         int ciphertextVersion,
+        String encryptedPin,
         String note,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

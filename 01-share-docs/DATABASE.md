@@ -72,7 +72,8 @@
 | platform_name | VARCHAR(255) | NOT NULL | e.g. Gmail, Facebook |
 | account | VARCHAR(255) | NOT NULL | Username/email on that platform |
 | encrypted_password | TEXT | NOT NULL | Client-side encrypted password: `base64(iv):base64(ciphertext+authTag)` (AES-GCM). Opaque to the backend — never decrypted or validated. |
-| ciphertext_version | INT | NOT NULL, default `1` | Identifies the client-side encryption format/version. Backend stores it as-is; only the client uses it to pick the decryption path. See `API_SPEC.md` §7 `POST /credentials`. |
+| ciphertext_version | INT | NOT NULL, default `1` | Identifies the client-side encryption format/version. Backend stores it as-is; only the client uses it to pick the decryption path. See `API_SPEC.md` §7 `POST /credentials`. Shared by `encrypted_password` and `encrypted_pin` — one version per row, not per-field. |
+| encrypted_pin | TEXT | NULL | Optional client-side encrypted PIN, same AES-GCM scheme/encoding as `encrypted_password`. Plaintext PIN is digits-only, enforced by the client before encryption — opaque to the backend like `encrypted_password`. `NULL` when the user has not set a PIN. |
 | note | TEXT | NULL | Extra notes or reminders |
 | created_at | TIMESTAMP | NOT NULL, default now() | Audit field |
 | updated_at | TIMESTAMP | NOT NULL, default now() | Auto-updated |

@@ -54,6 +54,51 @@ describe('CredentialFormScreen', () => {
     expect(capturedBody?.encryptedPassword).toMatch(/^[A-Za-z0-9+/]+=*:[A-Za-z0-9+/]+=*$/)
   })
 
+  it('sends a null encryptedPin when the PIN field is left blank', async () => {
+    let capturedBody: { encryptedPin?: string | null } | undefined
+    server.use(
+      rest.post(`${API_BASE_URL}/credentials`, async (req, res, ctx) => {
+        capturedBody = await req.json()
+        return res(ctx.status(201), ctx.json({ success: true, data: { ...credentialFixture, ...capturedBody }, meta: null }))
+      }),
+    )
+
+    await renderScreen()
+
+    await fireEvent.changeText(screen.getByLabelText('Platform'), 'Gmail')
+    await fireEvent.changeText(screen.getByLabelText('Account'), 'user@gmail.com')
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'plaintext-password-123')
+    await fireEvent.press(screen.getByRole('button', { name: 'Add credential' }))
+
+    await waitFor(() => expect(mockBack).toHaveBeenCalled())
+
+    expect(capturedBody?.encryptedPin).toBeNull()
+  })
+
+  it('encrypts a numeric PIN before sending it to the server on create', async () => {
+    let capturedBody: { encryptedPin?: string | null } | undefined
+    server.use(
+      rest.post(`${API_BASE_URL}/credentials`, async (req, res, ctx) => {
+        capturedBody = await req.json()
+        return res(ctx.status(201), ctx.json({ success: true, data: { ...credentialFixture, ...capturedBody }, meta: null }))
+      }),
+    )
+
+    await renderScreen()
+
+    await fireEvent.changeText(screen.getByLabelText('Platform'), 'Gmail')
+    await fireEvent.changeText(screen.getByLabelText('Account'), 'user@gmail.com')
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'plaintext-password-123')
+    await fireEvent.changeText(screen.getByLabelText('PIN (optional)'), '2468')
+    await fireEvent.press(screen.getByRole('button', { name: 'Add credential' }))
+
+    await waitFor(() => expect(mockBack).toHaveBeenCalled())
+
+    expect(capturedBody?.encryptedPin).toBeDefined()
+    expect(capturedBody?.encryptedPin).not.toContain('2468')
+    expect(capturedBody?.encryptedPin).toMatch(/^[A-Za-z0-9+/]+=*:[A-Za-z0-9+/]+=*$/)
+  })
+
   it('loads the existing credential and submits an update when editing', async () => {
     server.use(getCredentialSuccessHandler, updateCredentialSuccessHandler)
     await renderScreen('cred-1')

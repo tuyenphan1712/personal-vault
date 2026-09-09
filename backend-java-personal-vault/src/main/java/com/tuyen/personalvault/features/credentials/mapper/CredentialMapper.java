@@ -14,6 +14,7 @@ public class CredentialMapper {
                 credential.getAccount(),
                 credential.getEncryptedPassword(),
                 credential.getCiphertextVersion(),
+                credential.getEncryptedPin(),
                 credential.getNote(),
                 credential.getCreatedAt(),
                 credential.getUpdatedAt()

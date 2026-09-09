@@ -7,6 +7,7 @@ public record CreateCredentialRequest(
         @NotBlank String account,
         @NotBlank String encryptedPassword,
         Integer ciphertextVersion,
+        String encryptedPin,
         String note
 ) {
     public int ciphertextVersionOrDefault() {

@@ -89,18 +89,23 @@
       "platform": "Nền tảng",
       "account": "Tài khoản",
       "password": "Mật khẩu",
-      "note": "Ghi chú (không bắt buộc)"
+      "note": "Ghi chú (không bắt buộc)",
+      "pin": "Mã PIN (không bắt buộc)"
     },
     "errors": {
       "platformRequired": "Vui lòng nhập tên nền tảng",
       "accountRequired": "Vui lòng nhập tài khoản",
-      "passwordRequired": "Vui lòng nhập mật khẩu"
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "pinDigitsOnly": "Mã PIN chỉ được chứa chữ số"
     },
     "savedToastEdit": "Đã niêm phong thay đổi.",
     "savedToastCreate": "Đã niêm phong và lưu.",
     "saveError": "Không thể lưu thông tin đăng nhập. Vui lòng thử lại.",
     "notFound": "Không tìm thấy thông tin đăng nhập.",
-    "backToCredentials": "Về danh sách thông tin đăng nhập"
+    "backToCredentials": "Về danh sách thông tin đăng nhập",
+    "pinLabel": "Mã PIN",
+    "showPinAria": "Hiện mã PIN",
+    "hidePinAria": "Ẩn mã PIN"
   },
   "documents": {
     "pageTitle": "Tài liệu",

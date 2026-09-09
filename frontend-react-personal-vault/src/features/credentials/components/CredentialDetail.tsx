@@ -3,6 +3,7 @@ import { toIntlLocale } from '@/shared/i18n'
 import type { Credential } from '../types/credential.types'
 import { CopyableField } from './CopyableField'
 import { PasswordReveal } from './PasswordReveal'
+import { PinReveal } from './PinReveal'
 
 interface CredentialDetailProps {
   credential: Credential
@@ -29,6 +30,7 @@ export function CredentialDetail({ credential, onUnlockNeeded, onNotify }: Crede
       />
       {credential.note ? <p className="text-sm text-muted">{credential.note}</p> : null}
       <PasswordReveal encryptedPassword={credential.encryptedPassword} onUnlockNeeded={onUnlockNeeded} onNotify={onNotify} />
+      {credential.encryptedPin ? <PinReveal encryptedPin={credential.encryptedPin} onUnlockNeeded={onUnlockNeeded} /> : null}
       <p className="font-mono text-xs text-muted">
         {t('credentials.lastUpdated', { date: new Date(credential.updatedAt).toLocaleString(toIntlLocale(i18n.language)) })}
       </p>

@@ -89,18 +89,23 @@
       "platform": "Platform",
       "account": "Account",
       "password": "Password",
-      "note": "Note (optional)"
+      "note": "Note (optional)",
+      "pin": "PIN (optional)"
     },
     "errors": {
       "platformRequired": "Platform name is required",
       "accountRequired": "Account is required",
-      "passwordRequired": "Password is required"
+      "passwordRequired": "Password is required",
+      "pinDigitsOnly": "PIN must contain digits only"
     },
     "savedToastEdit": "Changes sealed.",
     "savedToastCreate": "Sealed and saved.",
     "saveError": "Couldn't save this credential. Try again.",
     "notFound": "Credential not found.",
-    "backToCredentials": "Back to credentials"
+    "backToCredentials": "Back to credentials",
+    "pinLabel": "PIN",
+    "showPinAria": "Show PIN",
+    "hidePinAria": "Hide PIN"
   },
   "documents": {
     "pageTitle": "Documents",

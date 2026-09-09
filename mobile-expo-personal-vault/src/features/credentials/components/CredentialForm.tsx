@@ -12,6 +12,7 @@ const credentialSchema = z.object({
   platformName: z.string().min(1, 'Platform is required'),
   account: z.string().min(1, 'Account is required'),
   password: z.string().min(1, 'Password is required'),
+  pin: z.string().optional(),
   note: z.string().optional(),
 })
 
@@ -36,6 +37,10 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
           platformName: z.string().min(1, t('validation.platformRequired')),
           account: z.string().min(1, t('validation.accountRequired')),
           password: z.string().min(1, t('validation.passwordRequired')),
+          pin: z
+            .string()
+            .optional()
+            .refine((value) => !value || /^\d+$/.test(value), t('validation.pinDigitsOnly')),
           note: z.string().optional(),
         }),
       ),
@@ -48,6 +53,7 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
       platformName: defaultValues?.platformName ?? '',
       account: defaultValues?.account ?? '',
       password: '',
+      pin: '',
       note: defaultValues?.note ?? '',
     },
   })
@@ -116,6 +122,23 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
             onChangeText={onChange}
             value={value}
             error={errors.password?.message}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="pin"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextField
+            label={t('form.pinLabel')}
+            placeholder={t('form.pinPlaceholder')}
+            secureTextEntry
+            keyboardType="numeric"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            error={errors.pin?.message}
           />
         )}
       />
