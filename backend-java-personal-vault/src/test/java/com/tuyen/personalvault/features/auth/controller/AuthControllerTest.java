@@ -23,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,8 +45,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Same slice-test convention as UserControllerTest: our real SecurityConfig isn't loaded here,
  * so a fake Authentication is seeded and CSRF tokens are attached manually. This only verifies
  * controller<->service contract (status/body/cookie), not real endpoint authorization.
+ *
+ * <p>Pins {@code app.cookie.secure=true} explicitly: the property defaults to {@code true} in
+ * {@code application.properties}, but a developer's local {@code .env} (COOKIE_SECURE=false, for
+ * local HTTP dev) is imported ahead of it and would otherwise leak into this test's context.
  */
 @WebMvcTest(AuthController.class)
+@TestPropertySource(properties = "app.cookie.secure=true")
 class AuthControllerTest {
 
     @Autowired
