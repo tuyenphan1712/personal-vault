@@ -75,7 +75,7 @@ describe('CredentialForm', () => {
     let capturedBody: { encryptedPassword?: string; platformName?: string; account?: string } | undefined
     server.use(
       http.post(`${API_BASE_URL}/credentials`, async ({ request }) => {
-        capturedBody = await request.json()
+        capturedBody = (await request.json()) as typeof capturedBody
         return HttpResponse.json({
           success: true,
           data: { ...EXISTING_CREDENTIAL, encryptedPassword: capturedBody?.encryptedPassword ?? '' },
@@ -112,7 +112,7 @@ describe('CredentialForm', () => {
     let capturedBody: { encryptedPassword?: string } | undefined
     server.use(
       http.patch(`${API_BASE_URL}/credentials/:id`, async ({ request }) => {
-        capturedBody = await request.json()
+        capturedBody = (await request.json()) as typeof capturedBody
         return HttpResponse.json({ success: true, data: EXISTING_CREDENTIAL, meta: null })
       }),
     )

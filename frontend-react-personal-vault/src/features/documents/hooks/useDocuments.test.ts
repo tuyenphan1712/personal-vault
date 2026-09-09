@@ -72,7 +72,7 @@ describe('useDocuments', () => {
     const wrapper = createQueryClientWrapper()
     const { result, rerender } = renderHook(({ search }: { search?: string }) => useDocuments({ search }), {
       wrapper,
-      initialProps: { search: undefined },
+      initialProps: { search: undefined as string | undefined },
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))

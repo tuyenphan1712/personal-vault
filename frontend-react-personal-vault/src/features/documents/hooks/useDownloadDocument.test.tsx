@@ -8,18 +8,18 @@ import { useDownloadDocument } from './useDownloadDocument'
 describe('useDownloadDocument', () => {
   let createObjectURLSpy: ReturnType<typeof vi.fn>
   let revokeObjectURLSpy: ReturnType<typeof vi.fn>
-  let clickSpy: ReturnType<typeof vi.fn>
+  let clickSpy: ReturnType<typeof vi.fn<() => void>>
 
   beforeEach(() => {
     createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url')
     revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
 
-    clickSpy = vi.fn()
+    clickSpy = vi.fn<() => void>()
     const originalCreateElement = document.createElement.bind(document)
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
       const el = originalCreateElement(tagName)
       if (tagName === 'a') {
-        el.click = clickSpy
+        el.click = () => clickSpy()
       }
       return el
     })

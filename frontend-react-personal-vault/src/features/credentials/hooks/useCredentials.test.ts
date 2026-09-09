@@ -73,7 +73,7 @@ describe('useCredentials', () => {
     const wrapper = createQueryClientWrapper()
     const { result, rerender } = renderHook(({ search }: { search?: string }) => useCredentials({ search }), {
       wrapper,
-      initialProps: { search: undefined },
+      initialProps: { search: undefined as string | undefined },
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))

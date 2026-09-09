@@ -69,7 +69,7 @@ describe('CredentialListPage', () => {
     let capturedBody: { encryptedPassword?: string } | undefined
     server.use(
       http.post(`${API_BASE_URL}/credentials`, async ({ request }) => {
-        capturedBody = await request.json()
+        capturedBody = (await request.json()) as typeof capturedBody
         return HttpResponse.json({
           success: true,
           data: { id: 'c2', platformName: 'Facebook', account: 'me@example.com', encryptedPassword: capturedBody?.encryptedPassword ?? '', ciphertextVersion: 1, note: null, createdAt: 't', updatedAt: 't' },
