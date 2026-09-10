@@ -249,5 +249,24 @@
       "LOGIN_FAILED": "Đăng nhập thất bại",
       "ACCOUNT_LOCKED": "Tài khoản bị khóa bởi quản trị viên"
     }
+  },
+  "sessions": {
+    "sectionTitle": "Phiên đăng nhập",
+    "sectionSubtitle": "Các thiết bị và trình duyệt đang đăng nhập vào tài khoản của bạn.",
+    "loading": "Đang tải phiên đăng nhập…",
+    "loadError": "Không thể tải danh sách phiên đăng nhập. Vui lòng thử lại.",
+    "empty": "Không có phiên đăng nhập nào.",
+    "currentDevice": "Thiết bị này · đang hoạt động",
+    "lastActive": "Đã đăng nhập {{date}}",
+    "revokeButton": "Thu hồi",
+    "clientType": {
+      "web": "Trình duyệt web",
+      "mobile": "Ứng dụng di động"
+    },
+    "revokeDialog": {
+      "title": "Thu hồi phiên đăng nhập",
+      "body": "Đăng xuất {{device}}? Thiết bị đó sẽ cần đăng nhập lại.",
+      "confirm": "Thu hồi"
+    }
   }
 }

@@ -249,5 +249,24 @@
       "LOGIN_FAILED": "Failed sign-in attempt",
       "ACCOUNT_LOCKED": "Account locked by an admin"
     }
+  },
+  "sessions": {
+    "sectionTitle": "Active sessions",
+    "sectionSubtitle": "Devices and browsers currently signed in to your account.",
+    "loading": "Loading sessions…",
+    "loadError": "Couldn't load your active sessions. Try again.",
+    "empty": "No active sessions.",
+    "currentDevice": "This device · active now",
+    "lastActive": "Signed in {{date}}",
+    "revokeButton": "Revoke",
+    "clientType": {
+      "web": "Web browser",
+      "mobile": "Mobile app"
+    },
+    "revokeDialog": {
+      "title": "Revoke session",
+      "body": "Sign out {{device}}? That device will need to log in again.",
+      "confirm": "Revoke"
+    }
   }
 }

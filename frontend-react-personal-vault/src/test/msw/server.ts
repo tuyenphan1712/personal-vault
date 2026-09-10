@@ -15,6 +15,7 @@ const defaultHandlers = [
   http.get(`${API_BASE_URL}/audit-logs`, () =>
     HttpResponse.json({ success: true, data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } }),
   ),
+  http.get(`${API_BASE_URL}/sessions`, () => HttpResponse.json({ success: true, data: [], meta: null })),
 ]
 
 /** Shared MSW server for tests. Each test file registers its own handlers with `server.use(...)`. */

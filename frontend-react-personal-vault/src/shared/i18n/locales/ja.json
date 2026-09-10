@@ -249,5 +249,24 @@
       "LOGIN_FAILED": "サインインに失敗しました",
       "ACCOUNT_LOCKED": "管理者によりアカウントがロックされました"
     }
+  },
+  "sessions": {
+    "sectionTitle": "アクティブなセッション",
+    "sectionSubtitle": "現在アカウントにサインインしているデバイスとブラウザです。",
+    "loading": "セッションを読み込み中…",
+    "loadError": "アクティブなセッションを読み込めませんでした。もう一度お試しください。",
+    "empty": "アクティブなセッションはありません。",
+    "currentDevice": "この端末 · 現在使用中",
+    "lastActive": "{{date}} にサインイン",
+    "revokeButton": "取り消す",
+    "clientType": {
+      "web": "ウェブブラウザ",
+      "mobile": "モバイルアプリ"
+    },
+    "revokeDialog": {
+      "title": "セッションを取り消す",
+      "body": "{{device}} をサインアウトしますか?その端末は再度ログインが必要になります。",
+      "confirm": "取り消す"
+    }
   }
 }
