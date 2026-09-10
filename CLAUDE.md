@@ -67,6 +67,6 @@ When using the `superpowers:brainstorming` or `superpowers:writing-plans` skills
 - Frontend work → `frontend-react-personal-vault/docs/specs/` and `frontend-react-personal-vault/docs/plans/`
 - Backend work → `backend-java-personal-vault/docs/specs/` and `backend-java-personal-vault/docs/plans/`
 - Mobile work → `mobile-expo-personal-vault/docs/specs/` and `mobile-expo-personal-vault/docs/plans/`
-- Work spanning multiple apps (rare) → keep at repo root `docs/specs/` / `docs/plans/`
+- Work spanning multiple apps (rare) → `01-share-docs/specs/` and `01-share-docs/plans/` (alongside the other shared docs — `API_SPEC.md`, `DATABASE.md`, `BACKLOG.md`)
 
 This overrides the skills' own default (`docs/superpowers/...` at repo root) on **where** files go, not **whether** to use the `superpowers:brainstorming` / `superpowers:writing-plans` skills — always use those skills for brainstorming/planning, just save their output to the paths above instead of the skills' default location.

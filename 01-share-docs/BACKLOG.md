@@ -15,9 +15,9 @@
 - Remove an entry once it ships — put the detail in the commit/PR instead of
   leaving it here.
 - This is **not** a feature roadmap. Planned features under active design
-  belong in the owning app's `docs/specs/` and
-  `docs/plans/` (see root `CLAUDE.md` §"Brainstorming / Planning
-  Doc Location").
+  belong in the owning app's `docs/specs/` and `docs/plans/`, or
+  `01-share-docs/specs/` / `01-share-docs/plans/` for cross-app work
+  (see root `CLAUDE.md` §"Brainstorming / Planning Doc Location").
 
 ---
 
