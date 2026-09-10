@@ -7,6 +7,7 @@ import type { TFunction } from 'i18next'
 import { z } from 'zod'
 import { Button } from '@/shared/components/Button'
 import { PasswordInput } from '@/shared/components/PasswordInput'
+import { PasswordStrengthMeter } from '@/shared/components/PasswordStrengthMeter'
 import { IncorrectCurrentPasswordError, useChangePassword } from '../hooks/useChangePassword'
 
 function createChangePasswordSchema(t: TFunction) {
@@ -41,9 +42,11 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ChangePasswordFormValues>({ resolver: zodResolver(schema) })
   const changePassword = useChangePassword()
+  const newPassword = watch('newPassword') ?? ''
 
   const onSubmit = handleSubmit((values) => {
     changePassword.mutate(
@@ -65,6 +68,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         error={errors.currentPassword?.message ?? (isIncorrectCurrentPassword ? t('auth.errors.currentPasswordIncorrect') : undefined)}
       />
       <PasswordInput label={t('auth.fields.newPassword')} {...register('newPassword')} error={errors.newPassword?.message} />
+      <PasswordStrengthMeter password={newPassword} />
       <PasswordInput
         label={t('auth.fields.confirmNewPassword')}
         {...register('confirmNewPassword')}

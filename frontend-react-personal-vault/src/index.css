@@ -15,6 +15,10 @@
   --color-danger: #9e4b39;
   --color-danger-dark: #7a3728;
   --color-danger-soft: #f5e1dc;
+  --color-warning: #b8792a;
+  --color-warning-dark: #8f5c1f;
+  --color-success: #3f7d4b;
+  --color-success-dark: #2c5936;
 }
 
 :root {

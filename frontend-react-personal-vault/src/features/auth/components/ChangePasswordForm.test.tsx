@@ -71,6 +71,16 @@ describe('ChangePasswordForm', () => {
     expect(await screen.findByText('Password must be at least 8 characters')).toBeInTheDocument()
   })
 
+  it('shows a password strength hint for the new password field that updates as the user types', async () => {
+    renderForm()
+
+    await userEvent.type(screen.getByLabelText('New password'), 'abc')
+    expect(await screen.findByText('Weak password — try adding uppercase letters, numbers, or symbols')).toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText('New password'), 'defghij1!')
+    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+  })
+
   it('calls onSuccess after changing the password when the user owns no credentials', async () => {
     emptyCredentialsList()
     server.use(

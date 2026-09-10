@@ -55,6 +55,18 @@ describe('RegisterForm', () => {
     expect(await screen.findByText('Password must be at least 8 characters')).toBeInTheDocument()
   })
 
+  it('shows a password strength hint that updates as the user types', async () => {
+    renderForm()
+
+    expect(screen.queryByText('Weak password — try adding uppercase letters, numbers, or symbols')).not.toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText('Password'), 'abc')
+    expect(await screen.findByText('Weak password — try adding uppercase letters, numbers, or symbols')).toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText('Password'), 'defghij1!')
+    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+  })
+
   it('calls the register mutation with valid input and invokes onSuccess', async () => {
     let capturedBody: unknown
     server.use(

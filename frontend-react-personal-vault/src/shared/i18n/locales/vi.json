@@ -58,6 +58,11 @@
       "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
       "staleCredentialSet": "Danh sách thông tin đăng nhập của bạn vừa thay đổi. Vui lòng thử lại."
     },
+    "passwordStrength": {
+      "weak": "Mật khẩu còn yếu, hãy thêm chữ hoa, số hoặc ký tự đặc biệt",
+      "medium": "Mật khẩu khá ổn, có thể mạnh hơn nữa",
+      "strong": "Mật khẩu rất mạnh, an toàn!"
+    },
     "changePasswordButton": "Đổi mật khẩu",
     "changePasswordError": "Không thể đổi mật khẩu. Vui lòng thử lại."
   },

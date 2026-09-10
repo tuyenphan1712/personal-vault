@@ -58,6 +58,11 @@
       "currentPasswordIncorrect": "Current password is incorrect",
       "staleCredentialSet": "Your credentials changed while this form was open. Please try again."
     },
+    "passwordStrength": {
+      "weak": "Weak password — try adding uppercase letters, numbers, or symbols",
+      "medium": "Decent password — could still be stronger",
+      "strong": "Strong password — well secured!"
+    },
     "changePasswordButton": "Change password",
     "changePasswordError": "Couldn't change your password. Try again."
   },

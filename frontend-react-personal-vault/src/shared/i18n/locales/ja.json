@@ -58,6 +58,11 @@
       "currentPasswordIncorrect": "現在のパスワードが正しくありません",
       "staleCredentialSet": "フォームを開いている間に認証情報が変更されました。もう一度お試しください。"
     },
+    "passwordStrength": {
+      "weak": "パスワードが弱いです。大文字・数字・記号を加えてみましょう",
+      "medium": "まずまずの強さです。もう少し強化できます",
+      "strong": "とても強力なパスワードです!"
+    },
     "changePasswordButton": "パスワードを変更",
     "changePasswordError": "パスワードを変更できませんでした。もう一度お試しください。"
   },
