@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { PasswordInput } from '@/shared/components/PasswordInput'
+import { PasswordStrengthMeter } from '@/shared/components/PasswordStrengthMeter'
 import { useRegister } from '../hooks/useRegister'
 
 // Kept in sync with backend RegisterRequest (Jakarta Bean Validation) per API_SPEC.md §7.
@@ -30,9 +31,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormValues>({ resolver: zodResolver(registerSchema) })
   const registerUser = useRegister()
+  const password = watch('password') ?? ''
 
   const onSubmit = handleSubmit((values) => {
     registerUser.mutate(values, { onSuccess })
@@ -43,6 +46,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       <Input label={t('auth.fields.fullName')} {...register('fullName')} error={errors.fullName?.message} />
       <Input label={t('auth.fields.phone')} type="tel" {...register('phone')} error={errors.phone?.message} />
       <PasswordInput label={t('auth.fields.password')} {...register('password')} error={errors.password?.message} />
+      <PasswordStrengthMeter password={password} />
       {registerUser.isError ? <p className="text-sm text-danger">{t('auth.registerError')}</p> : null}
       <Button type="submit" isLoading={registerUser.isPending}>
         {t('auth.registerButton')}
