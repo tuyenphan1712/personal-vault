@@ -5,6 +5,8 @@ import com.tuyen.personalvault.features.documents.entity.Document;
 import com.tuyen.personalvault.features.documents.exception.DocumentNotFoundException;
 import com.tuyen.personalvault.features.documents.mapper.DocumentMapper;
 import com.tuyen.personalvault.features.documents.repository.DocumentRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.repository.UserRepository;
 import com.tuyen.personalvault.shared.exception.AppException;
@@ -35,15 +37,18 @@ public class DocumentService {
     private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
     private final DocumentStorageService storageService;
+    private final AuditLogService auditLogService;
 
     public DocumentService(DocumentRepository documentRepository,
                             UserRepository userRepository,
                             DocumentMapper documentMapper,
-                            DocumentStorageService storageService) {
+                            DocumentStorageService storageService,
+                            AuditLogService auditLogService) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.documentMapper = documentMapper;
         this.storageService = storageService;
+        this.auditLogService = auditLogService;
     }
 
     public DocumentListResult list(int page, int limit, String search, String docType, String sortBy, String sortDirection) {
@@ -85,6 +90,7 @@ public class DocumentService {
             storageService.delete(stored.storagePath());
             throw e;
         }
+        auditLogService.record(CurrentUser.id(), AuditAction.DOCUMENT_UPLOADED, document.getTitle());
         return documentMapper.toResponse(document);
     }
 
@@ -99,6 +105,7 @@ public class DocumentService {
         Document document = findOwned(id);
         storageService.delete(document.getStoragePath());
         documentRepository.delete(document);
+        auditLogService.record(CurrentUser.id(), AuditAction.DOCUMENT_DELETED, document.getTitle());
     }
 
     private void validateTitle(String title) {

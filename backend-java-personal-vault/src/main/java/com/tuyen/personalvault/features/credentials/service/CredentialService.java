@@ -9,6 +9,8 @@ import com.tuyen.personalvault.features.credentials.exception.CredentialNotFound
 import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.credentials.mapper.CredentialMapper;
 import com.tuyen.personalvault.features.credentials.repository.CredentialRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.repository.UserRepository;
 import com.tuyen.personalvault.shared.response.PageMeta;
@@ -35,13 +37,16 @@ public class CredentialService {
     private final CredentialRepository credentialRepository;
     private final UserRepository userRepository;
     private final CredentialMapper credentialMapper;
+    private final AuditLogService auditLogService;
 
     public CredentialService(CredentialRepository credentialRepository,
                               UserRepository userRepository,
-                              CredentialMapper credentialMapper) {
+                              CredentialMapper credentialMapper,
+                              AuditLogService auditLogService) {
         this.credentialRepository = credentialRepository;
         this.userRepository = userRepository;
         this.credentialMapper = credentialMapper;
+        this.auditLogService = auditLogService;
     }
 
     public CredentialListResult list(int page, int limit, String search, String sortBy, String sortDirection) {
@@ -75,6 +80,7 @@ public class CredentialService {
                 request.note()
         );
         credentialRepository.save(credential);
+        auditLogService.record(CurrentUser.id(), AuditAction.CREDENTIAL_CREATED, credential.getPlatformName());
         return credentialMapper.toResponse(credential);
     }
 
@@ -99,12 +105,16 @@ public class CredentialService {
         if (request.note() != null) {
             credential.setNote(request.note());
         }
+        AuditAction action = request.encryptedPin() != null ? AuditAction.PIN_CHANGED : AuditAction.CREDENTIAL_UPDATED;
+        auditLogService.record(CurrentUser.id(), action, credential.getPlatformName());
         return credentialMapper.toResponse(credential);
     }
 
     @Transactional
     public void delete(UUID id) {
-        credentialRepository.delete(findOwned(id));
+        Credential credential = findOwned(id);
+        credentialRepository.delete(credential);
+        auditLogService.record(CurrentUser.id(), AuditAction.CREDENTIAL_DELETED, credential.getPlatformName());
     }
 
     @Transactional

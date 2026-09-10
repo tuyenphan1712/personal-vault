@@ -84,6 +84,21 @@
 
 ---
 
+### Feature: Audit Logs (`audit_logs`)
+
+| Field | Type | Constraints | Notes |
+|---|---|---|---|
+| id | UUID | PK | Unique entry identifier |
+| user_id | UUID | FK → `users.id`, NOT NULL | Owner the entry is shown to |
+| action | VARCHAR(50) | NOT NULL | One of the action values listed in `API_SPEC.md` §7 `GET /audit-logs` |
+| target_label | VARCHAR(255) | NULL | Snapshot of the affected item's name/title, captured at write time — not a live FK, since the target may later be deleted |
+| read_at | TIMESTAMP | NULL | `NULL` = unread; set in bulk by `PATCH /audit-logs/read-all` |
+| created_at | TIMESTAMP | NOT NULL, default now() | Audit field; entries are never updated after creation except `read_at` |
+
+**Indexes**:
+- `idx_audit_logs_user_id` on `user_id`
+- `idx_audit_logs_user_id_read_at` on `(user_id, read_at)`
+
 ### Feature: Sensitive Document Storage (`documents`)
 
 | Field | Type | Constraints | Notes |
@@ -110,13 +125,14 @@
 users (1) ──< owns >── (n) credentials
 users (1) ──< owns >── (n) documents
 users (1) ──< owns >── (n) refresh_tokens
+users (1) ──< owns >── (n) audit_logs
 ```
 
 - All relationships are **one-to-many**; no many-to-many in v1.
-- `credentials.user_id`, `documents.user_id`, `refresh_tokens.user_id` → FK to `users.id`.
-- **Cross-feature access rule**: every query on `credentials`, `documents`, or `refresh_tokens` must be scoped by `user_id` from the authenticated token — never trust a client-supplied `user_id`.
+- `credentials.user_id`, `documents.user_id`, `refresh_tokens.user_id`, `audit_logs.user_id` → FK to `users.id`.
+- **Cross-feature access rule**: every query on `credentials`, `documents`, `refresh_tokens`, or `audit_logs` must be scoped by `user_id` from the authenticated token — never trust a client-supplied `user_id`.
 - **Cascade on user deletion** (`DELETE /admin/users/{id}`):
-  - `credentials.user_id` and `refresh_tokens.user_id` use `ON DELETE CASCADE` — the database removes these rows automatically when the owning user is deleted.
+  - `credentials.user_id`, `refresh_tokens.user_id`, and `audit_logs.user_id` use `ON DELETE CASCADE` — the database removes these rows automatically when the owning user is deleted.
   - `documents.user_id` also uses `ON DELETE CASCADE` for the row, but the **file bytes are not touched by the database**. `AdminService`/`DocumentService` must delete the stored files from disk/object storage *before* (or in the same transaction as, with compensating cleanup on failure) removing the user, so cascade-deleted rows never leave orphaned files behind.
 
 ---
@@ -171,8 +187,10 @@ src/main/java/com/tuyen/personalvault/
 │   │   └── entity/RefreshToken.java       # entity → refresh_tokens
 │   ├── credentials/
 │   │   └── entity/Credential.java         # entity → credentials
-│   └── documents/
-│       └── entity/Document.java           # entity → documents
+│   ├── documents/
+│   │   └── entity/Document.java           # entity → documents
+│   └── auditlogs/
+│       └── entity/AuditLog.java           # entity → audit_logs
 └── shared/
     ├── response/                          # ApiResponse, ApiErrorResponse, PageMeta
     ├── exception/                         # AppException, GlobalExceptionHandler

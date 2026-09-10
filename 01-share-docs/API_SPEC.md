@@ -269,6 +269,14 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 
 > `encryptedPassword` may be returned to the authenticated owner because the Frontend needs it to decrypt the value locally. Plaintext passwords must never be sent or stored by the backend. The ciphertext must never be returned to another user or written to logs. `encryptedPin` follows the identical rule and is `null` when the user has not set a PIN.
 
+### Audit Logs
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/audit-logs` | List owned audit log entries, newest first | User |
+| GET | `/audit-logs/unread-count` | Count of the caller's unread entries | User |
+| PATCH | `/audit-logs/read-all` | Marks all of the caller's entries read | User |
+
 ### Documents
 
 | Method | Path | Description | Auth |
@@ -418,6 +426,32 @@ Request:
 - Optional: `null`/omitted when the user sets no PIN. The Frontend/Mobile UI must hide the PIN field entirely on the credential detail view when `encryptedPin` is `null` — do not render an empty/placeholder PIN row.
 - Plaintext PIN must be digits only (`0-9`); this is enforced by the client (Zod on Frontend/Mobile) before encryption — the backend never sees or validates plaintext, so it applies no digit check of its own (the stored value is opaque ciphertext, same as `encryptedPassword`).
 - Reveal UX: like the password field, hidden by default and decrypted-on-tap by the client. Unlike the password field, the PIN reveal control has **no copy-to-clipboard button** — a PIN is short-lived/glance-only, not something users copy elsewhere.
+
+### `GET /audit-logs`
+
+Standard `page`/`limit` params from §3 (no `search`/`sortBy` — always newest first). Response `data` items:
+
+```json
+{
+  "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+  "action": "CREDENTIAL_DELETED",
+  "targetLabel": "Gmail",
+  "createdAt": "2026-08-22T10:30:00Z",
+  "readAt": null
+}
+```
+
+`action` is one of: `PASSWORD_CHANGED`, `PIN_CHANGED`, `CREDENTIAL_CREATED`, `CREDENTIAL_UPDATED`, `CREDENTIAL_DELETED`, `DOCUMENT_UPLOADED`, `DOCUMENT_DELETED`, `LOGIN_SUCCESS`, `LOGIN_FAILED`, `ACCOUNT_LOCKED`. `targetLabel` is a snapshot of the affected item's name/title captured when the entry was written (e.g. a credential's `platformName`) — it is `null` for actions with no single named target (login, password change, account lock). `readAt` is `null` until the caller has opened `PATCH /audit-logs/read-all`.
+
+A failed login only produces an entry when the phone number belongs to an existing account (there is no `user_id` to attach the entry to otherwise). `PATCH /credentials/{id}` records `PIN_CHANGED` instead of `CREDENTIAL_UPDATED` when the request includes `encryptedPin`. `PATCH /admin/users/{id}/status` only records `ACCOUNT_LOCKED` on a transition to `locked` (not when reactivating), and the entry is written for the target user, not the admin.
+
+### `GET /audit-logs/unread-count`
+
+Response `data`: `{ "count": 3 }`.
+
+### `PATCH /audit-logs/read-all`
+
+Marks every one of the caller's entries with `readAt = null` as read. `204`, no body.
 
 ### `POST /documents`
 

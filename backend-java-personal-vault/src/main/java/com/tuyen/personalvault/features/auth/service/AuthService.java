@@ -16,6 +16,8 @@ import com.tuyen.personalvault.features.auth.exception.PhoneAlreadyRegisteredExc
 import com.tuyen.personalvault.features.auth.exception.TooManyAttemptsException;
 import com.tuyen.personalvault.features.auth.mapper.AuthMapper;
 import com.tuyen.personalvault.features.auth.repository.RefreshTokenRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.credentials.service.CredentialService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.entity.UserStatus;
@@ -50,6 +52,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final Duration refreshTokenDuration;
     private final CredentialService credentialService;
+    private final AuditLogService auditLogService;
 
     public AuthService(UserRepository userRepository,
                         RefreshTokenRepository refreshTokenRepository,
@@ -57,7 +60,8 @@ public class AuthService {
                         PasswordEncoder passwordEncoder,
                         JwtService jwtService,
                         com.tuyen.personalvault.shared.security.JwtProperties jwtProperties,
-                        CredentialService credentialService) {
+                        CredentialService credentialService,
+                        AuditLogService auditLogService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.authMapper = authMapper;
@@ -65,6 +69,7 @@ public class AuthService {
         this.jwtService = jwtService;
         this.refreshTokenDuration = Duration.ofMillis(jwtProperties.getRefreshTokenExpirationMs());
         this.credentialService = credentialService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -94,6 +99,7 @@ public class AuthService {
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             registerFailedAttempt(user, now);
+            auditLogService.record(user.getId(), AuditAction.LOGIN_FAILED, null);
             throw new InvalidCredentialsException();
         }
 
@@ -103,6 +109,7 @@ public class AuthService {
         ClientType clientType = "mobile".equalsIgnoreCase(request.clientType()) ? ClientType.mobile : ClientType.web;
         IssuedRefreshToken issued = issueRefreshToken(user, clientType, deviceInfo);
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getRole().name());
+        auditLogService.record(user.getId(), AuditAction.LOGIN_SUCCESS, null);
 
         LoginResponse response = new LoginResponse(
                 authMapper.toLoginUserSummary(user),
@@ -163,6 +170,7 @@ public class AuthService {
                 : request.currentRefreshToken();
         UUID keepTokenId = findUsableToken(rawToken).map(RefreshToken::getId).orElse(null);
         refreshTokenRepository.revokeAllForUserExcept(user.getId(), keepTokenId);
+        auditLogService.record(user.getId(), AuditAction.PASSWORD_CHANGED, null);
     }
 
     private void registerFailedAttempt(User user, LocalDateTime now) {
