@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
+import { ChangePasswordForm } from '@/src/features/auth'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { Button } from '@/src/shared/components/Button'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -13,10 +14,11 @@ import { useUpdateProfile } from '../hooks/useUpdateProfile'
 
 export function ProfileScreen() {
   const { colors, fonts, radii, spacing } = useTheme()
-  const { t } = useTranslation(['profile', 'common'])
+  const { t } = useTranslation(['profile', 'common', 'auth'])
   const { data: profile, isLoading, isError, error, refetch } = useProfile()
   const updateProfile = useUpdateProfile()
   const [isEditing, setIsEditing] = useState(false)
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   const styles = useMemo(
     () =>
@@ -91,6 +93,10 @@ export function ProfileScreen() {
     },
     editButton: {
       marginTop: 4,
+    },
+    securitySection: {
+      marginTop: spacing.xl,
+      gap: 12,
     },
     errorText: {
       fontFamily: fonts.sans,
@@ -177,6 +183,25 @@ export function ProfileScreen() {
 
             <Button label={t('editProfile')} style={styles.editButton} onPress={() => setIsEditing(true)} />
           </>
+        )}
+
+        {isChangingPassword ? (
+          <View style={styles.securitySection}>
+            <ChangePasswordForm onSuccess={() => setIsChangingPassword(false)} />
+            <Button
+              label={t('common:actions.cancel')}
+              variant="outline"
+              style={styles.editButton}
+              onPress={() => setIsChangingPassword(false)}
+            />
+          </View>
+        ) : (
+          <Button
+            label={t('auth:changePassword.submit')}
+            variant="outline"
+            style={styles.securitySection}
+            onPress={() => setIsChangingPassword(true)}
+          />
         )}
       </ScrollView>
     </SafeAreaView>

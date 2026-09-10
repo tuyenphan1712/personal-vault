@@ -1,4 +1,5 @@
 export { CredentialListScreen } from './screens/CredentialListScreen'
 export { CredentialDetailScreen } from './screens/CredentialDetailScreen'
 export { CredentialFormScreen } from './screens/CredentialFormScreen'
+export { credentialService } from './services/credential.service'
 export type { Credential } from './types/credential.types'

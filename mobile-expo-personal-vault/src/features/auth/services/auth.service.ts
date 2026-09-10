@@ -1,7 +1,13 @@
 import { apiClient } from '@/src/shared/lib/api/axios'
 import type { ApiSuccessResponse } from '@/src/shared/types/api.types'
 import type { CurrentUser } from '../types/Session.types'
-import type { LoginRequest, LoginResponse, RefreshResponse, RegisterRequest } from '../types/auth.types'
+import type {
+  ChangePasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RefreshResponse,
+  RegisterRequest,
+} from '../types/auth.types'
 
 export const authService = {
   register: async (payload: RegisterRequest): Promise<CurrentUser> => {
@@ -27,5 +33,9 @@ export const authService = {
   getMe: async (): Promise<CurrentUser> => {
     const res = await apiClient.get<ApiSuccessResponse<CurrentUser>>('/auth/me')
     return res.data.data
+  },
+
+  changePassword: async (payload: ChangePasswordRequest): Promise<void> => {
+    await apiClient.post('/auth/change-password', payload)
   },
 }

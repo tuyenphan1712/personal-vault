@@ -36,7 +36,13 @@ let refreshPromise: Promise<string | null> | null = null
 // A 401 from one of these endpoints is a login/refresh failure, not an expired session —
 // retrying it through the refresh flow would recurse into itself (e.g. an invalid refresh
 // token causes /auth/refresh to 401, which would otherwise try to refresh again).
-const AUTH_ENDPOINTS_EXEMPT_FROM_REFRESH = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout']
+const AUTH_ENDPOINTS_EXEMPT_FROM_REFRESH = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh',
+  '/auth/logout',
+  '/auth/change-password',
+]
 
 apiClient.interceptors.response.use(
   (response) => response,

@@ -24,3 +24,17 @@ export interface RefreshResponse {
   refreshToken: string
   expiresIn: number
 }
+
+export interface ChangePasswordCredentialUpdate {
+  id: string
+  encryptedPassword: string
+  encryptedPin: string | null
+  ciphertextVersion: number
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  currentRefreshToken: string | null
+  credentials: ChangePasswordCredentialUpdate[]
+}
