@@ -10,12 +10,13 @@ import { useTheme } from '@/src/shared/theme/ThemeProvider'
 interface NavCardProps {
   title: string
   subtitle: string
+  icon: keyof typeof Ionicons.glyphMap
   onPress?: () => void
   comingSoon?: boolean
   soonTagLabel: string
 }
 
-function NavCard({ title, subtitle, onPress, comingSoon = false, soonTagLabel }: NavCardProps) {
+function NavCard({ title, subtitle, icon, onPress, comingSoon = false, soonTagLabel }: NavCardProps) {
   const { colors, fonts, radii, spacing } = useTheme()
 
   const styles = useMemo(
@@ -39,6 +40,8 @@ function NavCard({ title, subtitle, onPress, comingSoon = false, soonTagLabel }:
           height: 38,
           borderRadius: radii.sm,
           backgroundColor: colors.primarySoft,
+          alignItems: 'center',
+          justifyContent: 'center',
           flexShrink: 0,
         },
         navIconDim: {
@@ -86,7 +89,9 @@ function NavCard({ title, subtitle, onPress, comingSoon = false, soonTagLabel }:
       onPress={onPress}
       style={[styles.navCard, comingSoon && styles.navCardDim]}
     >
-      <View style={[styles.navIcon, comingSoon && styles.navIconDim]} />
+      <View style={[styles.navIcon, comingSoon && styles.navIconDim]}>
+        <Ionicons name={icon} size={19} color={comingSoon ? colors.mist : colors.primaryDark} />
+      </View>
       <View style={styles.navCopy}>
         <Text style={styles.navTitle} numberOfLines={1}>
           {title}
@@ -205,18 +210,21 @@ export default function Home() {
         <NavCard
           title={t('credentialsTitle')}
           subtitle={t('credentialsSubtitle')}
+          icon="key-outline"
           onPress={() => router.push('/(protected)/credentials')}
           soonTagLabel={t('soonTag')}
         />
         <NavCard
           title={t('documentsTitle')}
           subtitle={t('documentsSubtitle')}
+          icon="document-text-outline"
           onPress={() => router.push('/(protected)/documents')}
           soonTagLabel={t('soonTag')}
         />
         <NavCard
           title={t('profileTitle')}
           subtitle={t('profileSubtitle')}
+          icon="person-outline"
           onPress={() => router.push('/(protected)/profile')}
           soonTagLabel={t('soonTag')}
         />
