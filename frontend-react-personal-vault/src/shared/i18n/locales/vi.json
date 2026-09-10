@@ -43,15 +43,23 @@
     "fields": {
       "phone": "Số điện thoại",
       "password": "Mật khẩu",
-      "fullName": "Họ và tên"
+      "fullName": "Họ và tên",
+      "currentPassword": "Mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "confirmNewPassword": "Xác nhận mật khẩu mới"
     },
     "errors": {
       "phoneRequired": "Vui lòng nhập số điện thoại",
       "passwordRequired": "Vui lòng nhập mật khẩu",
       "phoneInvalid": "Số điện thoại không hợp lệ",
       "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
-      "fullNameRequired": "Vui lòng nhập họ và tên"
-    }
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "passwordsDoNotMatch": "Mật khẩu xác nhận không khớp",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
+      "staleCredentialSet": "Danh sách thông tin đăng nhập của bạn vừa thay đổi. Vui lòng thử lại."
+    },
+    "changePasswordButton": "Đổi mật khẩu",
+    "changePasswordError": "Không thể đổi mật khẩu. Vui lòng thử lại."
   },
   "credentials": {
     "unlock": {

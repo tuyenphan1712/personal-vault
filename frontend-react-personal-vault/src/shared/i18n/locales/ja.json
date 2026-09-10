@@ -43,15 +43,23 @@
     "fields": {
       "phone": "電話番号",
       "password": "パスワード",
-      "fullName": "氏名"
+      "fullName": "氏名",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmNewPassword": "新しいパスワード(確認)"
     },
     "errors": {
       "phoneRequired": "電話番号を入力してください",
       "passwordRequired": "パスワードを入力してください",
       "phoneInvalid": "電話番号の形式が正しくありません",
       "passwordMinLength": "パスワードは8文字以上で入力してください",
-      "fullNameRequired": "氏名を入力してください"
-    }
+      "fullNameRequired": "氏名を入力してください",
+      "passwordsDoNotMatch": "パスワードが一致しません",
+      "currentPasswordIncorrect": "現在のパスワードが正しくありません",
+      "staleCredentialSet": "フォームを開いている間に認証情報が変更されました。もう一度お試しください。"
+    },
+    "changePasswordButton": "パスワードを変更",
+    "changePasswordError": "パスワードを変更できませんでした。もう一度お試しください。"
   },
   "credentials": {
     "unlock": {

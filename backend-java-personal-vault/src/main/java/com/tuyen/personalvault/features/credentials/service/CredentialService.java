@@ -1,10 +1,12 @@
 package com.tuyen.personalvault.features.credentials.service;
 
 import com.tuyen.personalvault.features.credentials.dto.CreateCredentialRequest;
+import com.tuyen.personalvault.features.credentials.dto.CredentialCiphertextUpdate;
 import com.tuyen.personalvault.features.credentials.dto.CredentialResponse;
 import com.tuyen.personalvault.features.credentials.dto.UpdateCredentialRequest;
 import com.tuyen.personalvault.features.credentials.entity.Credential;
 import com.tuyen.personalvault.features.credentials.exception.CredentialNotFoundException;
+import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.credentials.mapper.CredentialMapper;
 import com.tuyen.personalvault.features.credentials.repository.CredentialRepository;
 import com.tuyen.personalvault.features.users.entity.User;
@@ -19,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class CredentialService {
@@ -100,6 +105,25 @@ public class CredentialService {
     @Transactional
     public void delete(UUID id) {
         credentialRepository.delete(findOwned(id));
+    }
+
+    @Transactional
+    public void replaceAllCiphertext(UUID userId, List<CredentialCiphertextUpdate> updates) {
+        List<Credential> owned = credentialRepository.findAllByUserId(userId);
+        Set<UUID> ownedIds = owned.stream().map(Credential::getId).collect(Collectors.toSet());
+        Set<UUID> updateIds = updates.stream().map(CredentialCiphertextUpdate::id).collect(Collectors.toSet());
+
+        if (updates.size() != updateIds.size() || !ownedIds.equals(updateIds)) {
+            throw new StaleCredentialSetException();
+        }
+
+        Map<UUID, Credential> byId = owned.stream().collect(Collectors.toMap(Credential::getId, Function.identity()));
+        for (CredentialCiphertextUpdate update : updates) {
+            Credential credential = byId.get(update.id());
+            credential.setEncryptedPassword(update.encryptedPassword());
+            credential.setEncryptedPin(update.encryptedPin());
+            credential.setCiphertextVersion(update.ciphertextVersion());
+        }
     }
 
     private Credential findOwned(UUID id) {

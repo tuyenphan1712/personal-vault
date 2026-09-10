@@ -1,17 +1,22 @@
 package com.tuyen.personalvault.features.auth.service;
 
 import com.tuyen.personalvault.features.auth.dto.AuthUserResponse;
+import com.tuyen.personalvault.features.auth.dto.ChangePasswordRequest;
 import com.tuyen.personalvault.features.auth.dto.LoginRequest;
 import com.tuyen.personalvault.features.auth.dto.RegisterRequest;
 import com.tuyen.personalvault.features.auth.entity.ClientType;
 import com.tuyen.personalvault.features.auth.entity.RefreshToken;
 import com.tuyen.personalvault.features.auth.exception.AccountLockedException;
 import com.tuyen.personalvault.features.auth.exception.InvalidCredentialsException;
+import com.tuyen.personalvault.features.auth.exception.InvalidCurrentPasswordException;
 import com.tuyen.personalvault.features.auth.exception.InvalidRefreshTokenException;
 import com.tuyen.personalvault.features.auth.exception.PhoneAlreadyRegisteredException;
 import com.tuyen.personalvault.features.auth.exception.TooManyAttemptsException;
 import com.tuyen.personalvault.features.auth.mapper.AuthMapper;
 import com.tuyen.personalvault.features.auth.repository.RefreshTokenRepository;
+import com.tuyen.personalvault.features.credentials.dto.CredentialCiphertextUpdate;
+import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
+import com.tuyen.personalvault.features.credentials.service.CredentialService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.entity.UserStatus;
 import com.tuyen.personalvault.features.users.exception.UserNotFoundException;
@@ -32,6 +37,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +47,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -63,6 +71,9 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private CredentialService credentialService;
+
     private final AuthMapper authMapper = new AuthMapper();
 
     private AuthService authService;
@@ -74,7 +85,7 @@ class AuthServiceTest {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setRefreshTokenExpirationMs(Duration.ofDays(30).toMillis());
         authService = new AuthService(userRepository, refreshTokenRepository, authMapper,
-                passwordEncoder, jwtService, jwtProperties);
+                passwordEncoder, jwtService, jwtProperties, credentialService);
     }
 
     @AfterEach
@@ -357,6 +368,109 @@ class AuthServiceTest {
 
             assertThatThrownBy(() -> authService.me())
                     .isInstanceOf(UserNotFoundException.class);
+        }
+    }
+
+    @Nested
+    class ChangePassword {
+
+        @BeforeEach
+        void mockCurrentUser() {
+            currentUserMock = Mockito.mockStatic(CurrentUser.class);
+            currentUserMock.when(CurrentUser::id).thenReturn(CURRENT_USER_ID);
+        }
+
+        private User currentUser() {
+            return new User(CURRENT_USER_ID, "0900000000", "Nguyen Van A", "hashed-old-password");
+        }
+
+        private RefreshToken sessionToken(User user) {
+            return new RefreshToken(UUID.randomUUID(), user, "some-hash", ClientType.web,
+                    "test-agent", LocalDateTime.now().plusDays(1));
+        }
+
+        @Test
+        void updatesPasswordReencryptsCredentialsAndRevokesOtherSessionsWhenCurrentPasswordMatches() {
+            User user = currentUser();
+            RefreshToken current = sessionToken(user);
+            when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches("old-password", "hashed-old-password")).thenReturn(true);
+            when(passwordEncoder.encode("new-password")).thenReturn("hashed-new-password");
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(UUID.randomUUID(), "new-cipher", null, 1));
+            ChangePasswordRequest request = new ChangePasswordRequest("old-password", "new-password", null, updates);
+
+            authService.changePassword(request, "raw-cookie-token");
+
+            assertThat(user.getPasswordHash()).isEqualTo("hashed-new-password");
+            verify(credentialService).replaceAllCiphertext(CURRENT_USER_ID, updates);
+            verify(refreshTokenRepository).revokeAllForUserExcept(CURRENT_USER_ID, current.getId());
+        }
+
+        @Test
+        void throwsInvalidCurrentPasswordAndChangesNothingWhenCurrentPasswordIsWrong() {
+            User user = currentUser();
+            when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches("wrong-password", "hashed-old-password")).thenReturn(false);
+            ChangePasswordRequest request = new ChangePasswordRequest("wrong-password", "new-password", null, List.of());
+
+            assertThatThrownBy(() -> authService.changePassword(request, "raw-cookie-token"))
+                    .isInstanceOf(InvalidCurrentPasswordException.class);
+
+            assertThat(user.getPasswordHash()).isEqualTo("hashed-old-password");
+            verify(credentialService, never()).replaceAllCiphertext(any(), any());
+            verify(passwordEncoder, never()).encode(anyString());
+            verify(refreshTokenRepository, never()).revokeAllForUserExcept(any(), any());
+        }
+
+        @Test
+        void propagatesStaleCredentialSetAndLeavesPasswordUnchanged() {
+            User user = currentUser();
+            when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches("old-password", "hashed-old-password")).thenReturn(true);
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(UUID.randomUUID(), "new-cipher", null, 1));
+            ChangePasswordRequest request = new ChangePasswordRequest("old-password", "new-password", null, updates);
+            Mockito.doThrow(new StaleCredentialSetException())
+                    .when(credentialService).replaceAllCiphertext(CURRENT_USER_ID, updates);
+
+            assertThatThrownBy(() -> authService.changePassword(request, "raw-cookie-token"))
+                    .isInstanceOf(StaleCredentialSetException.class);
+
+            assertThat(user.getPasswordHash()).isEqualTo("hashed-old-password");
+            verify(passwordEncoder, never()).encode(anyString());
+            verify(refreshTokenRepository, never()).revokeAllForUserExcept(any(), any());
+        }
+
+        @Test
+        void revokesAllSessionsWhenNoCurrentRefreshTokenIsIdentifiable() {
+            User user = currentUser();
+            when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches("old-password", "hashed-old-password")).thenReturn(true);
+            when(passwordEncoder.encode("new-password")).thenReturn("hashed-new-password");
+            ChangePasswordRequest request = new ChangePasswordRequest("old-password", "new-password", null, List.of());
+
+            authService.changePassword(request, null);
+
+            verify(refreshTokenRepository).revokeAllForUserExcept(eq(CURRENT_USER_ID), isNull());
+            verify(refreshTokenRepository, never()).findByTokenHashForUpdate(anyString());
+        }
+
+        @Test
+        void usesBodyRefreshTokenToIdentifyCurrentSessionWhenNoCookieIsPresent() {
+            User user = currentUser();
+            RefreshToken current = sessionToken(user);
+            when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches("old-password", "hashed-old-password")).thenReturn(true);
+            when(passwordEncoder.encode("new-password")).thenReturn("hashed-new-password");
+            when(refreshTokenRepository.findByTokenHashForUpdate(anyString())).thenReturn(Optional.of(current));
+            ChangePasswordRequest request = new ChangePasswordRequest(
+                    "old-password", "new-password", "raw-mobile-refresh-token", List.of());
+
+            authService.changePassword(request, null);
+
+            verify(refreshTokenRepository).revokeAllForUserExcept(CURRENT_USER_ID, current.getId());
         }
     }
 }

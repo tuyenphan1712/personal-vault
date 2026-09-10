@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ChangePasswordForm } from '@/features/auth'
 import { ROUTES } from '@/routes/routes'
 import { BackLink } from '@/shared/components/BackLink'
+import { Button } from '@/shared/components/Button'
 import { TopBar } from '@/shared/components/TopBar'
 import { ProfileDetail } from '../components/ProfileDetail'
 import { ProfileForm } from '../components/ProfileForm'
@@ -11,6 +13,7 @@ export function ProfilePage() {
   const { t } = useTranslation()
   const { data: profile, isLoading, isError } = useProfile()
   const [isEditing, setIsEditing] = useState(false)
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
@@ -40,6 +43,20 @@ export function ProfilePage() {
                 <ProfileDetail profile={profile} onEdit={() => setIsEditing(true)} />
               )}
             </>
+          )}
+        </div>
+        <div className="mt-6 rounded-2xl border border-line bg-surface p-8 shadow-sm">
+          {isChangingPassword ? (
+            <div className="flex flex-col gap-3">
+              <ChangePasswordForm onSuccess={() => setIsChangingPassword(false)} />
+              <Button variant="secondary" onClick={() => setIsChangingPassword(false)} className="self-start">
+                {t('common.cancel')}
+              </Button>
+            </div>
+          ) : (
+            <Button variant="secondary" onClick={() => setIsChangingPassword(true)}>
+              {t('auth.changePasswordButton')}
+            </Button>
           )}
         </div>
       </div>

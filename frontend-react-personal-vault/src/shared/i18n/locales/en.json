@@ -43,15 +43,23 @@
     "fields": {
       "phone": "Phone number",
       "password": "Password",
-      "fullName": "Full name"
+      "fullName": "Full name",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password"
     },
     "errors": {
       "phoneRequired": "Phone number is required",
       "passwordRequired": "Password is required",
       "phoneInvalid": "Phone number is invalid",
       "passwordMinLength": "Password must be at least 8 characters",
-      "fullNameRequired": "Full name is required"
-    }
+      "fullNameRequired": "Full name is required",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "currentPasswordIncorrect": "Current password is incorrect",
+      "staleCredentialSet": "Your credentials changed while this form was open. Please try again."
+    },
+    "changePasswordButton": "Change password",
+    "changePasswordError": "Couldn't change your password. Try again."
   },
   "credentials": {
     "unlock": {

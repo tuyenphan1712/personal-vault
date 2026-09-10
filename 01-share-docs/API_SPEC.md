@@ -202,9 +202,11 @@ AUTH_002         Account is locked
 AUTH_003         Refresh token is invalid or revoked
 AUTH_004         Too many failed login attempts — temporarily locked out
 AUTH_005         Missing or invalid access token
+AUTH_006         Current password is incorrect
 USER_001         User not found
 USER_002         Phone number already registered
 CREDENTIAL_001   Credential not found
+CREDENTIAL_002   Credential set is stale or incomplete
 DOCUMENT_001     Document not found
 DOCUMENT_002     File type is unsupported
 DOCUMENT_003     File is too large
@@ -246,6 +248,7 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 | POST | `/auth/refresh` | Issue a new access token | Refresh cookie (web) or `refreshToken` body field (mobile) |
 | POST | `/auth/logout` | Revoke current refresh token | Refresh cookie (web) or `refreshToken` body field (mobile) |
 | GET | `/auth/me` | Get current user summary | User |
+| POST | `/auth/change-password` | Change the current user's password and re-encrypt owned credentials under the new key | User |
 
 ### Profile
 
@@ -358,6 +361,31 @@ Response `data`:
   "status": "active"
 }
 ```
+
+### `POST /auth/change-password`
+
+**Why this isn't a plain password-change endpoint**: the login password is also the sole input (with `userId` as salt) to the client-side `deriveEncryptionKey` used for `encryptedPassword`/`encryptedPin` (see §7 `POST /credentials`). Changing the password changes the derived vault key, so the client must re-encrypt every owned credential under the new key and submit it in the same request — otherwise that credential's ciphertext becomes permanently undecryptable.
+
+Request:
+
+```json
+{
+  "currentPassword": "old-password",
+  "newPassword": "new-password",
+  "currentRefreshToken": "only present for mobile clients (no cookie)",
+  "credentials": [
+    { "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc", "encryptedPassword": "base64(iv):base64(ct)", "encryptedPin": null, "ciphertextVersion": 1 }
+  ]
+}
+```
+
+- `credentials` must be exactly the full set of the caller's current owned credential ids — no more, no fewer, no duplicates. The client re-fetches, decrypts every owned credential with the *old* derived key, re-encrypts each with the *new* derived key, and sends the complete set here. A mismatch (e.g. a credential was created/deleted elsewhere while the form was open) is rejected with `409`/`CREDENTIAL_002` and nothing is changed — the client should refetch and let the user retry.
+- Wrong `currentPassword` → `401`/`AUTH_006`, nothing changed.
+- `newPassword` reuses the same validation as `POST /auth/register`'s `password` field (`@NotBlank`, 8–255 chars).
+- `ciphertextVersion` is not bumped by this flow — it identifies the algorithm/encoding, not the key; re-encrypting under a new key with the same AES-GCM scheme keeps the same version.
+- On success (single transaction): `password_hash` is updated, every listed credential's `encryptedPassword`/`encryptedPin`/`ciphertextVersion` is overwritten verbatim from the request, and all of the user's `refresh_tokens` are revoked **except** the one belonging to the current session — identified via the `refreshToken` HttpOnly cookie for web, or via `currentRefreshToken` in the body for mobile (no cookie available). If no current session can be identified, all refresh tokens are revoked.
+- Response: `200`, `data: null`.
+- `documents` are unaffected — they are not client-side encrypted (see `BACKLOG.md` §3.1).
 
 ### `GET /profile` / `PATCH /profile`
 

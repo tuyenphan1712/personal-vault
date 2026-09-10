@@ -31,7 +31,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined
-    const isAuthEndpoint = originalRequest?.url?.includes('/auth/refresh') || originalRequest?.url?.includes('/auth/login')
+    const isAuthEndpoint =
+      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/change-password')
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retried && !isAuthEndpoint && onUnauthorized) {
       originalRequest._retried = true

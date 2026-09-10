@@ -1,6 +1,7 @@
 package com.tuyen.personalvault.features.auth.service;
 
 import com.tuyen.personalvault.features.auth.dto.AuthUserResponse;
+import com.tuyen.personalvault.features.auth.dto.ChangePasswordRequest;
 import com.tuyen.personalvault.features.auth.dto.LoginRequest;
 import com.tuyen.personalvault.features.auth.dto.LoginResponse;
 import com.tuyen.personalvault.features.auth.dto.RefreshResponse;
@@ -9,11 +10,13 @@ import com.tuyen.personalvault.features.auth.entity.ClientType;
 import com.tuyen.personalvault.features.auth.entity.RefreshToken;
 import com.tuyen.personalvault.features.auth.exception.AccountLockedException;
 import com.tuyen.personalvault.features.auth.exception.InvalidCredentialsException;
+import com.tuyen.personalvault.features.auth.exception.InvalidCurrentPasswordException;
 import com.tuyen.personalvault.features.auth.exception.InvalidRefreshTokenException;
 import com.tuyen.personalvault.features.auth.exception.PhoneAlreadyRegisteredException;
 import com.tuyen.personalvault.features.auth.exception.TooManyAttemptsException;
 import com.tuyen.personalvault.features.auth.mapper.AuthMapper;
 import com.tuyen.personalvault.features.auth.repository.RefreshTokenRepository;
+import com.tuyen.personalvault.features.credentials.service.CredentialService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.entity.UserStatus;
 import com.tuyen.personalvault.features.users.exception.UserNotFoundException;
@@ -46,19 +49,22 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final Duration refreshTokenDuration;
+    private final CredentialService credentialService;
 
     public AuthService(UserRepository userRepository,
                         RefreshTokenRepository refreshTokenRepository,
                         AuthMapper authMapper,
                         PasswordEncoder passwordEncoder,
                         JwtService jwtService,
-                        com.tuyen.personalvault.shared.security.JwtProperties jwtProperties) {
+                        com.tuyen.personalvault.shared.security.JwtProperties jwtProperties,
+                        CredentialService credentialService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.authMapper = authMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenDuration = Duration.ofMillis(jwtProperties.getRefreshTokenExpirationMs());
+        this.credentialService = credentialService;
     }
 
     @Transactional
@@ -138,6 +144,25 @@ public class AuthService {
         User user = userRepository.findById(CurrentUser.id())
                 .orElseThrow(UserNotFoundException::new);
         return authMapper.toAuthUserResponse(user);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request, String cookieRefreshToken) {
+        User user = userRepository.findById(CurrentUser.id())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidCurrentPasswordException();
+        }
+
+        credentialService.replaceAllCiphertext(user.getId(), request.credentials());
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+
+        String rawToken = cookieRefreshToken != null && !cookieRefreshToken.isBlank()
+                ? cookieRefreshToken
+                : request.currentRefreshToken();
+        UUID keepTokenId = findUsableToken(rawToken).map(RefreshToken::getId).orElse(null);
+        refreshTokenRepository.revokeAllForUserExcept(user.getId(), keepTokenId);
     }
 
     private void registerFailedAttempt(User user, LocalDateTime now) {
