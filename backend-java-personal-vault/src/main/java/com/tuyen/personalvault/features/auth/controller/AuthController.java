@@ -1,6 +1,7 @@
 package com.tuyen.personalvault.features.auth.controller;
 
 import com.tuyen.personalvault.features.auth.dto.AuthUserResponse;
+import com.tuyen.personalvault.features.auth.dto.ChangePasswordRequest;
 import com.tuyen.personalvault.features.auth.dto.LoginRequest;
 import com.tuyen.personalvault.features.auth.dto.LoginResponse;
 import com.tuyen.personalvault.features.auth.dto.RefreshRequest;
@@ -93,6 +94,13 @@ public class AuthController {
     @GetMapping("/me")
     public ApiResponse<AuthUserResponse> me() {
         return ApiResponse.of(authService.me());
+    }
+
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request,
+                                             @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String cookieToken) {
+        authService.changePassword(request, cookieToken);
+        return ApiResponse.of(null);
     }
 
     private ResponseCookie buildRefreshCookie(String rawToken) {

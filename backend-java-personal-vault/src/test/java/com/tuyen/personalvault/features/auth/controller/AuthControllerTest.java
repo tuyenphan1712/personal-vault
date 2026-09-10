@@ -7,10 +7,12 @@ import com.tuyen.personalvault.features.auth.dto.RefreshResponse;
 import com.tuyen.personalvault.features.auth.entity.ClientType;
 import com.tuyen.personalvault.features.auth.exception.AccountLockedException;
 import com.tuyen.personalvault.features.auth.exception.InvalidCredentialsException;
+import com.tuyen.personalvault.features.auth.exception.InvalidCurrentPasswordException;
 import com.tuyen.personalvault.features.auth.exception.InvalidRefreshTokenException;
 import com.tuyen.personalvault.features.auth.exception.PhoneAlreadyRegisteredException;
 import com.tuyen.personalvault.features.auth.exception.TooManyAttemptsException;
 import com.tuyen.personalvault.features.auth.service.AuthService;
+import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.users.exception.UserNotFoundException;
 import com.tuyen.personalvault.shared.security.JwtProperties;
 import jakarta.servlet.http.Cookie;
@@ -32,6 +34,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -275,5 +282,78 @@ class AuthControllerTest {
         mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error.code").value("USER_001"));
+    }
+
+    @Test
+    void changePasswordReturns200AndPassesCookieTokenThrough() throws Exception {
+        doNothing().when(authService).changePassword(any(), eq("raw-cookie-token"));
+
+        mockMvc.perform(post("/api/v1/auth/change-password")
+                        .with(csrf())
+                        .cookie(new Cookie("refreshToken", "raw-cookie-token"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword":"old-password","newPassword":"new-password","credentials":[]}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(authService).changePassword(any(), eq("raw-cookie-token"));
+    }
+
+    @Test
+    void changePasswordPassesNullCookieThroughWhenNoCookiePresent() throws Exception {
+        doNothing().when(authService).changePassword(any(), isNull());
+
+        mockMvc.perform(post("/api/v1/auth/change-password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword":"old-password","newPassword":"new-password","credentials":[]}
+                                """))
+                .andExpect(status().isOk());
+
+        verify(authService).changePassword(any(), isNull());
+    }
+
+    @Test
+    void changePasswordReturns400WhenNewPasswordTooShort() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/change-password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword":"old-password","newPassword":"short","credentials":[]}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("COMMON_001"));
+    }
+
+    @Test
+    void changePasswordReturns401WhenCurrentPasswordIsWrong() throws Exception {
+        doThrow(new InvalidCurrentPasswordException()).when(authService).changePassword(any(), any());
+
+        mockMvc.perform(post("/api/v1/auth/change-password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword":"wrong-password","newPassword":"new-password","credentials":[]}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("AUTH_006"));
+    }
+
+    @Test
+    void changePasswordReturns409WhenCredentialSetIsStale() throws Exception {
+        doThrow(new StaleCredentialSetException()).when(authService).changePassword(any(), any());
+
+        mockMvc.perform(post("/api/v1/auth/change-password")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword":"old-password","newPassword":"new-password","credentials":[]}
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("CREDENTIAL_002"));
     }
 }

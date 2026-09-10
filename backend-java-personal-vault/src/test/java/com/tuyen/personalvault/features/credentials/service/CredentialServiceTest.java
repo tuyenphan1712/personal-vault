@@ -1,10 +1,12 @@
 package com.tuyen.personalvault.features.credentials.service;
 
 import com.tuyen.personalvault.features.credentials.dto.CreateCredentialRequest;
+import com.tuyen.personalvault.features.credentials.dto.CredentialCiphertextUpdate;
 import com.tuyen.personalvault.features.credentials.dto.CredentialResponse;
 import com.tuyen.personalvault.features.credentials.dto.UpdateCredentialRequest;
 import com.tuyen.personalvault.features.credentials.entity.Credential;
 import com.tuyen.personalvault.features.credentials.exception.CredentialNotFoundException;
+import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.credentials.mapper.CredentialMapper;
 import com.tuyen.personalvault.features.credentials.repository.CredentialRepository;
 import com.tuyen.personalvault.features.users.entity.User;
@@ -229,6 +231,82 @@ class CredentialServiceTest {
             assertThatThrownBy(() -> credentialService.delete(id))
                     .isInstanceOf(CredentialNotFoundException.class);
             verify(credentialRepository, never()).delete(any());
+        }
+    }
+
+    @Nested
+    class ReplaceAllCiphertext {
+
+        @Test
+        void overwritesCiphertextForEveryOwnedCredentialWhenSetMatchesExactly() {
+            Credential first = credential();
+            Credential second = new Credential(UUID.randomUUID(), owner(), "Facebook", "user@fb.com",
+                    "base64(iv):base64(cipher2)", 1, null, null);
+            when(credentialRepository.findAllByUserId(CURRENT_USER_ID)).thenReturn(List.of(first, second));
+
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(first.getId(), "new-cipher-1", "new-pin-1", 1),
+                    new CredentialCiphertextUpdate(second.getId(), "new-cipher-2", null, 1)
+            );
+
+            credentialService.replaceAllCiphertext(CURRENT_USER_ID, updates);
+
+            assertThat(first.getEncryptedPassword()).isEqualTo("new-cipher-1");
+            assertThat(first.getEncryptedPin()).isEqualTo("new-pin-1");
+            assertThat(second.getEncryptedPassword()).isEqualTo("new-cipher-2");
+            assertThat(second.getEncryptedPin()).isNull();
+        }
+
+        @Test
+        void doesNothingWhenUserOwnsNoCredentialsAndUpdatesIsEmpty() {
+            when(credentialRepository.findAllByUserId(CURRENT_USER_ID)).thenReturn(List.of());
+
+            credentialService.replaceAllCiphertext(CURRENT_USER_ID, List.of());
+        }
+
+        @Test
+        void throwsStaleCredentialSetWhenAnOwnedCredentialIsMissingFromUpdates() {
+            Credential first = credential();
+            Credential second = new Credential(UUID.randomUUID(), owner(), "Facebook", "user@fb.com",
+                    "base64(iv):base64(cipher2)", 1, null, null);
+            when(credentialRepository.findAllByUserId(CURRENT_USER_ID)).thenReturn(List.of(first, second));
+
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(first.getId(), "new-cipher-1", null, 1)
+            );
+
+            assertThatThrownBy(() -> credentialService.replaceAllCiphertext(CURRENT_USER_ID, updates))
+                    .isInstanceOf(StaleCredentialSetException.class);
+            assertThat(first.getEncryptedPassword()).isEqualTo("base64(iv):base64(cipher)");
+        }
+
+        @Test
+        void throwsStaleCredentialSetWhenUpdatesContainAnIdNotOwnedByUser() {
+            Credential first = credential();
+            when(credentialRepository.findAllByUserId(CURRENT_USER_ID)).thenReturn(List.of(first));
+
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(first.getId(), "new-cipher-1", null, 1),
+                    new CredentialCiphertextUpdate(UUID.randomUUID(), "someone-elses-cipher", null, 1)
+            );
+
+            assertThatThrownBy(() -> credentialService.replaceAllCiphertext(CURRENT_USER_ID, updates))
+                    .isInstanceOf(StaleCredentialSetException.class);
+        }
+
+        @Test
+        void throwsStaleCredentialSetWhenUpdatesContainADuplicateId() {
+            Credential first = credential();
+            when(credentialRepository.findAllByUserId(CURRENT_USER_ID)).thenReturn(List.of(first));
+
+            List<CredentialCiphertextUpdate> updates = List.of(
+                    new CredentialCiphertextUpdate(first.getId(), "new-cipher-1", null, 1),
+                    new CredentialCiphertextUpdate(first.getId(), "duplicate-entry", null, 1)
+            );
+
+            assertThatThrownBy(() -> credentialService.replaceAllCiphertext(CURRENT_USER_ID, updates))
+                    .isInstanceOf(StaleCredentialSetException.class);
+            assertThat(first.getEncryptedPassword()).isEqualTo("base64(iv):base64(cipher)");
         }
     }
 }
