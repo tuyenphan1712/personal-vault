@@ -75,10 +75,10 @@ describe('ChangePasswordForm', () => {
     renderForm()
 
     await userEvent.type(screen.getByLabelText('New password'), 'abc')
-    expect(await screen.findByText('Weak password — try adding uppercase letters, numbers, or symbols')).toBeInTheDocument()
+    expect(await screen.findByText('Weak password')).toBeInTheDocument()
 
     await userEvent.type(screen.getByLabelText('New password'), 'defghij1!')
-    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+    expect(await screen.findByText('Strong password')).toBeInTheDocument()
   })
 
   it('calls onSuccess after changing the password when the user owns no credentials', async () => {

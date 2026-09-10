@@ -58,13 +58,13 @@ describe('RegisterForm', () => {
   it('shows a password strength hint that updates as the user types', async () => {
     renderForm()
 
-    expect(screen.queryByText('Weak password — try adding uppercase letters, numbers, or symbols')).not.toBeInTheDocument()
+    expect(screen.queryByText('Weak password')).not.toBeInTheDocument()
 
     await userEvent.type(screen.getByLabelText('Password'), 'abc')
-    expect(await screen.findByText('Weak password — try adding uppercase letters, numbers, or symbols')).toBeInTheDocument()
+    expect(await screen.findByText('Weak password')).toBeInTheDocument()
 
     await userEvent.type(screen.getByLabelText('Password'), 'defghij1!')
-    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+    expect(await screen.findByText('Strong password')).toBeInTheDocument()
   })
 
   it('calls the register mutation with valid input and invokes onSuccess', async () => {
