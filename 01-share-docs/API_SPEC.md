@@ -211,6 +211,8 @@ DOCUMENT_001     Document not found
 DOCUMENT_002     File type is unsupported
 DOCUMENT_003     File is too large
 ADMIN_001        Admin permission required
+SESSION_001      Session not found
+SESSION_002      Cannot revoke the current session
 ```
 
 > `USER_002` maps to HTTP `409` and is returned by `POST /auth/register` when the given `phone` already exists.
@@ -249,6 +251,8 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 | POST | `/auth/logout` | Revoke current refresh token | Refresh cookie (web) or `refreshToken` body field (mobile) |
 | GET | `/auth/me` | Get current user summary | User |
 | POST | `/auth/change-password` | Change the current user's password and re-encrypt owned credentials under the new key | User |
+| GET | `/sessions` | List the caller's active (non-revoked, non-expired) login sessions | User |
+| DELETE | `/sessions/{id}` | Revoke one session — rejects revoking the caller's own current session | User |
 
 ### Profile
 
@@ -394,6 +398,33 @@ Request:
 - On success (single transaction): `password_hash` is updated, every listed credential's `encryptedPassword`/`encryptedPin`/`ciphertextVersion` is overwritten verbatim from the request, and all of the user's `refresh_tokens` are revoked **except** the one belonging to the current session — identified via the `refreshToken` HttpOnly cookie for web, or via `currentRefreshToken` in the body for mobile (no cookie available). If no current session can be identified, all refresh tokens are revoked.
 - Response: `200`, `data: null`.
 - `documents` are unaffected — they are not client-side encrypted (see `BACKLOG.md` §3.1).
+
+### `GET /sessions`
+
+Lists the caller's own non-revoked, non-expired `refresh_tokens` rows (no pagination — a user has at most a handful of active sessions). Response `data`:
+
+```json
+[
+  {
+    "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+    "clientType": "web",
+    "deviceInfo": "Mozilla/5.0 ...",
+    "createdAt": "2026-08-22T10:30:00Z",
+    "expiresAt": "2026-09-21T10:30:00Z",
+    "isCurrent": true
+  }
+]
+```
+
+"Current" is resolved the same way as `POST /auth/change-password`: by hashing the caller's own refresh token (web: `refreshToken` HttpOnly cookie; mobile: `currentRefreshToken` query param) and matching `token_hash`. If no current session can be identified, every row is returned with `isCurrent: false`.
+
+### `DELETE /sessions/{id}`
+
+Revokes one session (sets `revoked_at`). Accepts the same `currentRefreshToken` query param as `GET /sessions` (mobile) or reads the `refreshToken` cookie (web) to identify the caller's current session.
+
+- `404`/`SESSION_001` if `id` doesn't exist or belongs to another user (same not-found-for-either-case rule as `CREDENTIAL_001`/`DOCUMENT_001`).
+- `400`/`SESSION_002` if `id` is the caller's own current session — revoke the current session via `POST /auth/logout` instead, so "revoke another device" and "log yourself out" stay two distinct, unambiguous actions.
+- `204`, no body, on success.
 
 ### `GET /profile` / `PATCH /profile`
 
