@@ -31,3 +31,16 @@ export interface RefreshResponseData {
   refreshToken: string | null
   expiresIn: number
 }
+
+export interface ChangePasswordCredentialUpdate {
+  id: string
+  encryptedPassword: string
+  encryptedPin: string | null
+  ciphertextVersion: number
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  credentials: ChangePasswordCredentialUpdate[]
+}
