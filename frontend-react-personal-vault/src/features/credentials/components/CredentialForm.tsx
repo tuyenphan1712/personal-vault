@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { z } from 'zod'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
-import { encryptValue } from '@/shared/lib/crypto'
+import { decryptValue, encryptValue } from '@/shared/lib/crypto'
 import { getEncryptionKey } from '@/shared/lib/keyStore'
 import { useCreateCredential } from '../hooks/useCreateCredential'
 import { useUpdateCredential } from '../hooks/useUpdateCredential'
@@ -38,6 +38,7 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CredentialFormValues>({
     resolver: zodResolver(credentialSchema),
@@ -51,6 +52,49 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
   const createCredential = useCreateCredential()
   const updateCredential = useUpdateCredential()
   const isPending = createCredential.isPending || updateCredential.isPending
+  const [decryptError, setDecryptError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!credential) {
+      return
+    }
+    const key = getEncryptionKey()
+    if (!key) {
+      return
+    }
+
+    let cancelled = false
+
+    decryptValue(credential.encryptedPassword, key)
+      .then((password) => {
+        if (!cancelled) {
+          setValue('password', password)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDecryptError(t('credentials.decryptError'))
+        }
+      })
+
+    if (credential.encryptedPin) {
+      decryptValue(credential.encryptedPin, key)
+        .then((pin) => {
+          if (!cancelled) {
+            setValue('pin', pin)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setDecryptError(t('credentials.decryptError'))
+          }
+        })
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [credential, setValue, t])
 
   const onSubmit = handleSubmit(async (values) => {
     const key = getEncryptionKey()
@@ -91,6 +135,7 @@ export function CredentialForm({ credential, onSuccess }: CredentialFormProps) {
         error={errors.pin?.message}
       />
       <Input label={t('credentials.fields.note')} {...register('note')} error={errors.note?.message} />
+      {decryptError ? <p className="text-sm text-danger">{decryptError}</p> : null}
       {createCredential.isError || updateCredential.isError ? (
         <p className="text-sm text-danger">{t('credentials.saveError')}</p>
       ) : null}

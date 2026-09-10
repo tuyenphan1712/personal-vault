@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { API_BASE_URL } from '@/config/constants'
 import { createQueryClientWrapper } from '@/test/QueryClientWrapper'
 import { server } from '@/test/msw/server'
-import { decryptValue, deriveEncryptionKey } from '@/shared/lib/crypto'
+import { decryptValue, deriveEncryptionKey, encryptValue } from '@/shared/lib/crypto'
 import { getEncryptionKey, setEncryptionKey } from '@/shared/lib/keyStore'
 import type { Credential } from '../types/credential.types'
 import { CredentialForm } from './CredentialForm'
@@ -57,6 +57,46 @@ describe('CredentialForm', () => {
     expect(screen.getByLabelText('Account')).toHaveValue('user@example.com')
     expect(screen.getByLabelText('Note (optional)')).toHaveValue('Personal')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
+  it('pre-fills password and PIN fields with decrypted values when editing so the user is not forced to retype them', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+    const encryptedPassword = await encryptValue(PLAINTEXT_PASSWORD, key)
+    const encryptedPin = await encryptValue('4321', key)
+
+    renderForm({ credential: { ...EXISTING_CREDENTIAL, encryptedPassword, encryptedPin } })
+
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveValue(PLAINTEXT_PASSWORD))
+    expect(screen.getByLabelText('PIN (optional)')).toHaveValue('4321')
+  })
+
+  it('submits successfully when editing only the note, without retyping the password', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+    const encryptedPassword = await encryptValue(PLAINTEXT_PASSWORD, key)
+
+    let capturedBody: { encryptedPassword?: string; note?: string | null } | undefined
+    server.use(
+      http.patch(`${API_BASE_URL}/credentials/:id`, async ({ request }) => {
+        capturedBody = (await request.json()) as typeof capturedBody
+        return HttpResponse.json({ success: true, data: EXISTING_CREDENTIAL, meta: null })
+      }),
+    )
+
+    const onSuccess = vi.fn()
+    renderForm({ credential: { ...EXISTING_CREDENTIAL, encryptedPassword }, onSuccess })
+
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveValue(PLAINTEXT_PASSWORD))
+
+    await userEvent.clear(screen.getByLabelText('Note (optional)'))
+    await userEvent.type(screen.getByLabelText('Note (optional)'), 'Updated note')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+    expect(capturedBody?.note).toBe('Updated note')
+    const decrypted = await decryptValue(capturedBody!.encryptedPassword!, key)
+    expect(decrypted).toBe(PLAINTEXT_PASSWORD)
   })
 
   it('shows validation errors when required fields are empty', async () => {
