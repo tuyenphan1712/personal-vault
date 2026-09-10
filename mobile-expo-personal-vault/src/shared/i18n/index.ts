@@ -9,6 +9,7 @@ import documentsEn from './locales/en/documents.json'
 import homeEn from './locales/en/home.json'
 import notificationsEn from './locales/en/notifications.json'
 import profileEn from './locales/en/profile.json'
+import sessionsEn from './locales/en/sessions.json'
 import settingsEn from './locales/en/settings.json'
 import authVi from './locales/vi/auth.json'
 import commonVi from './locales/vi/common.json'
@@ -17,6 +18,7 @@ import documentsVi from './locales/vi/documents.json'
 import homeVi from './locales/vi/home.json'
 import notificationsVi from './locales/vi/notifications.json'
 import profileVi from './locales/vi/profile.json'
+import sessionsVi from './locales/vi/sessions.json'
 import settingsVi from './locales/vi/settings.json'
 
 export const SUPPORTED_LANGUAGES = ['vi', 'en'] as const
@@ -24,7 +26,7 @@ export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
 
 const LANGUAGE_STORAGE_KEY = 'vault-language'
 
-const NAMESPACES = ['common', 'auth', 'credentials', 'documents', 'profile', 'settings', 'home', 'notifications'] as const
+const NAMESPACES = ['common', 'auth', 'credentials', 'documents', 'profile', 'settings', 'home', 'notifications', 'sessions'] as const
 
 // NOTE: i18next.init below is synchronous and always starts with lng: 'vi', because
 // AsyncStorage has no synchronous read API — there is no way to know the persisted
@@ -46,6 +48,7 @@ i18next.use(initReactI18next).init({
       settings: settingsVi,
       home: homeVi,
       notifications: notificationsVi,
+      sessions: sessionsVi,
     },
     en: {
       common: commonEn,
@@ -56,6 +59,7 @@ i18next.use(initReactI18next).init({
       settings: settingsEn,
       home: homeEn,
       notifications: notificationsEn,
+      sessions: sessionsEn,
     },
   },
   interpolation: {

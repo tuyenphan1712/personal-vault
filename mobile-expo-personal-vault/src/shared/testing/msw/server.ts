@@ -17,6 +17,7 @@ const defaultHandlers = [
   rest.get(url('/audit-logs'), (_req, res, ctx) =>
     res(ctx.status(200), ctx.json({ success: true, data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } })),
   ),
+  rest.get(url('/sessions'), (_req, res, ctx) => res(ctx.status(200), ctx.json({ success: true, data: [], meta: null }))),
 ]
 
 // Shared across all feature test suites; each suite registers its own handlers via server.use(...).

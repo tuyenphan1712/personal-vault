@@ -1,0 +1,18 @@
+{
+  "sectionTitle": "Active sessions",
+  "loading": "Loading sessions…",
+  "loadError": "Couldn't load your active sessions.",
+  "empty": "No active sessions.",
+  "currentDevice": "This device · active now",
+  "lastActive": "Signed in {{date}}",
+  "revokeButton": "Revoke",
+  "clientType": {
+    "web": "Web browser",
+    "mobile": "Mobile app"
+  },
+  "revokeDialog": {
+    "title": "Revoke session",
+    "body": "Sign out {{device}}? That device will need to log in again.",
+    "confirm": "Revoke"
+  }
+}
