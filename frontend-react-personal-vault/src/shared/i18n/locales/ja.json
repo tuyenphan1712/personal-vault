@@ -225,5 +225,29 @@
       "body": "{{name}}({{phone}})のアカウントを削除してもよろしいですか?保存されているすべての認証情報と書類が完全に削除されます。この操作は取り消せません。",
       "confirm": "アカウントを削除"
     }
+  },
+  "auditLog": {
+    "bellLabel": "通知",
+    "pageTitle": "アクティビティログ",
+    "pageSubtitle": "アカウントに対する重要な変更の履歴です。",
+    "viewAll": "すべてのアクティビティを見る",
+    "loading": "アクティビティを読み込み中…",
+    "loadError": "アクティビティログを読み込めませんでした。もう一度お試しください。",
+    "emptyTitle": "まだアクティビティはありません",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "pageIndicator": "{{page}} / {{totalPages}} ページ",
+    "actions": {
+      "PASSWORD_CHANGED": "パスワードを変更しました",
+      "PIN_CHANGED": "PINを変更しました",
+      "CREDENTIAL_CREATED": "認証情報を作成しました",
+      "CREDENTIAL_UPDATED": "認証情報を更新しました",
+      "CREDENTIAL_DELETED": "認証情報を削除しました",
+      "DOCUMENT_UPLOADED": "書類をアップロードしました",
+      "DOCUMENT_DELETED": "書類を削除しました",
+      "LOGIN_SUCCESS": "サインインしました",
+      "LOGIN_FAILED": "サインインに失敗しました",
+      "ACCOUNT_LOCKED": "管理者によりアカウントがロックされました"
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { NotificationBell } from '@/features/audit-log'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { Logo } from './Logo'
 import { LogoutButton } from './LogoutButton'
@@ -8,6 +9,7 @@ export function TopBar() {
     <header className="flex h-[60px] flex-none items-center gap-4 border-b border-line bg-surface px-7">
       <Logo />
       <div className="flex-1" />
+      <NotificationBell />
       <LanguageSwitcher />
       <ThemeToggleButton />
       <LogoutButton />
