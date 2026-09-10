@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/components/Button'
+import { PasswordStrengthMeter } from '@/shared/components/PasswordStrengthMeter'
 import { decryptValue } from '@/shared/lib/crypto'
 import { getEncryptionKey } from '@/shared/lib/keyStore'
 
@@ -80,6 +81,7 @@ export function PasswordReveal({ encryptedPassword, onUnlockNeeded, onNotify }: 
           {revealed ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
+      {revealed ? <PasswordStrengthMeter password={revealed} /> : null}
       {error ? (
         <div className="flex items-center gap-2">
           <p className="text-sm text-danger">{error}</p>

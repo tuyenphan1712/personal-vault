@@ -53,6 +53,28 @@ describe('PasswordReveal', () => {
     expect(screen.getByText('••••••••••••')).toBeInTheDocument()
   })
 
+  it('does not show a strength hint before the password is revealed', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+    const encryptedPassword = await encryptValue(PLAINTEXT_PASSWORD, key)
+
+    render(<PasswordReveal encryptedPassword={encryptedPassword} onUnlockNeeded={vi.fn()} onNotify={vi.fn()} />)
+
+    expect(screen.queryByText('Strong password — well secured!')).not.toBeInTheDocument()
+  })
+
+  it('shows a password strength hint below the value once revealed', async () => {
+    const key = await deriveEncryptionKey('unlock-pass', 'user-1')
+    setEncryptionKey(key)
+    const encryptedPassword = await encryptValue(PLAINTEXT_PASSWORD, key)
+
+    render(<PasswordReveal encryptedPassword={encryptedPassword} onUnlockNeeded={vi.fn()} onNotify={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }))
+
+    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+  })
+
   it('shows a "vault locked" message when no encryption key is available', async () => {
     // No key set — simulates a locked vault (e.g. after reload).
     const encryptedPassword = 'aXY=:Y2lwaGVy'
