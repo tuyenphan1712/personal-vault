@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore, useLogout } from '@/src/features/auth'
+import { useUnreadCount } from '@/src/features/audit-log'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
 
 interface NavCardProps {
@@ -112,9 +113,11 @@ function NavCard({ title, subtitle, icon, onPress, comingSoon = false, soonTagLa
 export default function Home() {
   const router = useRouter()
   const { colors, fonts, radii, spacing } = useTheme()
-  const { t } = useTranslation('home')
+  const { t } = useTranslation(['home', 'notifications'])
   const fullName = useAuthStore((state) => state.user?.fullName)
   const { mutate: logout, isPending: isLoggingOut } = useLogout()
+  const { data: unreadCount } = useUnreadCount()
+  const badgeLabel = (unreadCount?.count ?? 0) > 9 ? '9+' : String(unreadCount?.count ?? 0)
 
   const styles = useMemo(
     () =>
@@ -149,13 +152,35 @@ export default function Home() {
           fontSize: 24,
           color: colors.surface,
         },
+        headerButtons: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: spacing.sm,
+          flexShrink: 0,
+        },
         settingsButton: {
           width: 34,
           height: 34,
           borderRadius: radii.circle,
           alignItems: 'center',
           justifyContent: 'center',
-          flexShrink: 0,
+        },
+        badge: {
+          position: 'absolute',
+          top: -2,
+          right: -2,
+          minWidth: 16,
+          height: 16,
+          borderRadius: radii.pill,
+          paddingHorizontal: 3,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.danger,
+        },
+        badgeText: {
+          fontFamily: fonts.monoMedium,
+          fontSize: 9,
+          color: colors.surface,
         },
         body: {
           flex: 1,
@@ -196,14 +221,29 @@ export default function Home() {
             {fullName ?? t('defaultName')}
           </Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('settingsA11y')}
-          onPress={() => router.push('/(protected)/settings')}
-          style={styles.settingsButton}
-        >
-          <Ionicons name="settings-outline" size={22} color={colors.surface} />
-        </Pressable>
+        <View style={styles.headerButtons}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('notifications:bellA11y')}
+            onPress={() => router.push('/(protected)/notifications')}
+            style={styles.settingsButton}
+          >
+            <Ionicons name="notifications-outline" size={22} color={colors.surface} />
+            {(unreadCount?.count ?? 0) > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{badgeLabel}</Text>
+              </View>
+            ) : null}
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('home:settingsA11y')}
+            onPress={() => router.push('/(protected)/settings')}
+            style={styles.settingsButton}
+          >
+            <Ionicons name="settings-outline" size={22} color={colors.surface} />
+          </Pressable>
+        </View>
       </View>
       <View style={styles.body}>
         <Text style={styles.sectionLabel}>{t('vaultSection')}</Text>

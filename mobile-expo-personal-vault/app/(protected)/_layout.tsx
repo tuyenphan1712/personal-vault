@@ -22,6 +22,7 @@ export default function ProtectedLayout() {
       <Stack.Screen name="documents" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="settings" />
+      <Stack.Screen name="notifications" />
     </Stack>
   )
 }
