@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
-import { encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
+import { decryptCredential, encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -26,6 +26,42 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
   const updateCredential = useUpdateCredential()
   const isSubmitting = createCredential.isPending || updateCredential.isPending
   const mutationError = createCredential.error ?? updateCredential.error
+  const [decryptedValues, setDecryptedValues] = useState<{ password: string; pin: string } | null>(null)
+  const [decryptError, setDecryptError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const credential = existingCredential
+    if (!credential) {
+      setDecryptedValues(null)
+      return
+    }
+    const key = getEncryptionKey()
+    if (!key) {
+      return
+    }
+
+    let cancelled = false
+
+    const decryptExisting = async () => {
+      try {
+        const password = await decryptCredential(credential.encryptedPassword, key)
+        const pin = credential.encryptedPin ? await decryptCredential(credential.encryptedPin, key) : ''
+        if (!cancelled) {
+          setDecryptedValues({ password, pin })
+        }
+      } catch {
+        if (!cancelled) {
+          setDecryptError(t('form.decryptError'))
+        }
+      }
+    }
+
+    decryptExisting()
+
+    return () => {
+      cancelled = true
+    }
+  }, [existingCredential, t])
 
   async function handleSubmit(values: CredentialFormValues) {
     const key = getEncryptionKey()
@@ -78,11 +114,18 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
       fontSize: 21,
       color: colors.ink,
     },
+    errorText: {
+      fontFamily: fonts.sans,
+      color: colors.danger,
+      fontSize: 13,
+    },
   }),
   [colors, fonts, spacing],
   )
 
-  if (isEditing && isLoading) {
+  const isDecrypting = isEditing && Boolean(existingCredential) && !decryptedValues && !decryptError
+
+  if (isEditing && (isLoading || isDecrypting)) {
     return (
       <SafeAreaView style={[styles.container, styles.centered]}>
         <ActivityIndicator color={colors.primary} />
@@ -97,10 +140,16 @@ export function CredentialFormScreen({ credentialId }: CredentialFormScreenProps
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>{isEditing ? t('form.editTitle') : t('form.addTitle')}</Text>
+        {decryptError ? <Text style={styles.errorText}>{decryptError}</Text> : null}
         <CredentialForm
           defaultValues={
             existingCredential
-              ? { ...existingCredential, note: existingCredential.note ?? undefined }
+              ? {
+                  ...existingCredential,
+                  password: decryptedValues?.password ?? '',
+                  pin: decryptedValues?.pin ?? '',
+                  note: existingCredential.note ?? undefined,
+                }
               : undefined
           }
           onSubmit={handleSubmit}

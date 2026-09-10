@@ -52,8 +52,8 @@ export function CredentialForm({ defaultValues, onSubmit, isSubmitting, errorMes
     defaultValues: {
       platformName: defaultValues?.platformName ?? '',
       account: defaultValues?.account ?? '',
-      password: '',
-      pin: '',
+      password: defaultValues?.password ?? '',
+      pin: defaultValues?.pin ?? '',
       note: defaultValues?.note ?? '',
     },
   })

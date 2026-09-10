@@ -6,12 +6,15 @@ import { API_BASE_URL } from '@/src/config/constants'
 import { server } from '@/src/shared/testing/msw/server'
 import { createTestQueryClient } from '@/src/shared/testing/queryClient'
 import { setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { CredentialFormScreen } from '../CredentialFormScreen'
 import {
   credentialFixture,
   getCredentialSuccessHandler,
   updateCredentialSuccessHandler,
 } from '../../hooks/__tests__/mocks/credentialHandlers'
+
+const TEST_KEY = new Uint8Array(32).fill(7)
 
 const mockBack = jest.fn()
 jest.mock('expo-router', () => ({ useRouter: () => ({ back: mockBack }) }))
@@ -27,7 +30,7 @@ function renderScreen(credentialId?: string) {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  setEncryptionKey(new Uint8Array(32).fill(7))
+  setEncryptionKey(TEST_KEY)
 })
 
 describe('CredentialFormScreen', () => {
@@ -110,5 +113,58 @@ describe('CredentialFormScreen', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => expect(mockBack).toHaveBeenCalled())
+  })
+
+  it('pre-fills password and PIN fields with decrypted values when editing so the user is not forced to retype them', async () => {
+    const encryptedPassword = await encryptCredential('correct-horse-battery-staple', TEST_KEY)
+    const encryptedPin = await encryptCredential('4321', TEST_KEY)
+    server.use(
+      rest.get(`${API_BASE_URL}/credentials/:id`, (req, res, ctx) =>
+        res(
+          ctx.status(200),
+          ctx.json({
+            success: true,
+            data: { ...credentialFixture, id: req.params.id, encryptedPassword, encryptedPin },
+            meta: null,
+          }),
+        ),
+      ),
+    )
+
+    await renderScreen('cred-1')
+
+    expect(await screen.findByDisplayValue('correct-horse-battery-staple')).toBeTruthy()
+    expect(screen.getByDisplayValue('4321')).toBeTruthy()
+  })
+
+  it('submits successfully when editing only the note, without retyping the password', async () => {
+    const encryptedPassword = await encryptCredential('correct-horse-battery-staple', TEST_KEY)
+    server.use(
+      rest.get(`${API_BASE_URL}/credentials/:id`, (req, res, ctx) =>
+        res(
+          ctx.status(200),
+          ctx.json({ success: true, data: { ...credentialFixture, id: req.params.id, encryptedPassword }, meta: null }),
+        ),
+      ),
+    )
+    let capturedBody: { encryptedPassword?: string; note?: string | null } | undefined
+    server.use(
+      rest.patch(`${API_BASE_URL}/credentials/:id`, async (req, res, ctx) => {
+        capturedBody = await req.json()
+        return res(ctx.status(200), ctx.json({ success: true, data: { ...credentialFixture, ...capturedBody }, meta: null }))
+      }),
+    )
+
+    await renderScreen('cred-1')
+
+    await screen.findByDisplayValue('correct-horse-battery-staple')
+
+    await fireEvent.changeText(screen.getByLabelText('Note (optional)'), 'Updated note')
+    await fireEvent.press(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => expect(mockBack).toHaveBeenCalled())
+
+    expect(capturedBody?.note).toBe('Updated note')
+    expect(capturedBody?.encryptedPassword).not.toContain('correct-horse-battery-staple')
   })
 })
