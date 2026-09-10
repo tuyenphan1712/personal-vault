@@ -71,6 +71,26 @@ describe('apiClient auth interceptor', () => {
     expect(handleSessionExpired).toHaveBeenCalledTimes(1)
   })
 
+  it('does not attempt a coordinated refresh for a 401 from /auth/change-password', async () => {
+    server.use(
+      rest.post(url('/auth/change-password'), (_req, res, ctx) =>
+        res(
+          ctx.status(401),
+          ctx.json({ success: false, error: { code: 'AUTH_006', message: 'Current password is incorrect', details: null } }),
+        ),
+      ),
+    )
+
+    const refreshAccessToken = jest.fn(async () => 'should-not-be-called')
+    const handleSessionExpired = jest.fn()
+    registerAuthHandlers({ refreshAccessToken, handleSessionExpired })
+
+    await expect(apiClient.post(url('/auth/change-password'), {})).rejects.toMatchObject({ response: { status: 401 } })
+
+    expect(refreshAccessToken).not.toHaveBeenCalled()
+    expect(handleSessionExpired).not.toHaveBeenCalled()
+  })
+
   it('does not attempt a coordinated refresh for a 401 from the refresh endpoint itself', async () => {
     let refreshCallCount = 0
     server.use(
