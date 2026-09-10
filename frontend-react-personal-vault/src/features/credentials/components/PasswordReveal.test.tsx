@@ -60,7 +60,7 @@ describe('PasswordReveal', () => {
 
     render(<PasswordReveal encryptedPassword={encryptedPassword} onUnlockNeeded={vi.fn()} onNotify={vi.fn()} />)
 
-    expect(screen.queryByText('Strong password — well secured!')).not.toBeInTheDocument()
+    expect(screen.queryByText('Strong password')).not.toBeInTheDocument()
   })
 
   it('shows a password strength hint below the value once revealed', async () => {
@@ -72,7 +72,7 @@ describe('PasswordReveal', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Show password' }))
 
-    expect(await screen.findByText('Strong password — well secured!')).toBeInTheDocument()
+    expect(await screen.findByText('Strong password')).toBeInTheDocument()
   })
 
   it('shows a "vault locked" message when no encryption key is available', async () => {
