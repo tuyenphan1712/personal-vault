@@ -14,6 +14,8 @@ import com.tuyen.personalvault.features.auth.exception.PhoneAlreadyRegisteredExc
 import com.tuyen.personalvault.features.auth.exception.TooManyAttemptsException;
 import com.tuyen.personalvault.features.auth.mapper.AuthMapper;
 import com.tuyen.personalvault.features.auth.repository.RefreshTokenRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.credentials.dto.CredentialCiphertextUpdate;
 import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.credentials.service.CredentialService;
@@ -74,6 +76,9 @@ class AuthServiceTest {
     @Mock
     private CredentialService credentialService;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private final AuthMapper authMapper = new AuthMapper();
 
     private AuthService authService;
@@ -85,7 +90,7 @@ class AuthServiceTest {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setRefreshTokenExpirationMs(Duration.ofDays(30).toMillis());
         authService = new AuthService(userRepository, refreshTokenRepository, authMapper,
-                passwordEncoder, jwtService, jwtProperties, credentialService);
+                passwordEncoder, jwtService, jwtProperties, credentialService, auditLogService);
     }
 
     @AfterEach
@@ -147,6 +152,7 @@ class AuthServiceTest {
             assertThat(result.response().refreshToken()).isNull();
             assertThat(result.response().accessToken()).isEqualTo("access-token");
             verify(refreshTokenRepository).save(any(RefreshToken.class));
+            verify(auditLogService).record(user.getId(), AuditAction.LOGIN_SUCCESS, null);
         }
 
         @Test
@@ -212,6 +218,7 @@ class AuthServiceTest {
                     .isInstanceOf(InvalidCredentialsException.class);
             assertThat(user.getFailedLoginAttempts()).isEqualTo(1);
             assertThat(user.getLockoutUntil()).isNull();
+            verify(auditLogService).record(user.getId(), AuditAction.LOGIN_FAILED, null);
         }
 
         @Test
@@ -406,6 +413,7 @@ class AuthServiceTest {
             assertThat(user.getPasswordHash()).isEqualTo("hashed-new-password");
             verify(credentialService).replaceAllCiphertext(CURRENT_USER_ID, updates);
             verify(refreshTokenRepository).revokeAllForUserExcept(CURRENT_USER_ID, current.getId());
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.PASSWORD_CHANGED, null);
         }
 
         @Test

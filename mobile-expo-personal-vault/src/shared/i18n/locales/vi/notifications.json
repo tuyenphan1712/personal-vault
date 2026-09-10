@@ -1,0 +1,18 @@
+{
+  "bellA11y": "Thông báo",
+  "title": "Nhật ký hoạt động",
+  "empty": "Chưa có hoạt động nào",
+  "loadError": "Không thể tải nhật ký hoạt động.",
+  "actions": {
+    "PASSWORD_CHANGED": "Đã đổi mật khẩu",
+    "PIN_CHANGED": "Đã đổi PIN",
+    "CREDENTIAL_CREATED": "Đã tạo thông tin đăng nhập",
+    "CREDENTIAL_UPDATED": "Đã cập nhật thông tin đăng nhập",
+    "CREDENTIAL_DELETED": "Đã xóa thông tin đăng nhập",
+    "DOCUMENT_UPLOADED": "Đã tải lên tài liệu",
+    "DOCUMENT_DELETED": "Đã xóa tài liệu",
+    "LOGIN_SUCCESS": "Đã đăng nhập",
+    "LOGIN_FAILED": "Đăng nhập thất bại",
+    "ACCOUNT_LOCKED": "Tài khoản bị khóa bởi quản trị viên"
+  }
+}

@@ -4,6 +4,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { ChangePasswordForm } from '@/src/features/auth'
+import { SessionList } from '@/src/features/sessions'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { Button } from '@/src/shared/components/Button'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
@@ -14,7 +15,7 @@ import { useUpdateProfile } from '../hooks/useUpdateProfile'
 
 export function ProfileScreen() {
   const { colors, fonts, radii, spacing } = useTheme()
-  const { t } = useTranslation(['profile', 'common', 'auth'])
+  const { t } = useTranslation(['profile', 'common', 'auth', 'sessions'])
   const { data: profile, isLoading, isError, error, refetch } = useProfile()
   const updateProfile = useUpdateProfile()
   const [isEditing, setIsEditing] = useState(false)
@@ -97,6 +98,17 @@ export function ProfileScreen() {
     securitySection: {
       marginTop: spacing.xl,
       gap: 12,
+    },
+    sessionsSection: {
+      marginTop: spacing.xl,
+      gap: 12,
+    },
+    sectionTitle: {
+      fontFamily: fonts.mono,
+      fontSize: 10.5,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      color: colors.mist,
     },
     errorText: {
       fontFamily: fonts.sans,
@@ -203,6 +215,11 @@ export function ProfileScreen() {
             onPress={() => setIsChangingPassword(true)}
           />
         )}
+
+        <View style={styles.sessionsSection}>
+          <Text style={styles.sectionTitle}>{t('sessions:sectionTitle')}</Text>
+          <SessionList />
+        </View>
       </ScrollView>
     </SafeAreaView>
   )

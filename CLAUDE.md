@@ -63,10 +63,12 @@ When user asks to:
 - Any endpoint, DB field, or error code introduced while running a `*-crud` skill must also update `01-share-docs/API_SPEC.md` / `DATABASE.md` — these are the source of truth shared by all three apps.
 
 ## Brainstorming / Planning Doc Location
-When using the `superpowers:brainstorming` or `superpowers:writing-plans` skills, save the spec/plan inside the docs of the app the work belongs to, not at the repo root:
+When using the `story-splitting` (requirements exploration) or `planning` (implementation plans) skills, save the spec/plan inside the docs of the app the work belongs to, not at the repo root:
 - Frontend work → `frontend-react-personal-vault/docs/specs/` and `frontend-react-personal-vault/docs/plans/`
 - Backend work → `backend-java-personal-vault/docs/specs/` and `backend-java-personal-vault/docs/plans/`
 - Mobile work → `mobile-expo-personal-vault/docs/specs/` and `mobile-expo-personal-vault/docs/plans/`
 - Work spanning multiple apps (rare) → `01-share-docs/specs/` and `01-share-docs/plans/` (alongside the other shared docs — `API_SPEC.md`, `DATABASE.md`, `BACKLOG.md`)
 
-This overrides the skills' own default (`docs/superpowers/...` at repo root) on **where** files go, not **whether** to use the `superpowers:brainstorming` / `superpowers:writing-plans` skills — always use those skills for brainstorming/planning, just save their output to the paths above instead of the skills' default location.
+This overrides the skills' own default (`docs/` at repo root) on **where** files go, not **whether** to use the `story-splitting` / `planning` skills — always use those skills for brainstorming/planning, just save their output to the paths above instead of the skills' default location.
+
+> Note: the `superpowers` plugin (brainstorming, writing-plans, tdd, etc.) has been disabled for this environment — use the project-local skills listed above and in "Available Skills" instead.

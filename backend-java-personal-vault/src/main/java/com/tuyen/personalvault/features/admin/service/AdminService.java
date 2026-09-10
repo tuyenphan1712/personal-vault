@@ -3,6 +3,8 @@ package com.tuyen.personalvault.features.admin.service;
 import com.tuyen.personalvault.features.admin.dto.AdminUserResponse;
 import com.tuyen.personalvault.features.admin.dto.UpdateUserStatusRequest;
 import com.tuyen.personalvault.features.admin.mapper.AdminUserMapper;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.documents.entity.Document;
 import com.tuyen.personalvault.features.documents.repository.DocumentRepository;
 import com.tuyen.personalvault.features.documents.service.DocumentStorageService;
@@ -30,15 +32,18 @@ public class AdminService {
     private final DocumentRepository documentRepository;
     private final DocumentStorageService documentStorageService;
     private final AdminUserMapper adminUserMapper;
+    private final AuditLogService auditLogService;
 
     public AdminService(UserRepository userRepository,
                          DocumentRepository documentRepository,
                          DocumentStorageService documentStorageService,
-                         AdminUserMapper adminUserMapper) {
+                         AdminUserMapper adminUserMapper,
+                         AuditLogService auditLogService) {
         this.userRepository = userRepository;
         this.documentRepository = documentRepository;
         this.documentStorageService = documentStorageService;
         this.adminUserMapper = adminUserMapper;
+        this.auditLogService = auditLogService;
     }
 
     public Page<AdminUserResponse> listUsers(int page, int limit, String search, String sortBy, String sortDirection) {
@@ -56,7 +61,11 @@ public class AdminService {
     @Transactional
     public AdminUserResponse updateStatus(UUID userId, UpdateUserStatusRequest request) {
         User user = findUser(userId);
-        user.setStatus(UserStatus.valueOf(request.status()));
+        UserStatus newStatus = UserStatus.valueOf(request.status());
+        user.setStatus(newStatus);
+        if (newStatus == UserStatus.locked) {
+            auditLogService.record(user.getId(), AuditAction.ACCOUNT_LOCKED, null);
+        }
         return adminUserMapper.toResponse(user);
     }
 

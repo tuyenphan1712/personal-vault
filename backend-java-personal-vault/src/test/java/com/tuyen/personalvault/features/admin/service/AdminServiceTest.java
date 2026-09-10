@@ -3,6 +3,8 @@ package com.tuyen.personalvault.features.admin.service;
 import com.tuyen.personalvault.features.admin.dto.AdminUserResponse;
 import com.tuyen.personalvault.features.admin.dto.UpdateUserStatusRequest;
 import com.tuyen.personalvault.features.admin.mapper.AdminUserMapper;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.documents.entity.Document;
 import com.tuyen.personalvault.features.documents.repository.DocumentRepository;
 import com.tuyen.personalvault.features.documents.service.DocumentStorageService;
@@ -47,6 +49,9 @@ class AdminServiceTest {
     @Mock
     private DocumentStorageService documentStorageService;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private final AdminUserMapper adminUserMapper = new AdminUserMapper();
 
     private AdminService adminService;
@@ -61,7 +66,7 @@ class AdminServiceTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        adminService = new AdminService(userRepository, documentRepository, documentStorageService, adminUserMapper);
+        adminService = new AdminService(userRepository, documentRepository, documentStorageService, adminUserMapper, auditLogService);
     }
 
     @Nested
@@ -138,6 +143,19 @@ class AdminServiceTest {
 
             assertThat(response.status()).isEqualTo("locked");
             assertThat(user.getStatus()).isEqualTo(UserStatus.locked);
+            verify(auditLogService).record(user.getId(), AuditAction.ACCOUNT_LOCKED, null);
+        }
+
+        @Test
+        void doesNotRecordAuditLogWhenReactivating() {
+            User user = user();
+            user.setStatus(UserStatus.locked);
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            UpdateUserStatusRequest request = new UpdateUserStatusRequest("active");
+
+            adminService.updateStatus(user.getId(), request);
+
+            verify(auditLogService, never()).record(any(), any(), any());
         }
 
         @Test

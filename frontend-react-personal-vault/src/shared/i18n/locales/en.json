@@ -225,5 +225,48 @@
       "body": "Are you sure you want to delete {{name}}'s account ({{phone}})? All of their credentials and documents will be permanently deleted. This cannot be undone.",
       "confirm": "Delete account"
     }
+  },
+  "auditLog": {
+    "bellLabel": "Notifications",
+    "pageTitle": "Activity log",
+    "pageSubtitle": "A record of sensitive changes made to your account.",
+    "viewAll": "View all activity",
+    "loading": "Loading activity…",
+    "loadError": "Couldn't load your activity log. Try again.",
+    "emptyTitle": "No activity yet",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "pageIndicator": "Page {{page}} of {{totalPages}}",
+    "actions": {
+      "PASSWORD_CHANGED": "Password changed",
+      "PIN_CHANGED": "PIN changed",
+      "CREDENTIAL_CREATED": "Credential created",
+      "CREDENTIAL_UPDATED": "Credential updated",
+      "CREDENTIAL_DELETED": "Credential deleted",
+      "DOCUMENT_UPLOADED": "Document uploaded",
+      "DOCUMENT_DELETED": "Document deleted",
+      "LOGIN_SUCCESS": "Signed in",
+      "LOGIN_FAILED": "Failed sign-in attempt",
+      "ACCOUNT_LOCKED": "Account locked by an admin"
+    }
+  },
+  "sessions": {
+    "sectionTitle": "Active sessions",
+    "sectionSubtitle": "Devices and browsers currently signed in to your account.",
+    "loading": "Loading sessions…",
+    "loadError": "Couldn't load your active sessions. Try again.",
+    "empty": "No active sessions.",
+    "currentDevice": "This device · active now",
+    "lastActive": "Signed in {{date}}",
+    "revokeButton": "Revoke",
+    "clientType": {
+      "web": "Web browser",
+      "mobile": "Mobile app"
+    },
+    "revokeDialog": {
+      "title": "Revoke session",
+      "body": "Sign out {{device}}? That device will need to log in again.",
+      "confirm": "Revoke"
+    }
   }
 }

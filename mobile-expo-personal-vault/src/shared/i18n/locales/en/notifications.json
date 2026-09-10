@@ -1,0 +1,18 @@
+{
+  "bellA11y": "Notifications",
+  "title": "Activity log",
+  "empty": "No activity yet",
+  "loadError": "Couldn't load your activity log.",
+  "actions": {
+    "PASSWORD_CHANGED": "Password changed",
+    "PIN_CHANGED": "PIN changed",
+    "CREDENTIAL_CREATED": "Credential created",
+    "CREDENTIAL_UPDATED": "Credential updated",
+    "CREDENTIAL_DELETED": "Credential deleted",
+    "DOCUMENT_UPLOADED": "Document uploaded",
+    "DOCUMENT_DELETED": "Document deleted",
+    "LOGIN_SUCCESS": "Signed in",
+    "LOGIN_FAILED": "Failed sign-in attempt",
+    "ACCOUNT_LOCKED": "Account locked by an admin"
+  }
+}

@@ -225,5 +225,48 @@
       "body": "Bạn có chắc muốn xóa tài khoản của {{name}} ({{phone}})? Toàn bộ thông tin đăng nhập và tài liệu của họ sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
       "confirm": "Xóa tài khoản"
     }
+  },
+  "auditLog": {
+    "bellLabel": "Thông báo",
+    "pageTitle": "Nhật ký hoạt động",
+    "pageSubtitle": "Lịch sử các thay đổi nhạy cảm trên tài khoản của bạn.",
+    "viewAll": "Xem tất cả hoạt động",
+    "loading": "Đang tải hoạt động…",
+    "loadError": "Không thể tải nhật ký hoạt động. Vui lòng thử lại.",
+    "emptyTitle": "Chưa có hoạt động nào",
+    "prevPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "pageIndicator": "Trang {{page}}/{{totalPages}}",
+    "actions": {
+      "PASSWORD_CHANGED": "Đã đổi mật khẩu",
+      "PIN_CHANGED": "Đã đổi PIN",
+      "CREDENTIAL_CREATED": "Đã tạo thông tin đăng nhập",
+      "CREDENTIAL_UPDATED": "Đã cập nhật thông tin đăng nhập",
+      "CREDENTIAL_DELETED": "Đã xóa thông tin đăng nhập",
+      "DOCUMENT_UPLOADED": "Đã tải lên tài liệu",
+      "DOCUMENT_DELETED": "Đã xóa tài liệu",
+      "LOGIN_SUCCESS": "Đã đăng nhập",
+      "LOGIN_FAILED": "Đăng nhập thất bại",
+      "ACCOUNT_LOCKED": "Tài khoản bị khóa bởi quản trị viên"
+    }
+  },
+  "sessions": {
+    "sectionTitle": "Phiên đăng nhập",
+    "sectionSubtitle": "Các thiết bị và trình duyệt đang đăng nhập vào tài khoản của bạn.",
+    "loading": "Đang tải phiên đăng nhập…",
+    "loadError": "Không thể tải danh sách phiên đăng nhập. Vui lòng thử lại.",
+    "empty": "Không có phiên đăng nhập nào.",
+    "currentDevice": "Thiết bị này · đang hoạt động",
+    "lastActive": "Đã đăng nhập {{date}}",
+    "revokeButton": "Thu hồi",
+    "clientType": {
+      "web": "Trình duyệt web",
+      "mobile": "Ứng dụng di động"
+    },
+    "revokeDialog": {
+      "title": "Thu hồi phiên đăng nhập",
+      "body": "Đăng xuất {{device}}? Thiết bị đó sẽ cần đăng nhập lại.",
+      "confirm": "Thu hồi"
+    }
   }
 }

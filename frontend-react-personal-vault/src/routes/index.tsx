@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import App from '../app/App'
 import { DashboardPage } from '../app/pages/DashboardPage'
 import { AdminLayout, AdminOverviewPage, AdminUsersPage } from '../features/admin'
+import { AuditLogPage } from '../features/audit-log'
 import { LoginPage, RegisterPage } from '../features/auth'
 import { CredentialDetailPage, CredentialListPage } from '../features/credentials'
 import { DocumentDetailPage, DocumentListPage } from '../features/documents'
@@ -24,6 +25,7 @@ export function AppRouter() {
           <Route path={ROUTES.DOCUMENTS} element={<DocumentListPage />} />
           <Route path={ROUTES.DOCUMENT_DETAIL(':id')} element={<DocumentDetailPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          <Route path={ROUTES.AUDIT_LOG} element={<AuditLogPage />} />
         </Route>
         <Route element={<AdminRoute />}>
           <Route element={<AdminLayout />}>

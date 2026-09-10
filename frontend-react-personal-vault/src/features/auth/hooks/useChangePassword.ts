@@ -1,4 +1,5 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { auditLogKeys } from '@/features/audit-log'
 import { credentialService } from '@/features/credentials'
 import { MAX_PAGE_SIZE } from '@/config/constants'
 import { decryptValue, deriveEncryptionKey, encryptValue } from '@/shared/lib/crypto'
@@ -21,6 +22,7 @@ interface ChangePasswordInput {
 
 export function useChangePassword() {
   const userId = useAuthStore((state) => state.user?.id)
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ currentPassword, newPassword }: ChangePasswordInput) => {
@@ -53,6 +55,9 @@ export function useChangePassword() {
 
       await authService.changePassword({ currentPassword, newPassword, credentials: reencrypted })
       setEncryptionKey(newKey)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: auditLogKeys.all })
     },
   })
 }

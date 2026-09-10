@@ -9,6 +9,8 @@ import com.tuyen.personalvault.features.credentials.exception.CredentialNotFound
 import com.tuyen.personalvault.features.credentials.exception.StaleCredentialSetException;
 import com.tuyen.personalvault.features.credentials.mapper.CredentialMapper;
 import com.tuyen.personalvault.features.credentials.repository.CredentialRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.repository.UserRepository;
 import com.tuyen.personalvault.shared.security.CurrentUser;
@@ -49,6 +51,9 @@ class CredentialServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private final CredentialMapper credentialMapper = new CredentialMapper();
 
     private CredentialService credentialService;
@@ -57,7 +62,7 @@ class CredentialServiceTest {
 
     @BeforeEach
     void setUp() {
-        credentialService = new CredentialService(credentialRepository, userRepository, credentialMapper);
+        credentialService = new CredentialService(credentialRepository, userRepository, credentialMapper, auditLogService);
         currentUserMock = Mockito.mockStatic(CurrentUser.class);
         currentUserMock.when(CurrentUser::id).thenReturn(CURRENT_USER_ID);
     }
@@ -167,6 +172,7 @@ class CredentialServiceTest {
             assertThat(response.platformName()).isEqualTo("Gmail");
             assertThat(response.ciphertextVersion()).isEqualTo(2);
             verify(credentialRepository).save(any(Credential.class));
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.CREDENTIAL_CREATED, "Gmail");
         }
 
         @Test
@@ -196,6 +202,19 @@ class CredentialServiceTest {
             assertThat(response.note()).isEqualTo("updated note");
             assertThat(response.platformName()).isEqualTo("Gmail");
             assertThat(response.account()).isEqualTo("user@gmail.com");
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.CREDENTIAL_UPDATED, "Gmail");
+        }
+
+        @Test
+        void recordsPinChangedWhenEncryptedPinIsPartOfTheUpdate() {
+            Credential credential = credential();
+            when(credentialRepository.findByIdAndUserId(credential.getId(), CURRENT_USER_ID))
+                    .thenReturn(Optional.of(credential));
+            UpdateCredentialRequest request = new UpdateCredentialRequest(null, null, null, null, "new-pin-cipher", null);
+
+            credentialService.update(credential.getId(), request);
+
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.PIN_CHANGED, "Gmail");
         }
 
         @Test
@@ -221,6 +240,7 @@ class CredentialServiceTest {
             credentialService.delete(credential.getId());
 
             verify(credentialRepository).delete(credential);
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.CREDENTIAL_DELETED, "Gmail");
         }
 
         @Test

@@ -1,6 +1,12 @@
 # Auth Feature
 
-Owns `POST /auth/register|login|refresh|logout` and `GET /auth/me`, plus the `RefreshToken` entity. See `01-share-docs/API_SPEC.md` §2/§6/§7 and `01-share-docs/DATABASE.md` §2 (`refresh_tokens`).
+Owns `POST /auth/register|login|refresh|logout`, `GET /auth/me`, and `GET /sessions` / `DELETE /sessions/{id}`, plus the `RefreshToken` entity. See `01-share-docs/API_SPEC.md` §2/§6/§7 and `01-share-docs/DATABASE.md` §2 (`refresh_tokens`).
+
+## Why session management lives here, not in its own feature
+
+`GET /sessions`/`DELETE /sessions/{id}` (`SessionController`/`SessionService`) list and revoke `refresh_tokens` rows — there's no new entity or table. `BE-PROJECT-RULES.md` §3 only sanctions `admin` importing another feature's repository directly; a standalone `sessions` feature would need `RefreshTokenRepository` from `auth`, which isn't sanctioned. Since a session *is* a refresh token, this is naturally auth's own concern, not a cross-feature reach — so it's a second controller/service pair inside this feature instead of a new one.
+
+`SessionService` duplicates the small SHA-256 `hash()` helper already private in `AuthService` rather than extracting a shared utility — five lines, two call sites, not worth a `shared/util` abstraction yet.
 
 ## Why this imports from `users`
 

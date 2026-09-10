@@ -5,6 +5,8 @@ import com.tuyen.personalvault.features.documents.entity.Document;
 import com.tuyen.personalvault.features.documents.exception.DocumentNotFoundException;
 import com.tuyen.personalvault.features.documents.mapper.DocumentMapper;
 import com.tuyen.personalvault.features.documents.repository.DocumentRepository;
+import com.tuyen.personalvault.features.auditlogs.entity.AuditAction;
+import com.tuyen.personalvault.features.auditlogs.service.AuditLogService;
 import com.tuyen.personalvault.features.users.entity.User;
 import com.tuyen.personalvault.features.users.repository.UserRepository;
 import com.tuyen.personalvault.shared.exception.AppException;
@@ -55,6 +57,9 @@ class DocumentServiceTest {
     @Mock
     private DocumentStorageService storageService;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private final DocumentMapper documentMapper = new DocumentMapper();
 
     private DocumentService documentService;
@@ -63,7 +68,7 @@ class DocumentServiceTest {
 
     @BeforeEach
     void setUp() {
-        documentService = new DocumentService(documentRepository, userRepository, documentMapper, storageService);
+        documentService = new DocumentService(documentRepository, userRepository, documentMapper, storageService, auditLogService);
         currentUserMock = Mockito.mockStatic(CurrentUser.class);
         currentUserMock.when(CurrentUser::id).thenReturn(CURRENT_USER_ID);
     }
@@ -160,6 +165,7 @@ class DocumentServiceTest {
             assertThat(response.docType()).isEqualTo("passport");
             assertThat(response.mimeType()).isEqualTo("image/png");
             assertThat(response.fileSize()).isEqualTo(2048L);
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.DOCUMENT_UPLOADED, "Passport front");
         }
 
         @Test
@@ -286,6 +292,7 @@ class DocumentServiceTest {
             InOrder order = inOrder(storageService, documentRepository);
             order.verify(storageService).delete(document.getStoragePath());
             order.verify(documentRepository).delete(document);
+            verify(auditLogService).record(CURRENT_USER_ID, AuditAction.DOCUMENT_DELETED, "Passport front");
         }
 
         @Test

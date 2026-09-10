@@ -211,6 +211,8 @@ DOCUMENT_001     Document not found
 DOCUMENT_002     File type is unsupported
 DOCUMENT_003     File is too large
 ADMIN_001        Admin permission required
+SESSION_001      Session not found
+SESSION_002      Cannot revoke the current session
 ```
 
 > `USER_002` maps to HTTP `409` and is returned by `POST /auth/register` when the given `phone` already exists.
@@ -249,6 +251,8 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 | POST | `/auth/logout` | Revoke current refresh token | Refresh cookie (web) or `refreshToken` body field (mobile) |
 | GET | `/auth/me` | Get current user summary | User |
 | POST | `/auth/change-password` | Change the current user's password and re-encrypt owned credentials under the new key | User |
+| GET | `/sessions` | List the caller's active (non-revoked, non-expired) login sessions | User |
+| DELETE | `/sessions/{id}` | Revoke one session — rejects revoking the caller's own current session | User |
 
 ### Profile
 
@@ -268,6 +272,14 @@ When `COMMON_001` (`400`) is returned for request body validation failures (Jaka
 | DELETE | `/credentials/{id}` | Delete owned credential | User |
 
 > `encryptedPassword` may be returned to the authenticated owner because the Frontend needs it to decrypt the value locally. Plaintext passwords must never be sent or stored by the backend. The ciphertext must never be returned to another user or written to logs. `encryptedPin` follows the identical rule and is `null` when the user has not set a PIN.
+
+### Audit Logs
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/audit-logs` | List owned audit log entries, newest first | User |
+| GET | `/audit-logs/unread-count` | Count of the caller's unread entries | User |
+| PATCH | `/audit-logs/read-all` | Marks all of the caller's entries read | User |
 
 ### Documents
 
@@ -387,6 +399,33 @@ Request:
 - Response: `200`, `data: null`.
 - `documents` are unaffected — they are not client-side encrypted (see `BACKLOG.md` §3.1).
 
+### `GET /sessions`
+
+Lists the caller's own non-revoked, non-expired `refresh_tokens` rows (no pagination — a user has at most a handful of active sessions). Response `data`:
+
+```json
+[
+  {
+    "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+    "clientType": "web",
+    "deviceInfo": "Mozilla/5.0 ...",
+    "createdAt": "2026-08-22T10:30:00Z",
+    "expiresAt": "2026-09-21T10:30:00Z",
+    "isCurrent": true
+  }
+]
+```
+
+"Current" is resolved the same way as `POST /auth/change-password`: by hashing the caller's own refresh token (web: `refreshToken` HttpOnly cookie; mobile: `currentRefreshToken` query param) and matching `token_hash`. If no current session can be identified, every row is returned with `isCurrent: false`.
+
+### `DELETE /sessions/{id}`
+
+Revokes one session (sets `revoked_at`). Accepts the same `currentRefreshToken` query param as `GET /sessions` (mobile) or reads the `refreshToken` cookie (web) to identify the caller's current session.
+
+- `404`/`SESSION_001` if `id` doesn't exist or belongs to another user (same not-found-for-either-case rule as `CREDENTIAL_001`/`DOCUMENT_001`).
+- `400`/`SESSION_002` if `id` is the caller's own current session — revoke the current session via `POST /auth/logout` instead, so "revoke another device" and "log yourself out" stay two distinct, unambiguous actions.
+- `204`, no body, on success.
+
 ### `GET /profile` / `PATCH /profile`
 
 `GET` returns the same shape as `/auth/me` plus `birthday`. `PATCH` request body accepts only `fullName` and `birthday`; `phone`, `role`, and `status` are ignored if sent and can only change via `/auth/register` (phone, once) or admin endpoints (role/status).
@@ -418,6 +457,32 @@ Request:
 - Optional: `null`/omitted when the user sets no PIN. The Frontend/Mobile UI must hide the PIN field entirely on the credential detail view when `encryptedPin` is `null` — do not render an empty/placeholder PIN row.
 - Plaintext PIN must be digits only (`0-9`); this is enforced by the client (Zod on Frontend/Mobile) before encryption — the backend never sees or validates plaintext, so it applies no digit check of its own (the stored value is opaque ciphertext, same as `encryptedPassword`).
 - Reveal UX: like the password field, hidden by default and decrypted-on-tap by the client. Unlike the password field, the PIN reveal control has **no copy-to-clipboard button** — a PIN is short-lived/glance-only, not something users copy elsewhere.
+
+### `GET /audit-logs`
+
+Standard `page`/`limit` params from §3 (no `search`/`sortBy` — always newest first). Response `data` items:
+
+```json
+{
+  "id": "6c7f2c2d-5d3c-4a6f-9a14-123456789abc",
+  "action": "CREDENTIAL_DELETED",
+  "targetLabel": "Gmail",
+  "createdAt": "2026-08-22T10:30:00Z",
+  "readAt": null
+}
+```
+
+`action` is one of: `PASSWORD_CHANGED`, `PIN_CHANGED`, `CREDENTIAL_CREATED`, `CREDENTIAL_UPDATED`, `CREDENTIAL_DELETED`, `DOCUMENT_UPLOADED`, `DOCUMENT_DELETED`, `LOGIN_SUCCESS`, `LOGIN_FAILED`, `ACCOUNT_LOCKED`. `targetLabel` is a snapshot of the affected item's name/title captured when the entry was written (e.g. a credential's `platformName`) — it is `null` for actions with no single named target (login, password change, account lock). `readAt` is `null` until the caller has opened `PATCH /audit-logs/read-all`.
+
+A failed login only produces an entry when the phone number belongs to an existing account (there is no `user_id` to attach the entry to otherwise). `PATCH /credentials/{id}` records `PIN_CHANGED` instead of `CREDENTIAL_UPDATED` when the request includes `encryptedPin`. `PATCH /admin/users/{id}/status` only records `ACCOUNT_LOCKED` on a transition to `locked` (not when reactivating), and the entry is written for the target user, not the admin.
+
+### `GET /audit-logs/unread-count`
+
+Response `data`: `{ "count": 3 }`.
+
+### `PATCH /audit-logs/read-all`
+
+Marks every one of the caller's entries with `readAt = null` as read. `204`, no body.
 
 ### `POST /documents`
 

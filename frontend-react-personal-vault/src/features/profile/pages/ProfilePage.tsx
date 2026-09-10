@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChangePasswordForm } from '@/features/auth'
+import { SessionList } from '@/features/sessions'
 import { ROUTES } from '@/routes/routes'
 import { BackLink } from '@/shared/components/BackLink'
 import { Button } from '@/shared/components/Button'
@@ -58,6 +59,13 @@ export function ProfilePage() {
               {t('auth.changePasswordButton')}
             </Button>
           )}
+        </div>
+        <div className="mt-6 rounded-2xl border border-line bg-surface p-8 shadow-sm">
+          <h2 className="font-serif text-xl font-normal text-ink">{t('sessions.sectionTitle')}</h2>
+          <p className="mt-1 text-sm text-muted">{t('sessions.sectionSubtitle')}</p>
+          <div className="mt-4">
+            <SessionList />
+          </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 // Imported from the concrete service file, not the `credentials` barrel: that barrel also
 // re-exports screens which import `useAuthStore` from this (`auth`) feature's own barrel,
 // and this feature's barrel exports `ChangePasswordForm` (which needs this hook) — going
 // through both barrels would form an auth -> credentials -> auth circular require.
 import { credentialService } from '@/src/features/credentials/services/credential.service'
+import { auditLogKeys } from '@/src/features/audit-log'
 import { MAX_PAGE_SIZE } from '@/src/config/constants'
 import { decryptCredential, deriveEncryptionKey, encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
@@ -26,6 +27,7 @@ interface ChangePasswordInput {
 
 export function useChangePassword() {
   const userId = useAuthStore((state) => state.user?.id)
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ currentPassword, newPassword }: ChangePasswordInput) => {
@@ -59,6 +61,9 @@ export function useChangePassword() {
       const currentRefreshToken = await getRefreshToken()
       await authService.changePassword({ currentPassword, newPassword, currentRefreshToken, credentials: reencrypted })
       setEncryptionKey(newKey)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: auditLogKeys.all })
     },
   })
 }
