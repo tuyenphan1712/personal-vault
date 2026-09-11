@@ -11,5 +11,15 @@
     "rowLabel": "Display language",
     "vi": "Vietnamese",
     "en": "English"
+  },
+  "biometric": {
+    "sectionLabel": "Security",
+    "toggleLabel": "Biometric login",
+    "confirmModal": {
+      "title": "Confirm your password",
+      "passwordLabel": "Password",
+      "confirm": "Enable",
+      "cancel": "Cancel"
+    }
   }
 }

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/src/shared/components/BackButton'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import { AppearancePicker } from '../components/AppearancePicker'
+import { BiometricToggle } from '../components/BiometricToggle'
 import { LanguagePicker } from '../components/LanguagePicker'
 
 export function SettingsScreen() {
@@ -65,6 +66,11 @@ export function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('language.sectionLabel')}</Text>
           <LanguagePicker />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>{t('biometric.sectionLabel')}</Text>
+          <BiometricToggle />
         </View>
       </ScrollView>
     </SafeAreaView>

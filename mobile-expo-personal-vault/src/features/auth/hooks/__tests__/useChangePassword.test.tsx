@@ -7,11 +7,17 @@ import { server } from '@/src/shared/testing/msw/server'
 import { createTestQueryClient } from '@/src/shared/testing/queryClient'
 import { decryptCredential, deriveEncryptionKey, encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey, setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
+import { clearBiometricCredential } from '@/src/shared/lib/auth/biometricCredentialStore'
+import { useBiometricStore } from '@/src/features/settings/stores/biometric.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { IncorrectCurrentPasswordError, useChangePassword } from '../useChangePassword'
 
 jest.mock('@/src/shared/lib/storage/secureStorage', () => ({
   getRefreshToken: jest.fn().mockResolvedValue('raw-refresh-token'),
+}))
+
+jest.mock('@/src/shared/lib/auth/biometricCredentialStore', () => ({
+  clearBiometricCredential: jest.fn().mockResolvedValue(undefined),
 }))
 
 const url = (path: string) => `${API_BASE_URL}${path}`
@@ -47,6 +53,7 @@ beforeEach(() => {
     isSessionLoading: false,
     isAppLocked: false,
   })
+  useBiometricStore.setState({ enabled: false })
   jest.clearAllMocks()
 })
 
@@ -153,5 +160,26 @@ describe('useChangePassword', () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true), { timeout: 20000 })
     expect(getEncryptionKey()).toBeNull()
+  }, 30000)
+
+  it('clears the wrapped biometric credential and disables the biometric preference on success', async () => {
+    useBiometricStore.setState({ enabled: true })
+
+    server.use(
+      rest.get(url('/credentials'), (_req, res, ctx) =>
+        res(ctx.status(200), ctx.json({ success: true, data: [], meta: { page: 1, limit: 100, total: 0, totalPages: 0 } })),
+      ),
+    )
+    server.use(
+      rest.post(url('/auth/change-password'), (_req, res, ctx) => res(ctx.status(200), ctx.json({ success: true, data: null, meta: null }))),
+    )
+
+    const { result } = await renderHook(() => useChangePassword(), { wrapper })
+    result.current.mutate({ currentPassword: OLD_PASSWORD, newPassword: NEW_PASSWORD })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true), { timeout: 20000 })
+
+    expect(clearBiometricCredential).toHaveBeenCalled()
+    expect(useBiometricStore.getState().enabled).toBe(false)
   }, 30000)
 })

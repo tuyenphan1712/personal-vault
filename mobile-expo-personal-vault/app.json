@@ -42,6 +42,12 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Personal Vault to use Face ID to log in and unlock your vault."
+        }
+      ],
       "expo-font",
       "expo-asset",
       "react-native-quick-crypto",
