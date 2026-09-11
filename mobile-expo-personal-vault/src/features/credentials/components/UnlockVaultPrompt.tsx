@@ -1,12 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
+import { Ionicons } from '@expo/vector-icons'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/src/shared/components/Button'
 import { Logo } from '@/src/shared/components/Logo'
 import { TextField } from '@/src/shared/components/TextField'
+import { useBiometricStore } from '@/src/features/settings/stores/biometric.store'
+import { getBiometricAvailability, type BiometricAvailability } from '@/src/shared/lib/auth/biometricAdapter'
+import { readBiometricCredential } from '@/src/shared/lib/auth/biometricCredentialStore'
 import { useTheme } from '@/src/shared/theme/ThemeProvider'
 import { useUnlockVault } from '../hooks/useUnlockVault'
 
@@ -23,6 +27,24 @@ interface UnlockVaultPromptProps {
 export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
   const { colors, fonts, radii } = useTheme()
   const { t } = useTranslation('credentials')
+  const biometricEnabled = useBiometricStore((state) => state.enabled)
+
+  const [biometricAvailability, setBiometricAvailability] = useState<BiometricAvailability | 'checking'>('checking')
+  const [biometricError, setBiometricError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getBiometricAvailability().then((result) => {
+      if (!cancelled) {
+        setBiometricAvailability(result)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const showBiometricButton = biometricEnabled && biometricAvailability === 'available'
 
   const resolver = useMemo(
     () =>
@@ -44,6 +66,20 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
     await unlock(values.password)
     onUnlocked()
   })
+
+  async function handleBiometricUnlock() {
+    setBiometricError(null)
+    try {
+      const credential = await readBiometricCredential()
+      if (!credential) {
+        return
+      }
+      await unlock(credential.password)
+      onUnlocked()
+    } catch {
+      setBiometricError(t('unlock.biometricError'))
+    }
+  }
 
   const styles = useMemo(
     () =>
@@ -75,9 +111,29 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
       textAlign: 'center',
       marginBottom: 4,
     },
-    button: {
+    errorText: {
+      fontFamily: fonts.sans,
+      color: colors.danger,
+      fontSize: 13,
+      textAlign: 'center',
+    },
+    submitRow: {
+      flexDirection: 'row',
+      gap: 10,
       width: '100%',
       marginTop: 4,
+    },
+    submitButton: {
+      flex: 3.5,
+    },
+    biometricButton: {
+      flex: 1.5,
+      borderRadius: radii.sm,
+      borderWidth: 1,
+      borderColor: colors.line,
+      backgroundColor: colors.bg,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     statusText: {
       fontFamily: fonts.sans,
@@ -111,7 +167,20 @@ export function UnlockVaultPrompt({ onUnlocked }: UnlockVaultPromptProps) {
             />
           )}
         />
-        <Button label={t('unlock.submit')} onPress={onSubmit} isLoading={isUnlocking} style={styles.button} />
+        {biometricError ? <Text style={styles.errorText}>{biometricError}</Text> : null}
+        <View style={styles.submitRow}>
+          <Button label={t('unlock.submit')} onPress={onSubmit} isLoading={isUnlocking} style={styles.submitButton} />
+          {showBiometricButton ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('unlock.biometricButtonLabel')}
+              style={styles.biometricButton}
+              onPress={handleBiometricUnlock}
+            >
+              <Ionicons name="finger-print" size={22} color={colors.ink} />
+            </Pressable>
+          ) : null}
+        </View>
         {isUnlocking ? <Text style={styles.statusText}>{t('unlock.deriving')}</Text> : null}
       </View>
     </View>
