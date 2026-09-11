@@ -11,5 +11,15 @@
     "rowLabel": "Ngôn ngữ hiển thị",
     "vi": "Tiếng Việt",
     "en": "Tiếng Anh"
+  },
+  "biometric": {
+    "sectionLabel": "Bảo mật",
+    "toggleLabel": "Đăng nhập bằng vân tay",
+    "confirmModal": {
+      "title": "Xác nhận mật khẩu",
+      "passwordLabel": "Mật khẩu",
+      "confirm": "Bật",
+      "cancel": "Huỷ"
+    }
   }
 }

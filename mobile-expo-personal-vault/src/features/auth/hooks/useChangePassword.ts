@@ -5,7 +5,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 // through both barrels would form an auth -> credentials -> auth circular require.
 import { credentialService } from '@/src/features/credentials/services/credential.service'
 import { auditLogKeys } from '@/src/features/audit-log'
+import { useBiometricStore } from '@/src/features/settings/stores/biometric.store'
 import { MAX_PAGE_SIZE } from '@/src/config/constants'
+import { clearBiometricCredential } from '@/src/shared/lib/auth/biometricCredentialStore'
 import { decryptCredential, deriveEncryptionKey, encryptCredential } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { setEncryptionKey } from '@/src/shared/lib/crypto/keyStore'
 import { getRefreshToken } from '@/src/shared/lib/storage/secureStorage'
@@ -62,8 +64,12 @@ export function useChangePassword() {
       await authService.changePassword({ currentPassword, newPassword, currentRefreshToken, credentials: reencrypted })
       setEncryptionKey(newKey)
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: auditLogKeys.all })
+      // The wrapped biometric secret was derived from the now-stale password — never leave it
+      // usable after a password change; the user must re-enable biometrics explicitly.
+      await clearBiometricCredential()
+      useBiometricStore.getState().setEnabled(false)
     },
   })
 }
