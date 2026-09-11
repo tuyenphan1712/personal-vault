@@ -7,6 +7,7 @@ import { getAccessToken, setAccessToken } from '@/src/shared/lib/auth/tokenStore
 import * as cryptoAdapter from '@/src/shared/lib/crypto/cryptoAdapter'
 import { getEncryptionKey, setEncryptionKey, useIsDerivingKey } from '@/src/shared/lib/crypto/keyStore'
 import { useAuthStore } from '../../stores/auth.store'
+import { useLastAccountStore } from '../../stores/lastAccount.store'
 import { useLogin } from '../useLogin'
 import { loginSuccessHandler, VALID_PASSWORD, VALID_PHONE, currentUserFixture } from './mocks/authHandlers'
 
@@ -27,6 +28,7 @@ beforeEach(() => {
   setAccessToken(null)
   setEncryptionKey(null)
   useAuthStore.setState({ user: null, isAuthenticated: false, isSessionLoading: false, isAppLocked: false })
+  useLastAccountStore.setState({ phone: null, hasHydrated: true })
   jest.clearAllMocks()
 })
 
@@ -47,6 +49,16 @@ describe('useLogin', () => {
     const key = getEncryptionKey()
     expect(key).toBeInstanceOf(Uint8Array)
     expect(key).toHaveLength(32)
+  })
+
+  it('remembers the logged-in phone number for the next login screen visit', async () => {
+    server.use(loginSuccessHandler)
+    const { result } = await renderHook(() => useLogin(), { wrapper })
+
+    result.current.mutate({ phone: VALID_PHONE, password: VALID_PASSWORD })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true), { timeout: 5000 })
+    expect(useLastAccountStore.getState().phone).toBe(VALID_PHONE)
   })
 
   it('derives the same key for the same password and user id (deterministic, nothing persisted)', async () => {

@@ -6,6 +6,7 @@ import { deriveEncryptionKey } from '@/src/shared/lib/crypto/cryptoAdapter'
 import { setEncryptionKey, setIsDerivingKey } from '@/src/shared/lib/crypto/keyStore'
 import { authService } from '../services/auth.service'
 import { useAuthStore } from '../stores/auth.store'
+import { useLastAccountStore } from '../stores/lastAccount.store'
 
 export type LoginStage = 'idle' | 'signingIn' | 'derivingKey'
 
@@ -32,6 +33,7 @@ export function useLogin() {
       setAccessToken(data.accessToken)
       await setRefreshToken(data.refreshToken)
       setSession(data.user)
+      useLastAccountStore.getState().setPhone(data.user.phone)
       console.log(`[login] session persist took ${Date.now() - t2}ms, total so far ${Date.now() - t0}ms`)
 
       // The slow part: 100k rounds of pure-JS PBKDF2 on Hermes commonly takes 10-15s on a real
